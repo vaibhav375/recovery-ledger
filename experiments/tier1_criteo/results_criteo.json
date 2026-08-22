@@ -1,0 +1,84 @@
+{
+  "dataset": "criteo",
+  "target_col": "visit",
+  "seed": 20260823,
+  "n_total": 279592,
+  "n_train": 195714,
+  "n_test": 83878,
+  "treated_fraction": 0.8497739563363759,
+  "base_rate": 0.04685756387879481,
+  "learners": {
+    "s_learner": {
+      "qini_coefficient": 0.0744879713586338,
+      "auuc": 0.029207091689570634,
+      "mean_predicted_cate": 0.003398842605961472,
+      "std_predicted_cate": 0.007300367278107763,
+      "fit_seconds": 25.24
+    },
+    "t_learner": {
+      "qini_coefficient": 0.06632277559835381,
+      "auuc": 0.02612383204494336,
+      "mean_predicted_cate": 0.006756757731657528,
+      "std_predicted_cate": 0.029992843194837162,
+      "fit_seconds": 22.25
+    },
+    "x_learner": {
+      "qini_coefficient": 0.07057431790040893,
+      "auuc": 0.02779611574709518,
+      "mean_predicted_cate": 0.006804626504514903,
+      "std_predicted_cate": 0.02402292422242273,
+      "fit_seconds": 46.76
+    },
+    "causal_forest": {
+      "qini_coefficient": 0.061637296461717124,
+      "auuc": 0.024297981812973154,
+      "mean_predicted_cate": 0.006294368729607407,
+      "std_predicted_cate": 0.032921573182039095,
+      "fit_seconds": 345.49
+    }
+  },
+  "ope_validation": {
+    "direct_treated_mean": 0.04826241284004658,
+    "direct_control_mean": 0.038885802714070314,
+    "direct_ate": 0.009376610125976265,
+    "ips": {
+      "always_treat": {
+        "point": 0.0482621826847599,
+        "ci_low": 0.04680169047037517,
+        "ci_high": 0.04973600311820003
+      },
+      "never_treat": {
+        "point": 0.03888685167951119,
+        "ci_low": 0.035353306636592335,
+        "ci_high": 0.042299371316692785
+      },
+      "implied_ate": 0.009375331005248712
+    },
+    "snips": {
+      "always_treat": {
+        "point": 0.04826241284004658,
+        "ci_low": 0.04686358298609274,
+        "ci_high": 0.049708485415140335
+      },
+      "never_treat": {
+        "point": 0.038885802714070314,
+        "ci_low": 0.035425761096205405,
+        "ci_high": 0.04215246874787689
+      },
+      "implied_ate": 0.009376610125976265
+    },
+    "dr": {
+      "always_treat": {
+        "point": 0.04764122057576071,
+        "ci_low": 0.046307607603185426,
+        "ci_high": 0.0490151832820131
+      },
+      "never_treat": {
+        "point": 0.04093522258157733,
+        "ci_low": 0.03767852308830416,
+        "ci_high": 0.04394063110609692
+      },
+      "implied_ate": 0.00670599799418338
+    }
+  }
+}

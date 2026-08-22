@@ -9,6 +9,7 @@ dependencies = [
     "scikit-learn>=1.4",
     "econml>=0.15",
     "scikit-uplift>=0.5.1",
+    "pyarrow>=15.0",
     "matplotlib>=3.8",
     "pydantic>=2.6",
     "click>=8.1",
@@ -37,6 +38,7 @@ packages = ["src/recovery_ledger"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 
 [tool.ruff]
 line-length = 100

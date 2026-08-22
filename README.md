@@ -24,8 +24,11 @@ Build history and honest failures are in [`ENGINEERING_LOG.md`](ENGINEERING_LOG.
 
 ## Status
 
-- [ ] Tier 1 validation (uplift learners + doubly-robust OPE reproduce known
-      effects on real randomised data — Criteo / Hillstrom)
+- [x] Tier 1 validation (uplift learners + doubly-robust OPE reproduce known
+      effects on real randomised data — Criteo / Hillstrom). Passed with one
+      open finding (DR estimator bias under treatment-ratio imbalance, not
+      fully closed). Full results and reproduction commands:
+      [`experiments/tier1_criteo/REPORT.md`](experiments/tier1_criteo/REPORT.md).
 - [ ] Event schemas + simulator ("the recovery gym")
 - [ ] Compliance kernel (deterministic, no LLM, per-action certificates)
 - [ ] Agent loop + policy (EV decisioning, budget constraints, 11 stopping rules)
@@ -39,15 +42,19 @@ Build history and honest failures are in [`ENGINEERING_LOG.md`](ENGINEERING_LOG.
 ## Running this repo
 
 ```
-make setup    # not yet implemented
-make demo     # not yet implemented
-make eval     # not yet implemented
-make redteam  # not yet implemented
-make test     # not yet implemented
+make setup           # create .venv, install deps — verified working
+make test             # run the test suite — verified working
+make tier1-hillstrom  # Tier 1 validation on Hillstrom — verified working
+make tier1-criteo     # Tier 1 validation on a 2% Criteo subsample — verified
+                       # working; downloads ~340MB from HuggingFace on first run
+make demo             # not yet implemented
+make eval             # not yet implemented
+make redteam          # not yet implemented
 ```
 
-This section will only claim a command works once it has actually been run
-successfully from a clean clone.
+This section only claims a command works once it has actually been run
+successfully. `make demo`/`eval`/`redteam` currently print a clear "not yet
+implemented" message and exit non-zero rather than silently doing nothing.
 
 ## What is NOT claimed
 
