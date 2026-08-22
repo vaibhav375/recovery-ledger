@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+.venv/
+.uv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# large downloaded datasets — fetched by scripts, not committed
+data/*.csv
+data/*.csv.gz
+data/*.parquet
+!data/.gitkeep
+
+# local secrets
+.env
+*.key
+
+.DS_Store
