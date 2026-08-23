@@ -26,7 +26,7 @@ demo:
 # fresh eval batch. See experiments/tier2_simulation/REPORT.md.
 eval:
 	PYTHONPATH=src .venv/bin/python3 experiments/tier2_simulation/run_batch.py \
-		--n-train 1000 --n-eval 1000
+		--n-train 5000 --n-eval 2000
 
 # Not yet implemented — see README.md Status section.
 redteam:

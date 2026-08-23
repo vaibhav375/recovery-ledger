@@ -1,9 +1,12 @@
 # Recovery Ledger
 
-**Status: Tier 1 validation passed. B1 (headline incremental ₹ + CI) computed
-for the first time: ₹996,519 per 1,000 cases (95% CI ₹672,862–₹1,342,154) —
-policy dominance under stated assumptions, in simulation, not a real-world
-claim. See Status below for what's real vs. what's still missing.**
+**Status: Tier 1 validation passed. B1 (headline incremental ₹ + CI): ₹220,074
+per 1,000 cases (95% CI ₹90,448–₹341,757) — policy dominance under stated
+assumptions, in simulation, not a real-world claim. This revises an earlier
+(2026-08-23) figure of ₹996,519 that was found to be an artifact of a
+simulator bug, not a real result — see
+[`experiments/tier2_simulation/REPORT.md`](experiments/tier2_simulation/REPORT.md)
+for the full account. See Status below for what's real vs. what's still missing.**
 
 An autonomous revenue-recovery agent for Indian payments. It decides *whether, when,
 how, and in what language* to intervene on at-risk revenue — failed payments,
@@ -69,13 +72,17 @@ running.
 - [x] Agent loop — detect → diagnose → decide → gate → act → listen → stop.
       `make demo` (20 cases, stub fixed-sequence policy, for a fast,
       dependency-free look at the loop) is unchanged. `make eval` runs the
-      real `EVDecisionPolicy`, uplift-model-driven, over 1000+1000 cases.
+      real `EVDecisionPolicy`, uplift-model-driven, over 5000+2000 cases.
 - [x] **B1 — batch run, headline incremental ₹ + CI.** `make eval`:
       Tier-1-validated T-learner transferred onto simulator-generated
       randomised data, real EV decisioning, a randomised no-contact holdout
-      arm. **₹996,519 incremental per 1,000 cases (95% CI ₹672,862–₹1,342,154)**.
+      arm. **₹220,074 incremental per 1,000 cases (95% CI ₹90,448–₹341,757)**.
+      (Revises a 2026-08-23 figure of ₹996,519, found the next day to be an
+      artifact of a simulator bug — the uplift model had nothing real to
+      learn from — not a genuine result. Full account in the report below.)
       Full method, what's included, and what isn't (4 of 5 baselines, the
-      sensitivity sweep, cost accounting) in
+      sensitivity sweep, cost accounting, do-not-disturb leakage still at
+      16%) in
       [`experiments/tier2_simulation/REPORT.md`](experiments/tier2_simulation/REPORT.md) —
       **read the claim-scope section before citing this number for anything.**
 - [ ] Real listener + LLM personas (LLM backend decided and built — see
@@ -108,7 +115,7 @@ message and exits non-zero rather than silently doing nothing.
 
 ## What is NOT claimed
 
-- No real-world causal effect size. The ₹996,519-per-1,000-cases figure above
+- No real-world causal effect size. The ₹220,074-per-1,000-cases figure above
   is a simulation result — policy dominance under stated assumptions, in
   simulation. Everything in `experiments/tier2_simulation/` runs against a
   simulator calibrated to published marginal benchmarks — that calibrates

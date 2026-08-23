@@ -84,7 +84,7 @@ def build_kernel() -> KernelEngine:
 
 def train_uplift_model(n_train: int, seed: int) -> TLearnerModel:
     cases = generate_cases(n_train, seed=seed, now=NOW)
-    traits = generate_population([c.case_id for c in cases], seed=seed)
+    traits = generate_population(cases, seed=seed)
     env = SimulationEnvironment(traits, seed=seed)
 
     rng = np.random.default_rng(seed)
@@ -116,7 +116,7 @@ def _bootstrap_ci(treated_values: np.ndarray, control_values: np.ndarray, *, n_b
 
 def run_eval(n_eval: int, uplift_model: TLearnerModel, *, seed: int) -> dict:
     cases = generate_cases(n_eval, seed=seed, now=NOW)
-    traits = generate_population([c.case_id for c in cases], seed=seed)
+    traits = generate_population(cases, seed=seed)
 
     rng = np.random.default_rng(seed + 1)
     is_treatment = rng.integers(0, 2, size=n_eval).astype(bool)
@@ -153,6 +153,17 @@ def run_eval(n_eval: int, uplift_model: TLearnerModel, *, seed: int) -> dict:
     point, ci_low, ci_high = _bootstrap_ci(treatment_recovered, holdout_recovered, n_boot=2000, seed=seed)
     scale = 1000.0
 
+    # Sanity check kept as a permanent, printed part of every run, not a
+    # one-off manual check: is the uplift model's prediction actually
+    # correlated with the true (hidden, never-seen-by-the-model)
+    # persuadability? Near-zero here means the model isn't learning real
+    # heterogeneity and every downstream targeting claim is unsupported —
+    # this is exactly the failure mode found and fixed 2026-08-24.
+    X_eval = cases_to_feature_matrix(cases)
+    tau_hat_eval = uplift_model.predict_cate(X_eval)
+    tau_true_eval = np.array([persuadability(traits[c.case_id]) for c in cases])
+    uplift_model_correlation = float(np.corrcoef(tau_hat_eval, tau_true_eval)[0, 1])
+
     n_contacts = sum(
         1 for e in ledger._entries
         if e.entry_type == "decision" and e.payload.get("action_type") == "nudge"
@@ -167,6 +178,7 @@ def run_eval(n_eval: int, uplift_model: TLearnerModel, *, seed: int) -> dict:
         "n_eval": n_eval,
         "n_treatment": len(treatment_cases),
         "n_holdout": len(holdout_cases),
+        "uplift_model_correlation_with_true_persuadability": uplift_model_correlation,
         "gross_treatment_recovered": float(treatment_recovered.sum()),
         "gross_holdout_recovered": float(holdout_recovered.sum()),
         "treatment_recovery_rate": float((treatment_recovered > 0).mean()),
@@ -184,7 +196,7 @@ def run_eval(n_eval: int, uplift_model: TLearnerModel, *, seed: int) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--n-train", type=int, default=1000)
+    parser.add_argument("--n-train", type=int, default=5000)
     parser.add_argument("--n-eval", type=int, default=1000)
     args = parser.parse_args()
 

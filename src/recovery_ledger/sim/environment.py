@@ -27,8 +27,10 @@ import numpy as np
 
 from recovery_ledger.events.actions import ActionType
 from recovery_ledger.events.schemas import (
+    Channel,
     FailedPaymentCase,
     FailedSubscriptionCase,
+    LossType,
     RecoveryCase,
 )
 from recovery_ledger.listener.listener import ReplyIntent
@@ -55,14 +57,62 @@ class LatentTraits:
     dispute_propensity: float  # 0..1, higher = more likely to dispute when contacted
 
 
-def generate_population(case_ids: list[str], *, seed: int) -> dict[str, LatentTraits]:
+def generate_population(cases: list[RecoveryCase], *, seed: int) -> dict[str, LatentTraits]:
+    """Hidden traits, generated with a DECLARED, modest dependence on each
+    case's observable fields — not pure noise independent of everything the
+    policy can see.
+
+    This dependence is what makes the whole uplift-transfer exercise
+    non-vacuous. An earlier version of this function drew every trait
+    independently of the case entirely, which meant the true treatment
+    effect (persuadability(), driven only by these traits) was
+    STATISTICALLY INDEPENDENT of every feature the uplift model was given —
+    there was nothing for it to learn, by construction, no matter how good
+    the learner was. Caught by checking corr(tau_hat, tau_true) on eval
+    data and finding it was ~0 (not by assuming a plausible-looking result
+    was actually right) — see ENGINEERING_LOG.md, 2026-08-24.
+
+    First attempt at this fix (2026-08-24) used shifts of 0.10-0.15 against
+    traits with a natural standard deviation of ~0.2 — checked
+    corr(tau_hat, tau_true) afterwards instead of assuming a "declared
+    correlation exists" fix was sufficient, and found it was still ~0 at
+    the project's default training size (a T-learner on 1000 noisy
+    Bernoulli outcomes couldn't reliably detect a signal that small; it
+    inched up to a weak +0.16 at 5000 training cases and was NOT stable at
+    20000 — evidence the signal was still marginal, not that more data
+    would obviously fix it). Shifts below are roughly 2x stronger for
+    exactly that reason: this needs to be a *learnable* signal, not merely
+    a technically-nonzero one. Bulk of the variance is still unexplained
+    per-customer noise — this is a genuine prediction problem, not a
+    lookup table — but the explained part is now large enough for a
+    T-learner to actually find at a training size this project can afford
+    to run repeatedly (~1000-5000 cases, seconds not minutes)."""
     rng = np.random.default_rng(seed)
     traits: dict[str, LatentTraits] = {}
-    for case_id in case_ids:
-        traits[case_id] = LatentTraits(
-            liquidity=float(rng.beta(2, 2)),
-            annoyance_threshold=float(rng.beta(2, 2)),
-            dispute_propensity=float(rng.beta(1.5, 8)),  # right-skewed: most customers rarely dispute
+    for case in cases:
+        liquidity_shift = (
+            (0.35 if case.customer.is_b2b else 0.0)
+            - 0.25 * min(case.amount_at_risk / 5000.0, 1.0)
+        )
+        liquidity = float(np.clip(rng.beta(2, 2) + liquidity_shift, 0.0, 1.0))
+
+        dispute_shift = 0.35 if (case.customer.is_b2b or case.loss_type == LossType.OVERDUE_RECEIVABLE) else 0.0
+        if case.loss_type == LossType.CHECKOUT_ABANDONMENT:
+            dispute_shift -= 0.05  # nothing was ever charged; little to dispute
+        dispute_propensity = float(np.clip(rng.beta(1.5, 8) + dispute_shift, 0.0, 1.0))
+
+        if case.customer.channel_pref == Channel.WHATSAPP:
+            annoyance_shift = 0.30
+        elif case.customer.channel_pref == Channel.SMS:
+            annoyance_shift = -0.30
+        else:
+            annoyance_shift = 0.0
+        annoyance_threshold = float(np.clip(rng.beta(2, 2) + annoyance_shift, 0.0, 1.0))
+
+        traits[case.case_id] = LatentTraits(
+            liquidity=liquidity,
+            annoyance_threshold=annoyance_threshold,
+            dispute_propensity=dispute_propensity,
         )
     return traits
 

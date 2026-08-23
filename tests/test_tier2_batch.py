@@ -39,6 +39,18 @@ def test_run_eval_produces_internally_consistent_results():
         assert 0.0 <= results["pct_contacts_to_do_not_disturbs"] <= 1.0
 
 
+def test_uplift_model_correlates_with_true_persuadability():
+    """Regression test for the bug found and fixed 2026-08-24: the uplift
+    model's predictions used to be statistically independent of the true
+    (hidden) treatment effect, because the simulator generated hidden
+    traits with zero dependence on any observable feature. If this ever
+    goes back to ~0, every targeting claim in RESULTS.md is unsupported —
+    this must fail loudly, not get noticed months later by chance."""
+    model = train_uplift_model(n_train=3000, seed=3)
+    results, _ = run_eval(n_eval=500, uplift_model=model, seed=4)
+    assert results["uplift_model_correlation_with_true_persuadability"] > 0.10
+
+
 def test_run_eval_is_deterministic():
     model = train_uplift_model(n_train=100, seed=7)
     results_a, _ = run_eval(n_eval=100, uplift_model=model, seed=9)

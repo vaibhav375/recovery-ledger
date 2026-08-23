@@ -1,8 +1,18 @@
 # Tier 1 validation report
 
 **Every number below was produced by `run_validation.py` in this directory,
-run on 2026-08-23.** Re-run with the commands shown to reproduce it exactly —
-seeds are fixed (`SEED = 20260823`) throughout.
+run on 2026-08-23.** Re-run with the commands shown to reproduce it — seeds
+are fixed (`SEED = 20260823`) throughout. Checked precisely rather than
+assumed (2026-08-24, ran Hillstrom 3 more times): uplift learner outputs
+(Qini, AUUC, predicted CATE) are exactly bit-reproducible; the DR
+off-policy estimator's implied ATE is reproducible to 4 decimal places
+(+0.0462 every time) but not bit-for-bit identical at full precision
+(0.046255 vs 0.046222 across two runs) — most likely floating-point
+non-associativity in multi-threaded BLAS operations inside
+`GradientBoostingClassifier`, not an unseeded random draw (every explicit
+random source in this codebase is seeded, and the variation is far too
+small and too stable across repeats to be a real seeding gap). Doesn't
+change any conclusion in this report.
 
 ## What this validates
 

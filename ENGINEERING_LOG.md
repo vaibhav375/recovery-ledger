@@ -333,3 +333,92 @@ base demo path never gets slower or more fragile as the real pipeline grows.
 
 87/87 tests passing (13 new: environment model, WAIT-exemption regression,
 decision policy, batch experiment consistency/determinism).
+
+## 2026-08-24 — The B1 number from yesterday was wrong. Found it, fixed it, re-ran everything.
+
+Asked to work through known bugs and validate the pipeline before moving
+on. The most important thing that came out of taking that seriously: the
+₹996,519 headline number from 2026-08-23 was not a real result.
+
+It looked fine on its own terms — deterministic, internally consistent
+(holdout recovery rate matched the organic-resolution math independently),
+CI excluded zero, and the previous day's report even flagged the
+do-not-disturb-contact rate as a specific thing to check ("1.52%... not yet
+root-caused"). Went back to actually check it rather than let a
+plausible-looking number stand. Computed `corr(tau_hat, tau_true)` — the
+fitted uplift model's prediction against the simulator's own hidden ground
+truth — on held-out data: **-0.02**. Indistinguishable from noise.
+
+Root cause: `sim/environment.py`'s `generate_population()` drew every
+hidden trait (liquidity, annoyance_threshold, dispute_propensity)
+independently of every observable case field. Since the true treatment
+effect (`persuadability()`) is a pure function of those hidden traits, it
+was therefore statistically independent of every feature the uplift model
+had to learn from — by construction, not by bad luck. There was nothing to
+learn no matter how good the learner was. The reported 1.52%
+do-not-disturb-contact rate wasn't targeting skill; the true population
+do-not-disturb rate was itself ~1.5%, so near-random targeting would have
+shown almost the same number by coincidence. This is exactly the
+"plausible simulator, unvalidated causal structure" trap spec section 7.1
+describes for the domain simulator generally — turns out it's possible to
+fall into a version of it by accident even after doing the two-tier
+validation the spec prescribes, if the *transfer* step itself has a design
+flaw.
+
+Fixed `generate_population()` to derive traits with a declared dependence
+on observable fields (B2B/amount → liquidity, B2B/loss-type → dispute
+propensity, channel preference → annoyance threshold). First attempt used
+shifts of 0.10-0.15 against traits with ~0.2 natural standard deviation —
+checked again rather than assumed fixed: correlation was still weak and,
+more tellingly, *not monotonic* in training set size (0.15 at n=1000, 0.16
+at n=5000, dropping to 0.08 at n=20000) — the fingerprint of a signal too
+marginal to reliably detect, not a "just needs more data" problem. Roughly
+doubled the shift magnitudes. Correlation became monotonic and substantial:
+0.15 → 0.24 → 0.42 as training size went 1000 → 2000 → 5000. That
+monotonic-with-data shape is itself the evidence this is now a real,
+learnable signal rather than an artifact — the kind of check that's more
+convincing than any single number.
+
+Added this correlation as a permanent, printed, and tested part of every
+`make eval` run (`uplift_model_correlation_with_true_persuadability` in
+`results.json`, with a regression test that fails if it drops back toward
+zero) — this class of bug should never again require someone thinking to
+manually check for it.
+
+Also caught while fixing this: `Makefile`'s `eval` target hardcoded
+`--n-train 1000 --n-eval 1000`, silently overriding the script's own
+default even after the default was raised to 5000/2000 for a more reliable
+fit. Would have kept running the weak-signal configuration indefinitely.
+Fixed.
+
+**Re-ran the full experiment. New, honest result: ₹220,074 incremental per
+1,000 cases (95% CI ₹90,448–₹341,757).** Smaller than yesterday's
+withdrawn figure, as expected — that figure was inflated by a policy
+benefiting from RETRY/NUDGE's population-average effect while not
+genuinely targeting on any real signal. This figure reflects real (if
+imperfect — 0.41 correlation, not 1.0) learned heterogeneity. CI still
+excludes zero. Do-not-disturb contact rate is honestly 16.26%, not 1.52% —
+worse-looking, but real, and now the actual target for the next
+improvement (try the X-learner or causal forest already implemented in
+`policy/uplift/learners.py` but not yet swapped in). Verified deterministic
+again (ran twice, diffed, byte-identical). Updated
+`experiments/tier2_simulation/REPORT.md`, README, and this log with the
+full account rather than quietly replacing the number.
+
+90/90 tests passing (3 new: two trait-correlation regression tests in
+`test_environment.py`, one uplift-correlation regression test in
+`test_tier2_batch.py`).
+
+While re-validating, also caught and precisely characterised a smaller,
+separate issue: re-running Tier 1's Hillstrom validation produced identical
+uplift-learner outputs (Qini, AUUC, predicted CATE — bit-for-bit) but a
+tiny difference in the DR off-policy estimator's implied ATE (0.046255 vs
+0.046222 at full precision). Ran it 3 more times to check the pattern
+rather than shrug it off: all agreed to 4 decimal places (+0.0462), which
+points at floating-point non-associativity in multi-threaded BLAS
+operations inside `GradientBoostingClassifier` rather than an actual
+unseeded random source — every explicit random draw in this codebase is
+seeded, and a real seeding gap wouldn't produce results this stable across
+repeats. Corrected `experiments/tier1_criteo/REPORT.md`'s reproducibility
+claim to state this precisely rather than the blanket "reproduce it
+exactly" it said before.

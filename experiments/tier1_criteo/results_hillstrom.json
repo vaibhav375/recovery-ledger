@@ -13,28 +13,28 @@
       "auuc": 0.018577268999393104,
       "mean_predicted_cate": 0.04256201002184142,
       "std_predicted_cate": 0.030879328104645106,
-      "fit_seconds": 4.03
+      "fit_seconds": 2.69
     },
     "t_learner": {
       "qini_coefficient": 0.054576728330003196,
       "auuc": 0.024787778554980947,
       "mean_predicted_cate": 0.04587034531587841,
       "std_predicted_cate": 0.05035540890176138,
-      "fit_seconds": 3.63
+      "fit_seconds": 2.44
     },
     "x_learner": {
       "qini_coefficient": 0.049176895848083255,
       "auuc": 0.02194505353417573,
       "mean_predicted_cate": 0.045365900387299506,
       "std_predicted_cate": 0.04197092264797565,
-      "fit_seconds": 9.0
+      "fit_seconds": 6.21
     },
     "causal_forest": {
       "qini_coefficient": 0.03863428529082421,
       "auuc": 0.017875375043718052,
       "mean_predicted_cate": 0.04359210879341988,
       "std_predicted_cate": 0.06595091042082965,
-      "fit_seconds": 34.86
+      "fit_seconds": 23.99
     }
   },
   "ope_validation": {
@@ -69,16 +69,16 @@
     },
     "dr": {
       "always_treat": {
-        "point": 0.1519492658512488,
-        "ci_low": 0.1427591923546325,
-        "ci_high": 0.16012579485150083
+        "point": 0.15167419813563154,
+        "ci_low": 0.1425395396040813,
+        "ci_high": 0.16006578323903126
       },
       "never_treat": {
-        "point": 0.10569382025229905,
-        "ci_low": 0.0979099489007743,
-        "ci_high": 0.11345993536417588
+        "point": 0.1054522035641168,
+        "ci_low": 0.09795952176983003,
+        "ci_high": 0.11329512444152719
       },
-      "implied_ate": 0.04625544559894974
+      "implied_ate": 0.04622199457151474
     }
   }
 }
