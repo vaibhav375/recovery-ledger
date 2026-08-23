@@ -51,3 +51,41 @@ def test_all_five_policies_run_against_same_batch_and_produce_consistent_shapes(
     blast_result = run_one_policy("blast_everyone", BlastEveryonePolicy(), cases, traits, seed=3)
     ev_result = run_one_policy("ev_policy", EVDecisionPolicy(uplift_model=model), cases, traits, seed=3)
     assert blast_result["contacts_sent"] >= ev_result["contacts_sent"]
+
+
+def test_random_targeting_is_deterministic_and_respects_contact_rate():
+    from datetime import datetime, timezone
+
+    from recovery_ledger.policy.decision import RandomTargetingPolicy
+    from recovery_ledger.sim.generator import generate_cases
+
+    now = datetime(2026, 8, 23, 12, 0, tzinfo=timezone.utc)
+    cases = generate_cases(2000, seed=11, now=now)
+    policy = RandomTargetingPolicy(contact_rate=0.4, seed=7)
+
+    selected = [policy._contacts_this_case(c) for c in cases]
+    again = [policy._contacts_this_case(c) for c in cases]
+    assert selected == again, "selection must be deterministic for a given seed"
+
+    rate = sum(selected) / len(selected)
+    assert 0.35 < rate < 0.45, f"expected ~0.40 selection rate, got {rate:.3f}"
+
+
+def test_paired_bootstrap_is_tighter_than_unpaired_on_correlated_arms():
+    """The paired bootstrap exists because both baseline arms are measured on
+    the SAME cases. On positively correlated arms it must produce a tighter
+    interval than treating them as independent — if it doesn't, the pairing
+    isn't actually being applied."""
+    import numpy as np
+
+    from run_baselines import _paired_bootstrap_ci
+    from run_batch import _bootstrap_ci
+
+    rng = np.random.default_rng(0)
+    shared = rng.normal(100, 50, size=800)          # per-case variation common to both arms
+    control = shared + rng.normal(0, 5, size=800)
+    treated = shared + 20 + rng.normal(0, 5, size=800)
+
+    _, p_lo, p_hi = _paired_bootstrap_ci(treated, control, n_boot=500, seed=1)
+    _, u_lo, u_hi = _bootstrap_ci(treated, control, n_boot=500, seed=1)
+    assert (p_hi - p_lo) < (u_hi - u_lo)

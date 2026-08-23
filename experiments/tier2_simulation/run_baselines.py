@@ -41,14 +41,40 @@ from recovery_ledger.policy.decision import (
     DoNothingPolicy,
     EVDecisionPolicy,
     LookaheadEVDecisionPolicy,
+    RandomTargetingPolicy,
     RazorpayCurrentPolicy,
     RulesBasedDunningPolicy,
 )
 from recovery_ledger.sim.environment import EnvironmentListener, SimulationEnvironment, generate_population, persuadability
 from recovery_ledger.sim.generator import generate_cases
-from run_batch import NOW, SEED, build_kernel, train_uplift_model, _bootstrap_ci
+from run_batch import NOW, SEED, build_kernel, train_uplift_model
 
 HERE = Path(__file__).parent
+
+
+def _paired_bootstrap_ci(
+    treated_values: np.ndarray, control_values: np.ndarray, *, n_boot: int, seed: int
+) -> tuple[float, float, float]:
+    """PAIRED bootstrap: both arms here are measured on the SAME cases in the
+    same order, so case indices must be resampled ONCE and applied to both
+    arms together.
+
+    Using an unpaired bootstrap (resampling each arm independently) on paired
+    data throws away the correlation between arms and mis-sizes the interval —
+    it was doing exactly that until 2026-08-24. `run_batch.py` keeps the
+    unpaired version, which is correct there because its treatment and holdout
+    arms are disjoint random splits of different cases.
+    """
+    assert len(treated_values) == len(control_values), "paired bootstrap needs equal-length arms"
+    rng = np.random.default_rng(seed)
+    n = len(treated_values)
+    point = float(treated_values.mean() - control_values.mean())
+    boot = np.empty(n_boot)
+    for b in range(n_boot):
+        idx = rng.integers(0, n, size=n)
+        boot[b] = treated_values[idx].mean() - control_values[idx].mean()
+    lo, hi = np.quantile(boot, [0.025, 0.975])
+    return point, float(lo), float(hi)
 
 
 def run_one_policy(policy_name: str, policy, cases, traits, *, seed: int) -> dict:
@@ -114,6 +140,11 @@ def main() -> None:
         "blast_everyone": BlastEveryonePolicy(max_attempts=3),
         "razorpay_current": RazorpayCurrentPolicy(),
         "rules_based_dunning": RulesBasedDunningPolicy(max_attempts=3),
+        # Matched-volume control: contacts a random ~45% of cases, landing in
+        # the same contact-volume ballpark as the EV policy. This is what makes
+        # the efficiency claim falsifiable rather than rhetorical — see
+        # REPORT.md, "Does the targeting actually work?".
+        "random_targeting": RandomTargetingPolicy(contact_rate=0.45, seed=7),
         "ev_policy_greedy": EVDecisionPolicy(uplift_model=uplift_model),
         "ev_policy_lookahead": LookaheadEVDecisionPolicy(uplift_model=uplift_model),
     }
@@ -137,7 +168,7 @@ def main() -> None:
         if name == "do_nothing":
             incremental = {"point": 0.0, "ci_low": 0.0, "ci_high": 0.0}
         else:
-            point, ci_low, ci_high = _bootstrap_ci(r["_recovered"], baseline, n_boot=2000, seed=eval_seed)
+            point, ci_low, ci_high = _paired_bootstrap_ci(r["_recovered"], baseline, n_boot=2000, seed=eval_seed)
             incremental = {"point": point * 1000, "ci_low": ci_low * 1000, "ci_high": ci_high * 1000}
         comparison.append({
             "policy": name,
@@ -150,6 +181,12 @@ def main() -> None:
             "incremental_per_1000_cases": incremental,
             "cost_per_incremental_rupee": (
                 r["approx_channel_cost"] / incremental["point"] if incremental["point"] > 0 else None
+            ),
+            # The efficiency metric that actually separates targeting from
+            # sheer volume: incremental rupees earned per contact spent.
+            "incremental_rupees_per_contact": (
+                (r["gross_recovered"] - raw_results["do_nothing"]["gross_recovered"]) / r["contacts_sent"]
+                if r["contacts_sent"] else None
             ),
         })
 

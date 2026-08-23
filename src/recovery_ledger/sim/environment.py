@@ -21,6 +21,7 @@ If the policy could see these directly there would be nothing to learn.
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 
 import numpy as np
@@ -146,25 +147,52 @@ class StepResult:
 
 class SimulationEnvironment:
     """Stateful per-run environment: tracks accumulated contact/annoyance
-    per case and samples one outcome per `step()` call. Deterministic given
-    the seed the environment was built with — draws are made from a single
-    `np.random.Generator` advanced in call order, so re-running the same
-    sequence of steps reproduces the same outcomes."""
+    per case and samples one outcome per `step()` call.
+
+    Each case draws from its OWN independent RNG stream, seeded from
+    (seed, case_id) — not from one shared stream consumed in call order.
+    This makes the simulator a proper **common random numbers** design: a
+    given case sees the same sequence of random draws regardless of what
+    the policy did to *other* cases, or how many steps other cases took.
+
+    Why it matters (changed 2026-08-24): with a single shared stream, two
+    policies compared on the same batch see different random draws for the
+    same case purely because they made a different number of calls before
+    reaching it. That's a pure variance source with no informational
+    content, and it makes policy comparisons noisier than they need to be —
+    exactly the wrong property for an experiment whose entire purpose is
+    ranking policies against each other. Per-case streams remove it, so any
+    measured difference between two policies on the same case is caused by
+    the policy's decisions rather than by RNG bookkeeping.
+    """
 
     def __init__(self, traits_by_case: dict[str, LatentTraits], *, seed: int):
         self._traits = traits_by_case
-        self._rng = np.random.default_rng(seed)
+        self._seed = seed
+        self._rngs: dict[str, np.random.Generator] = {}
         self._contacts: dict[str, int] = {}
+
+    def _rng_for(self, case_id: str) -> np.random.Generator:
+        rng = self._rngs.get(case_id)
+        if rng is None:
+            # SeedSequence over (seed, stable hash of case_id) gives each case
+            # an independent, reproducible stream that doesn't depend on
+            # iteration order.
+            case_entropy = int.from_bytes(hashlib.sha256(case_id.encode()).digest()[:8], "big")
+            rng = np.random.default_rng(np.random.SeedSequence([self._seed, case_entropy]))
+            self._rngs[case_id] = rng
+        return rng
 
     def step(self, case: RecoveryCase, action_type: ActionType, attempt_index: int) -> StepResult:
         traits = self._traits[case.case_id]
+        rng = self._rng_for(case.case_id)
 
         if action_type == ActionType.WAIT:
-            paid = bool(self._rng.random() < BASE_ORGANIC_RESOLUTION_PROB)
+            paid = bool(rng.random() < BASE_ORGANIC_RESOLUTION_PROB)
             return StepResult(reply=ReplyIntent.PAID if paid else ReplyIntent.NO_REPLY, paid=paid)
 
         if action_type == ActionType.RETRY:
-            paid = bool(self._rng.random() < _retry_success_prob(case))
+            paid = bool(rng.random() < _retry_success_prob(case))
             return StepResult(reply=ReplyIntent.PAID if paid else ReplyIntent.NO_REPLY, paid=paid)
 
         # customer-contact actions (NUDGE / NEGOTIATE / ESCALATE_HUMAN)
@@ -183,7 +211,7 @@ class SimulationEnvironment:
         dispute_prob = BASE_DISPUTE_PROB_PER_CONTACT * (1 + 4 * traits.dispute_propensity)
         promise_prob = BASE_PROMISE_TO_PAY_PROB_PER_CONTACT
 
-        draw = float(self._rng.random())
+        draw = float(rng.random())
         cumulative = 0.0
         for prob, reply in (
             (pay_prob, ReplyIntent.PAID),

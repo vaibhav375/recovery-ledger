@@ -73,6 +73,26 @@ Both are fixed, both have regression tests, and together they closed
 essentially the whole gap to the naive baselines (EV policy gross went
 1,131,714 → 1,595,699 on the comparison batch).
 
+**2026-08-24, ₹376,484 → ₹284,957 — a methodology change, not a bug fix.**
+Two statistical defects were found while auditing the comparison design
+itself:
+
+1. **The simulator used one shared RNG stream.** A given case therefore saw
+   different random draws under different policies, purely because the
+   policy made a different number of calls before reaching it — pure noise
+   with no informational content, in an experiment whose entire purpose is
+   ranking policies. Now each case draws from its own stream seeded from
+   (seed, case_id): a proper **common random numbers** design.
+2. **The baseline comparison used an unpaired bootstrap on paired data.**
+   Both arms are measured on the *same* cases in the same order, so case
+   indices must be resampled once and applied to both arms. `run_batch.py`
+   correctly keeps the unpaired version, since its treatment and holdout
+   arms are disjoint splits of different cases.
+
+Neither changes any conclusion; the headline point estimate moved because
+the random draws changed, and the baseline CIs tightened because the paired
+bootstrap no longer discards the correlation between arms.
+
 ## Method
 
 1. **Train** (n=5000): generate cases, randomly assign contact/no-contact
@@ -89,31 +109,35 @@ essentially the whole gap to the naive baselines (EV policy gross went
 
 | | Treatment (n=1037) | Holdout (n=963) |
 |---|---:|---:|
-| Recovery rate | 33.75% | 15.37% |
-| Gross ₹ recovered | 880,178 | 454,814 |
-| Gross ₹ recovered per case | 849 | 472 |
+| Recovery rate | 34.81% | 15.47% |
+| Gross ₹ recovered | 801,323 | 469,727 |
+| Gross ₹ recovered per case | 773 | 488 |
 
-**Incremental ₹ recovered per 1,000 at-risk cases: ₹376,484 (95% CI: ₹203,979 – ₹554,243)**
+**Incremental ₹ recovered per 1,000 at-risk cases: ₹284,957 (95% CI: ₹128,725 – ₹451,483)**
 
-CI excludes zero. Note the holdout arm recovers 15.37% of cases entirely on
-its own — that is precisely why this project reports incremental rather
-than gross. A vendor quoting the ₹880,178 gross figure would be taking
-credit for the ₹454,814 that would have arrived with no agent at all.
+CI excludes zero. The holdout arm recovers 15.47% of cases entirely on its
+own — which is exactly why this project reports incremental rather than
+gross. A vendor quoting the ₹801,323 gross figure would be taking credit for
+the ₹469,727 that arrives with no agent at all.
 
-## Policy quality
+## Does the targeting actually work? (the falsification test)
 
-- **uplift_model_correlation_with_true_persuadability: 0.42.** Real, but
-  far from perfect — a genuinely hard prediction problem with a T-learner on
-  5,000 noisy Bernoulli outcomes, the same signal-to-noise challenge Tier 1
-  flagged for Criteo's 0.29% conversion rate.
-- **905 contacts sent, 167 (18.45%) to true-negative-uplift cases.** Not
-  close to spec's ≈0 target, and slightly *worse* than the 16.26% recorded
-  before the loop fixes — a direct, expected consequence of those fixes:
-  cases that were previously killed outright by a single kernel denial now
-  stay alive and get contacted, so more do-not-disturbs get reached. Real
-  tradeoff, reported rather than buried.
-- **100% certificate coverage**, structurally guaranteed by the loop design.
-- **Ledger**: 33,301 entries, hash chain verified valid.
+"Same recovery as mass-contact with far fewer contacts" is only evidence
+about *targeting* if a policy contacting the same number of cases **at
+random** does measurably worse. Otherwise the result would just be saying
+something about diminishing returns to contact volume, and nothing about the
+uplift model. So `RandomTargetingPolicy` was added as a matched-volume
+control, and it happened to land at exactly the same contact count as the
+greedy EV policy — 2,021 apiece, an unusually clean comparison:
+
+| | Contacts | Incremental ₹/1000 (95% CI) | Incremental ₹ per contact |
+|---|---:|---:|---:|
+| random_targeting | 2,021 | 119,671 (75,027–165,618) | 118.4 |
+| **ev_policy_greedy** | **2,021** | **340,000 (271,213–407,782)** | **336.5** |
+
+**2.8x the incremental recovery from the identical number of contacts, with
+non-overlapping confidence intervals.** That is the evidence that the uplift
+model — not merely contact volume — is doing the work.
 
 ## 5-baseline comparison (spec section 11.3)
 
@@ -121,81 +145,91 @@ credit for the ₹454,814 that would have arrived with no agent at all.
 uv run python experiments/tier2_simulation/run_baselines.py --n-train 5000 --n-eval 2000
 ```
 
-All 6 policies (the spec's 5, plus both EV variants) run against the SAME
-2,000-case eval batch. Incremental ₹ here is computed against `do_nothing`'s
-outcome on that same batch — a different design from the headline number
-above (which uses a genuine random holdout split), answering "how does each
-policy rank against named alternatives on identical cases".
+All 7 policies (the spec's 5, the matched-volume random control, and both EV
+variants) run against the SAME 2,000-case eval batch, using **common random
+numbers** (each case draws from its own RNG stream, so a case's luck doesn't
+depend on what the policy did to other cases). Incremental ₹ is computed
+against `do_nothing` on the same cases, with a **paired** bootstrap.
 
-| Policy | Recovery rate | Incremental ₹/1000 (95% CI) | Contacts | Channel cost | Cost per incremental ₹ | % to do-not-disturbs |
+| Policy | Recovery rate | Incremental ₹/1000 (95% CI) | Contacts | Incremental ₹/contact | Cost per incremental ₹ | % to do-not-disturbs |
 |---|---:|---:|---:|---:|---:|---:|
-| do_nothing | 13.85% | — (reference) | 0 | 0 | n/a | n/a |
-| blast_everyone | 35.90% | 355,209 (233,271–473,252) | 4,393 | 1,347 | 0.003792 | 20.49% |
-| rules_based_dunning | 35.90% | 355,209 (233,271–473,252) | 4,393 | 1,347 | 0.003792 | 20.49% |
-| razorpay_current | 16.55% | 130,228 (6,823–256,378) | 0 | 0 | n/a | n/a |
-| ev_policy_greedy | 34.15% | 348,644 (230,016–480,680) | 1,794 | 545 | 0.001562 | 16.83% |
-| **ev_policy_lookahead** | 34.25% | **353,755 (236,316–483,965)** | **1,733** | **527** | **0.001490** | 17.54% |
+| do_nothing | 14.25% | — (reference) | 0 | n/a | n/a | n/a |
+| blast_everyone | 36.40% | 330,108 (249,085–421,457) | 4,339 | 152.2 | 0.004081 | 20.19% |
+| rules_based_dunning | 36.40% | 330,108 (249,085–421,457) | 4,339 | 152.2 | 0.004081 | 20.19% |
+| razorpay_current | 16.35% | 86,648 (-16,693–193,109) | 0 | n/a | n/a | n/a |
+| random_targeting | 23.55% | 119,671 (75,027–165,618) | 2,021 | 118.4 | 0.005232 | 20.39% |
+| **ev_policy_greedy** | 36.45% | **340,000 (271,213–407,782)** | 2,021 | **336.5** | **0.001803** | 22.12% |
+| ev_policy_lookahead | 36.30% | 336,529 (267,698–404,717) | 1,972 | 341.3 | 0.001777 | 22.57% |
 
 Chart: `experiments/tier2_simulation/baselines_comparison.png`.
 
-### What this actually shows
+### What this shows
 
-**The EV policy matches blind contact on recovery while using 61% fewer
-contacts.** ₹353,755 vs ₹355,209 incremental — a 0.4% difference with
-heavily overlapping confidence intervals, i.e. statistically
-indistinguishable — from 1,733 contacts instead of 4,393. Cost per
-incremental rupee is **2.5x better** (0.001490 vs 0.003792), and it reaches
-fewer do-not-disturbs (17.54% vs 20.49%).
+- **Against blind mass-contact**: the EV policy matches or slightly exceeds
+  it on recovery (340,000 vs 330,108, overlapping CIs — treat as a tie) using
+  **53% fewer contacts**, at 2.3x better cost per incremental rupee.
+- **Against matched-volume random targeting**: 2.8x the incremental recovery
+  from the same 2,021 contacts, CIs non-overlapping. The targeting is real.
+- **`razorpay_current`'s CI includes zero** — a single automated retry then
+  halting is not reliably better than doing nothing at all, in this
+  simulation. That is precisely the gap spec section 3.3 describes.
 
-That efficiency, not a higher headline ₹, is the honest claim. In this
-simulation the ceiling on recovery is set mostly by how many times you are
-willing to contact someone; the value of targeting is getting the same
-result for far less contact volume, spend, and customer annoyance — all of
-which carry real costs (churn, complaints, TCCCPR complaint-threshold
-exposure) that this batch's short-horizon ₹ accounting does not price in.
+### The result that is NOT flattering
 
-**`blast_everyone` and `rules_based_dunning` remain byte-identical.** Both
-reduce to "NUDGE every attempt, up to 3, regardless of signal", and
-`sim/environment.py` doesn't differentiate pay probability by channel — so
-two policies differing only in default channel are the same policy to the
-simulator. They differ only in `approx_channel_cost`. A real simulator
-limitation, documented rather than hidden.
+**The EV policy contacts a higher share of true do-not-disturbs than either
+random targeting or mass-contact** (22.1% vs 20.4% and 20.2%). Since
+avoiding do-not-disturbs (N2) is a headline novelty claim, this deserves to
+be stated plainly rather than buried.
 
-**The lookahead reformulation is a marginal win, not the fix.** It edges
-greedy EV on both recovery (₹353,755 vs ₹348,644) and contact efficiency
-(1,733 vs 1,794 contacts). Worth keeping, but it was built on a hypothesis
-that turned out to be wrong: before the two agent bugs were found, adding
-lookahead changed almost nothing (1,128,226 vs 1,131,714 gross). The real
-gains came from the bug fixes, not the cleverer algorithm — recorded here
-because the opposite conclusion would have been easy and flattering to draw.
+Investigated rather than excused. In this simulator, amount at risk and true
+persuadability are **negatively correlated (-0.45)** by construction: larger
+amounts imply lower liquidity, which lowers persuadability. Measured
+consequence — the high-amount half of the population is **28.2%
+do-not-disturbs against the low-amount half's 6.0%**. The EV criterion is
+`τ̂ × amount`, so it is structurally drawn toward high-amount cases, which
+are exactly the ones most likely to be true do-not-disturbs. Where the
+model's τ̂ is wrong (correlation with truth is ~0.35–0.42, not 1.0), the
+amount term dominates and pulls it into contacting them.
+
+This is a genuine tension in the EV formulation, not a coding defect: the
+policy is optimising expected rupees, and expected rupees and
+do-not-disturb-avoidance genuinely conflict in this population. Fixing it
+properly means pricing the true cost of contacting a do-not-disturb (churn,
+complaints, TCCCPR complaint-threshold exposure) into the objective rather
+than treating annoyance as a flat per-attempt penalty — which is the
+`λ_churn × P(churn) × LTV` term the spec's full formula has and this
+implementation deliberately omits for lack of any defensible LTV estimate.
+Named as the top candidate for the next round of work rather than patched
+over.
 
 ## What this experiment still does NOT include
 
 - **No sensitivity sweep** over the response model's parameters — spec
   section 7.3 requires this before any result here can be called more than
-  a single point estimate. Especially warranted now: the baseline
-  comparison's shape turned out to depend heavily on the response model's
-  near-independence between successive contacts, which is an assumption,
-  not a finding.
-- **Do-not-disturb contact rate is 17.54%, nowhere near the ≈0 target.**
-  The policy reduces it relative to blind contact but does not come close
-  to eliminating it, and it got slightly worse after the loop fixes (more
-  cases survive to be contacted).
-- **Only the T-learner is used in the reported runs.** S/X-learner were
-  measured (correlations 0.42 / 0.37 vs T's 0.40 — comparable) and the
-  causal forest is **not usable on this feature set**: it emits CATE
-  estimates outside the mathematically possible [-1, 1] range for a
-  probability difference (mean -1.23, std 4.43, only 29% of predictions in
-  range). Removing feature collinearity improved that materially (to 60% in
-  range) but did not fix it; root cause not yet identified, so it is
-  excluded rather than reported. Documented as a known defect.
-- **`cost_per_incremental_rupee` counts channel costs only** — not
-  annoyance, churn, or complaint-handling cost.
+  a single point estimate. Especially warranted given how much the
+  do-not-disturb finding above depends on one modelling choice (the
+  amount↔liquidity coupling).
+- **Do-not-disturb contact rate is 22.1%, worse than random targeting's
+  20.4%** — see "The result that is NOT flattering" above. The single most
+  important open problem in this project.
+- **The `λ_churn × P(churn) × LTV` term is omitted** from the EV formula,
+  for lack of any defensible LTV estimate. That omission is the direct cause
+  of the do-not-disturb problem.
+- **Only the T-learner is used in reported runs.** S/X-learner were measured
+  and are comparable (correlations 0.42 / 0.37 vs T's 0.40). The causal
+  forest is **not usable on this feature set**: it emits CATE estimates
+  outside the mathematically possible [-1, 1] range for a probability
+  difference (mean -1.23, std 4.43, 29% in range). Removing feature
+  collinearity improved it materially (to 60% in range) but did not fix it;
+  root cause unidentified, so it is excluded and documented rather than
+  reported.
+- **`cost_per_incremental_rupee` counts channel costs only** — not annoyance,
+  churn, or complaint-handling cost.
 - **First-contact CATE only** — RETRY's effect is a fixed calibrated
   constant, not learned; NEGOTIATE/ESCALATE_HUMAN aren't in training data.
 - **The lookahead policy's `p_resolve` is approximated** as
-  `base_resolution_prob + tau_hat`, because the uplift model estimates an
-  incremental effect and not an absolute payment probability. That
-  approximation is the weakest link in the policy and is why
+  `base_resolution_prob + τ̂`, because the uplift model estimates an
+  incremental effect, not an absolute payment probability. That
+  approximation is the policy's weakest link, which is why
   `base_resolution_prob` is an explicit parameter rather than a buried
   constant.

@@ -9,6 +9,7 @@ every commit, even with stub components inside it).
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 
 from pydantic import BaseModel
@@ -302,6 +303,50 @@ class LookaheadEVDecisionPolicy:
         return ActionDecision(
             action_type=action, channel=channel,
             rationale=f"lookahead EV: tau_hat={tau_hat:.4f}, sequence value={value:.2f}",
+        )
+
+
+@dataclass
+class RandomTargetingPolicy:
+    """Contacts a RANDOM subset of cases, at a chosen rate, ignoring every
+    signal. This is the control that makes the efficiency claim falsifiable.
+
+    "Our policy gets the same recovery as mass-contact with 61% fewer
+    contacts" is only evidence of good *targeting* if a policy that contacts
+    the same reduced number of cases AT RANDOM does measurably worse. If
+    random targeting at matched volume performs just as well, then the
+    result says something about diminishing returns to contact volume and
+    nothing whatsoever about the uplift model — a distinction worth being
+    able to prove rather than assert (added 2026-08-24).
+
+    Seeded per case id so the choice is deterministic and reproducible.
+    """
+
+    contact_rate: float = 0.5
+    max_attempts: int = 3
+    seed: int = 0
+    default_channel: Channel = Channel.SMS
+
+    def _contacts_this_case(self, case: RecoveryCase) -> bool:
+        digest = hashlib.sha256(f"{self.seed}:{case.case_id}".encode()).digest()
+        draw = int.from_bytes(digest[:8], "big") / 2**64
+        return draw < self.contact_rate
+
+    def decide(self, case: RecoveryCase, diagnosis: Diagnosis, attempts_so_far: int) -> ActionDecision:
+        if attempts_so_far >= self.max_attempts:
+            return ActionDecision(
+                action_type=ActionType.STOP, channel=None,
+                rationale=f"random targeting: reached max_attempts={self.max_attempts}",
+            )
+        if not self._contacts_this_case(case):
+            return ActionDecision(
+                action_type=ActionType.WAIT, channel=None,
+                rationale=f"random targeting: case not selected (rate={self.contact_rate})",
+            )
+        channel = case.customer.channel_pref or self.default_channel
+        return ActionDecision(
+            action_type=ActionType.NUDGE, channel=channel,
+            rationale=f"random targeting: case selected at random (rate={self.contact_rate})",
         )
 
 

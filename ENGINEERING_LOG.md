@@ -555,3 +555,80 @@ tests updated because the WAIT-instead-of-STOP behaviour is deliberately
 different — the opt-out test was rewritten to assert the actual safety
 property, "an opted-out customer is never contacted", rather than the
 incidental stop-reason it previously checked).
+
+## 2026-08-24 (cont. 3) — Auditing my own comparison design: two statistical bugs, and the test that could have falsified the whole claim
+
+Asked to check for bugs and whether the results were actually the best
+achievable. The most valuable thing to come out of it was a test I had not
+run, that could have invalidated the previous day's headline claim.
+
+**Two statistical defects in the comparison design itself:**
+
+1. **The simulator used one shared RNG stream.** A given case saw different
+   random draws under different policies, purely because the policy made a
+   different number of calls before reaching it. In an experiment whose sole
+   purpose is *ranking policies against each other*, that is pure noise with
+   no informational content. Replaced with per-case streams seeded from
+   (seed, case_id) — a proper common-random-numbers design, so any measured
+   difference between policies on a case is caused by decisions rather than
+   RNG bookkeeping.
+2. **The baseline comparison used an unpaired bootstrap on paired data.**
+   Both arms are measured on the *same* cases in the same order; resampling
+   them independently discards the correlation between arms and mis-sizes
+   every interval. Added `_paired_bootstrap_ci` with a test that fails if
+   the paired version isn't actually tighter than the unpaired one on
+   correlated arms. `run_batch.py` deliberately keeps the unpaired version —
+   correct there, because its treatment and holdout arms are disjoint splits
+   of *different* cases.
+
+**The test I should have run a day earlier.** Yesterday's claim was "equal
+recovery to mass-contact with 61% fewer contacts". That is only evidence
+about *targeting* if a policy contacting the same number of cases AT RANDOM
+does worse. If random targeting at matched volume did just as well, the
+result would have been about diminishing returns to contact volume and
+would have said nothing whatsoever about the uplift model — and I would have
+been implicitly claiming credit for the model regardless. Built
+`RandomTargetingPolicy` as that control. It happened to land at exactly the
+same contact count as the greedy EV policy, 2,021 apiece:
+
+- random_targeting: 119,671 incremental/1000 (CI 75,027–165,618), 118.4 ₹/contact
+- ev_policy_greedy: 340,000 incremental/1000 (CI 271,213–407,782), 336.5 ₹/contact
+
+**2.8x, non-overlapping CIs, identical contact volume.** The claim survived,
+but it was not safe to assume it would — and it is now falsifiable on every
+run rather than asserted.
+
+**One genuinely unflattering finding, kept prominent rather than buried.**
+The EV policy contacts a *higher* share of true do-not-disturbs (22.1%) than
+either random targeting (20.4%) or mass-contact (20.2%). Since avoiding
+do-not-disturbs is one of the project's headline novelty claims (N2), this
+is the opposite of what it should show. Root-caused with data rather than
+explained away: in this simulator amount at risk and true persuadability
+correlate **-0.45** (larger amounts imply lower liquidity implies lower
+persuadability), so the high-amount half of the population is **28.2%
+do-not-disturbs vs the low-amount half's 6.0%**. The EV criterion is
+`τ̂ × amount`, so it is structurally drawn toward exactly the cases most
+likely to be do-not-disturbs, and where τ̂ is wrong (correlation ~0.35–0.42,
+not 1.0) the amount term dominates.
+
+That is a real tension in the objective function, not a coding error: the
+policy optimises expected rupees, and in this population expected rupees and
+do-not-disturb-avoidance genuinely conflict. The principled fix is the
+`λ_churn × P(churn) × LTV` term the spec's full formula includes and this
+implementation omits for lack of a defensible LTV estimate. Logged as the
+top candidate for the next round rather than patched over with a fudge
+factor.
+
+Headline moved ₹376,484 → ₹284,957 purely because the CRN change altered the
+random draws; CI still excludes zero. Baseline CIs tightened as expected
+from the paired bootstrap. Everything re-verified deterministic.
+
+Also worth recording as a near miss: while investigating the learner choice
+I wrote a code comment claiming the feature-scaling fix had resolved the
+causal forest's impossible CATE values — *before* verifying it. It had not
+(29% → 60% in valid range, still broken). Deleted the claim rather than
+leave a false statement in the codebase. The lesson is the same one this
+whole day keeps teaching: write the claim after the measurement, not before.
+
+102/102 tests passing (2 new: random-targeting determinism/rate, and a
+paired-vs-unpaired bootstrap width test).

@@ -1,13 +1,16 @@
 # Recovery Ledger
 
-**Status: Tier 1 validation passed. B1 headline: ₹376,484 incremental recovery
-per 1,000 cases (95% CI ₹203,979–₹554,243). Against the 5 required baselines,
-the agent matches blind mass-contact on recovery while using 61% fewer contacts
-and costing 2.5x less per incremental rupee. Policy dominance under stated
-assumptions, in simulation — not a real-world claim. Two earlier headline
-figures were withdrawn after checks found real bugs; both are documented in
+**Status: Tier 1 validation passed. B1 headline: ₹284,957 incremental recovery
+per 1,000 cases (95% CI ₹128,725–₹451,483).** The decisive test: against a
+control that contacts the *same 2,021 cases at random*, the agent recovers
+**2.8x more incremental revenue with non-overlapping confidence intervals** —
+so the targeting model, not merely contact volume, is doing the work. It also
+matches blind mass-contact on recovery using 53% fewer contacts. Policy
+dominance under stated assumptions, in simulation — not a real-world claim.
+Three revisions to these numbers (two from real bugs, one from a methodology
+fix) are documented in
 [`experiments/tier2_simulation/REPORT.md`](experiments/tier2_simulation/REPORT.md)
-rather than quietly replaced.**
+rather than quietly replaced — including one result that is *not* flattering.
 
 An autonomous revenue-recovery agent for Indian payments. It decides *whether, when,
 how, and in what language* to intervene on at-risk revenue — failed payments,
@@ -75,18 +78,20 @@ running.
       dependency-free look at the loop) is unchanged. `make eval` runs the
       real `LookaheadEVDecisionPolicy`, uplift-model-driven, over 5000+2000 cases.
 - [x] **B1 — batch run, headline incremental ₹ + CI.** `make eval`:
-      Tier-1-validated T-learner transferred onto simulator-generated
-      randomised data, lookahead EV decisioning, randomised no-contact
-      holdout arm. **₹376,484 incremental per 1,000 cases (95% CI
-      ₹203,979–₹554,243)**, holdout recovering 15.37% on its own — which is
-      exactly why this reports incremental, not gross.
-- [x] **5-baseline comparison (spec section 11.3).** `make baselines`: all
-      5 required policies plus both EV variants, same eval batch. The agent
-      is statistically indistinguishable from blind mass-contact on
-      recovery (₹353,755 vs ₹355,209, overlapping CIs) using **1,733
-      contacts instead of 4,393** — 2.5x better cost per incremental rupee,
-      and fewer do-not-disturbs reached (17.54% vs 20.49%). Efficiency, not
-      a bigger headline number, is the honest claim.
+      **₹284,957 incremental per 1,000 cases (95% CI ₹128,725–₹451,483)**;
+      holdout recovers 15.47% unaided, which is exactly why this reports
+      incremental rather than gross.
+- [x] **Baseline comparison + falsification test.** `make baselines`: the
+      spec's 5 required policies, both EV variants, and a matched-volume
+      random-targeting control. Headline: **2.8x incremental recovery vs
+      random targeting at the identical 2,021 contacts** (non-overlapping
+      CIs), and a tie with blind mass-contact on recovery at 53% fewer
+      contacts. Uses common random numbers and a paired bootstrap.
+- [x] **One honest negative result**: the EV policy contacts *more* true
+      do-not-disturbs (22.1%) than random targeting (20.4%). Root-caused,
+      not excused — amount at risk and persuadability are correlated -0.45
+      in this simulator, so `τ̂ × amount` is structurally pulled toward the
+      cases most likely to be do-not-disturbs. Full analysis in the report.
 - [ ] Real listener + LLM personas (LLM backend decided and built — see
       above — not yet wired into the loop's Listener)
 - [ ] Negotiation + Section 43B(h) clock
@@ -108,8 +113,9 @@ make demo             # runs 20 synthetic cases through the agent loop with the
 make eval             # trains the uplift model + runs the real 5000+2000-case
                        # batch experiment — verified working, deterministic
                        # (run twice, diffed byte-identical)
-make baselines         # runs all 5 spec-required baselines against the same
-                       # eval batch — verified working, deterministic
+make baselines         # runs all 5 spec-required baselines + a matched-volume
+                       # random-targeting control + both EV variants against the
+                       # same eval batch — verified working, deterministic
 make redteam          # not yet implemented
 ```
 
@@ -119,7 +125,7 @@ message and exits non-zero rather than silently doing nothing.
 
 ## What is NOT claimed
 
-- No real-world causal effect size. The ₹376,484-per-1,000-cases figure above
+- No real-world causal effect size. The ₹284,957-per-1,000-cases figure above
   is a simulation result — policy dominance under stated assumptions, in
   simulation. Everything in `experiments/tier2_simulation/` runs against a
   simulator calibrated to published marginal benchmarks — that calibrates
