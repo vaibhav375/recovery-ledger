@@ -33,11 +33,15 @@ Build history and honest failures are in [`ENGINEERING_LOG.md`](ENGINEERING_LOG.
 - [ ] Simulator ("the recovery gym") — thin skeleton only so far: deterministic
       case generation across all 4 loss types. Latent traits, a response
       model, marginal calibration, and the sensitivity sweep are not built yet.
-- [x] Compliance kernel skeleton — deny-by-default engine, per-action
-      certificates, hash-chained into the ledger, no-LLM-import test that
-      fails the build (verified: mutation-tested, not just passing vacuously).
-      3 real rules so far (contact hours, opt-out cooling, contact budget);
-      the full TCCCPR/DLT/e-mandate rule set is a dedicated later phase.
+- [x] Compliance kernel — deny-by-default engine, per-action certificates,
+      hash-chained into the ledger, no-LLM-import test that fails the build
+      (verified: mutation-tested, not just passing vacuously). 11 rules
+      covering RBI recovery-agent norms, TRAI TCCCPR, the RBI e-mandate 2026
+      framework, and DPDPA — see [`COMPLIANCE.md`](COMPLIANCE.md) for every
+      rule, its source citation, and two ambiguities flagged rather than
+      silently resolved. `make demo` shows the kernel genuinely denying a
+      real case (a mandate retry attempted before its 24-hour pre-debit
+      notice window elapsed), not just passing everything.
 - [x] Agent loop skeleton — detect → diagnose → decide → gate → act → listen →
       stop runs end to end (`make demo`) for all 4 loss types, every step
       ledgered, chain verified. Policy and listener are still stubs (fixed

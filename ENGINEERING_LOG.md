@@ -159,3 +159,55 @@ stub policy exhausting its fixed sequence, not a real decision. Expected,
 not a bug; will change once the uplift/EV policy is transferred in.
 
 35/35 tests passing (`make test`).
+
+## 2026-08-23 (cont. 2) — Full compliance rule set (11 rules), COMPLIANCE.md
+
+Extended `RuleContext` with structured consent/DLT/mandate state (mirroring
+the certificate justification example in spec section 9.3's field names),
+then implemented the rest of spec section 9.2's rule list: DLT registration,
+header-class matching, consent validity, opt-out-option presence, and
+number-series (`kernel/rules/tcccpr.py`); the e-mandate pre-debit notice
+window (`kernel/rules/emandate_2026.py`); a DPDPA consent-record check
+(`kernel/rules/dpdp.py`); and a tone-intensity escalation ceiling
+(`kernel/rules/escalation.py`) that directly backs bar requirement B2
+("compliant escalation... every rung is legally justified").
+
+Wrote `COMPLIANCE.md`: every rule, its file, what it checks, and its source
+citation. Two things flagged there rather than silently decided:
+
+1. The 7-day explicit-consent-expiry rule's exact scope is genuinely
+   ambiguous in the source material (does it apply to all explicit
+   consent for service messages, or only consent reused from a different
+   original purpose?). Encoded the strict/literal reading — a deny-by-
+   default kernel should fail toward more restrictive when unsure, not
+   less.
+2. AFA requirements for mandate registration/modification/withdrawal are
+   NOT encoded, because there's no `ActionType` in this project that
+   represents those operations — the agent only acts against existing
+   mandates. A rule against an action that can never be proposed would
+   test nothing, so it's recorded as a gap instead of faked.
+3. Purpose limitation and retention (DPDPA) aren't per-action rules at
+   all — they're structural properties of what the system stores, and
+   retention specifically is an honest open gap (no ledger purge policy
+   exists yet).
+
+Wired the full 11-rule kernel into `cli.py`'s default agent and re-ran
+`make demo`: it now genuinely denies a real case rather than always
+allowing — `case_000014` (a failed-subscription mandate retry) gets
+`REGULATORY_CEILING` because its retry attempt landed 22.53 hours after its
+pre-debit notice, 1.47 hours short of the 24-hour minimum. Checked this by
+reading the actual certificate out of the written ledger, not by assuming
+the rule fired for the reason intended:
+
+```
+DENIED BY: EMANDATE2026.PRE_DEBIT_NOTICE
+  {'pre_debit_notice_sent_at': '2026-08-22 13:28:27+00:00',
+   'hours_before_debit': 22.53, 'min_required_hours': 24}
+```
+
+19/20 demo cases still end in `negative_ev` (the stub policy exhausting its
+fixed sequence) — expected, unchanged from before, since the policy itself
+is still a stub.
+
+57/57 tests passing (35 existing + 22 new rule tests), all added and green
+before this was committed.

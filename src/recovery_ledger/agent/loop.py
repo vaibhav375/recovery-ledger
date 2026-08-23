@@ -17,7 +17,7 @@ from recovery_ledger.events.actions import ActionType, StopReason
 from recovery_ledger.events.schemas import RecoveryCase
 from recovery_ledger.executor.executor import SimulatedExecutor
 from recovery_ledger.kernel.certificate import Decision
-from recovery_ledger.kernel.engine import KernelEngine, RuleContext
+from recovery_ledger.kernel.engine import ConsentInfo, DLTInfo, KernelEngine, MandateInfo, RuleContext
 from recovery_ledger.ledger.ledger import Ledger
 from recovery_ledger.listener.listener import Listener, ReplyIntent
 from recovery_ledger.policy.decision import DecisionPolicy
@@ -86,6 +86,20 @@ class RecoveryAgent:
                 attempts_in_window=attempts_so_far,
                 attempt_cap=DEFAULT_ATTEMPT_CAP,
                 window_days=DEFAULT_WINDOW_DAYS,
+                message_class="service",
+                # Consent inferred from the existing transaction/subscription/
+                # invoice relationship the case arose from, captured at
+                # detection time — not marketing outreach to a stranger.
+                consent=ConsentInfo(basis="inferred", captured_at=case.detected_at, contract_active=True),
+                dlt=DLTInfo(registered=True, header="RZPRCV-S", template_class="service"),
+                # Modelling choice: the case's detection is treated as when the
+                # pre-debit notice would have gone out, so a mandate RETRY
+                # genuinely can get denied here if it's attempted too soon —
+                # this isn't forced to always pass.
+                mandate=MandateInfo(pre_debit_notice_sent_at=case.detected_at),
+                includes_opt_out_option=True,
+                sender_number_series="160",
+                tone_intensity=min(attempts_so_far, 3),
             )
             certificate = self.kernel.issue_certificate(context)
             self.ledger.append(case.case_id, "certificate", certificate.model_dump(mode="json"))

@@ -18,7 +18,17 @@ from recovery_ledger.diagnoser.diagnoser import CaseDiagnoser
 from recovery_ledger.executor.executor import SimulatedExecutor
 from recovery_ledger.kernel.engine import KernelEngine
 from recovery_ledger.kernel.rules.budget import ContactBudgetRule
+from recovery_ledger.kernel.rules.dpdp import ConsentRecordExistsRule
+from recovery_ledger.kernel.rules.emandate_2026 import PreDebitNotificationRule
+from recovery_ledger.kernel.rules.escalation import ToneIntensityCeilingRule
 from recovery_ledger.kernel.rules.opt_out import OptOutRule
+from recovery_ledger.kernel.rules.tcccpr import (
+    ConsentValidityRule,
+    DLTRegistrationRule,
+    HeaderClassMatchRule,
+    NumberSeriesRule,
+    OptOutOptionPresentRule,
+)
 from recovery_ledger.kernel.rules.timing import ContactHoursRule
 from recovery_ledger.ledger.ledger import Ledger
 from recovery_ledger.listener.listener import Listener
@@ -31,7 +41,12 @@ def build_default_agent(ledger: Ledger, *, clock) -> RecoveryAgent:
         detector=CaseDetector(),
         diagnoser=CaseDiagnoser(),
         policy=DecisionPolicy(),
-        kernel=KernelEngine(rules=[ContactHoursRule(), OptOutRule(), ContactBudgetRule()]),
+        kernel=KernelEngine(rules=[
+            ContactHoursRule(), OptOutRule(), ContactBudgetRule(),
+            DLTRegistrationRule(), HeaderClassMatchRule(), ConsentValidityRule(),
+            OptOutOptionPresentRule(), NumberSeriesRule(),
+            PreDebitNotificationRule(), ConsentRecordExistsRule(), ToneIntensityCeilingRule(),
+        ]),
         executor=SimulatedExecutor(),
         listener=Listener(),
         ledger=ledger,
