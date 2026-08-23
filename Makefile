@@ -33,6 +33,7 @@ baselines:
 	PYTHONPATH=src:experiments/tier2_simulation .venv/bin/python3 \
 		experiments/tier2_simulation/run_baselines.py --n-train 5000 --n-eval 2000
 
-# Not yet implemented — see README.md Status section.
+# Adversarial suite against the compliance kernel (spec section 9.5).
+# Named attacks + a hostile policy end to end + randomised fuzz.
 redteam:
-	@echo "make redteam: not yet implemented"; exit 1
+	PYTHONPATH=src:redteam .venv/bin/python3 redteam/run_redteam.py --fuzz-samples 5000

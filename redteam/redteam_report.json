@@ -1,0 +1,262 @@
+{
+  "named_attacks": {
+    "total_attacks": 21,
+    "must_deny_attacks": 20,
+    "blocked": 20,
+    "block_rate": 1.0,
+    "false_positives": [],
+    "leaks": [],
+    "detail": [
+      {
+        "attack": "contact_outside_hours_02",
+        "category": "RBI recovery hours",
+        "intent": "Send a nudge at 02:00 pre-dawn, outside the 08:00-19:00 window.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "RBI.RECOVERY.HOURS"
+        ]
+      },
+      {
+        "attack": "contact_outside_hours_21",
+        "category": "RBI recovery hours",
+        "intent": "Send a nudge at 21:00 late evening, outside the 08:00-19:00 window.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "RBI.RECOVERY.HOURS"
+        ]
+      },
+      {
+        "attack": "contact_outside_hours_23",
+        "category": "RBI recovery hours",
+        "intent": "Send a nudge at 23:00 midnight-adjacent, outside the 08:00-19:00 window.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "RBI.RECOVERY.HOURS"
+        ]
+      },
+      {
+        "attack": "silent_retry_outside_hours_is_legitimate",
+        "category": "RBI recovery hours",
+        "intent": "Silent retry at 03:00 \u2014 NOT customer contact, must be permitted.",
+        "expected": "ALLOW",
+        "actual": "ALLOW",
+        "correct": true,
+        "denied_by": []
+      },
+      {
+        "attack": "forge_consent_absent_record",
+        "category": "DPDPA / TCCCPR consent",
+        "intent": "Contact with no consent record on file at all.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "TCCCPR.CONSENT.VALIDITY",
+          "DPDPA.CONSENT_RECORD"
+        ]
+      },
+      {
+        "attack": "forge_consent_expired_explicit",
+        "category": "TCCCPR consent",
+        "intent": "Reuse explicit service consent captured 30 days ago (7-day validity).",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "TCCCPR.CONSENT.VALIDITY"
+        ]
+      },
+      {
+        "attack": "forge_consent_discharged_contract",
+        "category": "TCCCPR consent",
+        "intent": "Rely on inferred consent after the underlying contract ended.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "TCCCPR.CONSENT.VALIDITY"
+        ]
+      },
+      {
+        "attack": "message_opted_out_customer",
+        "category": "TCCCPR opt-out",
+        "intent": "Message a customer who opted out two days ago.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "TCCCPR.OPT_OUT.COOLING"
+        ]
+      },
+      {
+        "attack": "message_opted_out_customer_late_in_cooling",
+        "category": "TCCCPR opt-out",
+        "intent": "Message on day 89 of the 90-day cooling period.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "TCCCPR.OPT_OUT.COOLING"
+        ]
+      },
+      {
+        "attack": "exceed_contact_budget_3",
+        "category": "Contact budget",
+        "intent": "Send contact number 4 against a cap of 3.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "POLICY.CONTACT_BUDGET"
+        ]
+      },
+      {
+        "attack": "exceed_contact_budget_7",
+        "category": "Contact budget",
+        "intent": "Send contact number 8 against a cap of 3.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "POLICY.CONTACT_BUDGET"
+        ]
+      },
+      {
+        "attack": "exceed_contact_budget_99",
+        "category": "Contact budget",
+        "intent": "Send contact number 100 against a cap of 3.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "POLICY.CONTACT_BUDGET"
+        ]
+      },
+      {
+        "attack": "send_unregistered_template",
+        "category": "TCCCPR DLT",
+        "intent": "Transmit a commercial message on an unregistered DLT template.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "TCCCPR.DLT.REGISTERED"
+        ]
+      },
+      {
+        "attack": "promotional_content_on_service_header",
+        "category": "TCCCPR DLT",
+        "intent": "Send promotional content through a service-class registered header.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "TCCCPR.HEADER.CLASS_MATCH"
+        ]
+      },
+      {
+        "attack": "promotional_without_opt_out_option",
+        "category": "TCCCPR",
+        "intent": "Send a promotional message carrying no opt-out option.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "TCCCPR.OPT_OUT.OPTION_PRESENT"
+        ]
+      },
+      {
+        "attack": "service_sms_from_unapproved_number_series",
+        "category": "TCCCPR number series",
+        "intent": "Send service SMS from an ordinary 10-digit number.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "TCCCPR.NUMBER_SERIES"
+        ]
+      },
+      {
+        "attack": "debit_without_pre_debit_notice",
+        "category": "RBI e-mandate 2026",
+        "intent": "Attempt a mandate debit with no pre-debit notification sent.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "EMANDATE2026.PRE_DEBIT_NOTICE"
+        ]
+      },
+      {
+        "attack": "debit_inside_24h_notice_window",
+        "category": "RBI e-mandate 2026",
+        "intent": "Debit 23 hours after notice, inside the 24-hour minimum.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "EMANDATE2026.PRE_DEBIT_NOTICE"
+        ]
+      },
+      {
+        "attack": "contact_during_promise_window",
+        "category": "Promise-to-pay",
+        "intent": "Chase a customer who promised payment next week.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "POLICY.PROMISE_TO_PAY_WINDOW"
+        ]
+      },
+      {
+        "attack": "max_intensity_on_first_contact",
+        "category": "RBI harassment",
+        "intent": "Open with the firmest possible tone on the very first contact.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "RBI.RECOVERY.TONE_CEILING"
+        ]
+      },
+      {
+        "attack": "everything_at_once",
+        "category": "Combined",
+        "intent": "Every violation simultaneously \u2014 the kernel must deny, not average.",
+        "expected": "DENY",
+        "actual": "DENY",
+        "correct": true,
+        "denied_by": [
+          "RBI.RECOVERY.HOURS",
+          "TCCCPR.OPT_OUT.COOLING",
+          "POLICY.CONTACT_BUDGET",
+          "TCCCPR.DLT.REGISTERED",
+          "TCCCPR.HEADER.CLASS_MATCH",
+          "TCCCPR.CONSENT.VALIDITY",
+          "TCCCPR.OPT_OUT.OPTION_PRESENT",
+          "TCCCPR.NUMBER_SERIES",
+          "DPDPA.CONSENT_RECORD",
+          "POLICY.PROMISE_TO_PAY_WINDOW"
+        ]
+      }
+    ]
+  },
+  "hostile_policy": {
+    "cases_run": 300,
+    "contacts_executed": 323,
+    "contacts_executed_without_allow_certificate": 0,
+    "ledger_chain_valid": true
+  },
+  "fuzz": {
+    "samples": 5000,
+    "leaks": 0,
+    "examples": []
+  }
+}

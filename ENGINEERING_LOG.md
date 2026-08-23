@@ -758,3 +758,56 @@ unchanged in shape; EV policy still ~2.85x matched-volume random targeting.
 
 121/121 tests passing (17 new: 11 per-rule, the all-rules-reachable test,
 and 5 for the resumption queue). All experiments re-verified deterministic.
+
+## 2026-08-24 (cont. 6) — Red-team suite: 100% block rate, and proving that number means something
+
+Built the adversarial harness (spec section 9.5). The interesting part was
+deciding what an honest version of this even is.
+
+**What the spec asks for vs. what is actually possible.** Section 9.5 says
+"an adversarial LLM attempts to induce non-compliant sends (jailbreak the
+drafter...)". But the compliance kernel is deliberately *not* an LLM — it is
+a deterministic predicate over structured state. There is no prompt to
+jailbreak and no persuasion to resist. Building a fake "adversarial LLM
+attacks the kernel" demo would be theatre, and a panel would see through it
+immediately. Said so explicitly in `redteam/attacks.py` rather than quietly
+producing something that looks impressive and means nothing.
+
+The real attack surface is: crafted state that slips past a rule; a contact
+executed without a valid certificate; and a policy that has been compromised
+or badly tuned. So the suite has three layers:
+
+1. **21 named attacks**, each with an oracle stated *from the regulation*
+   rather than from the rule implementation — checking the kernel against a
+   restatement of its own code would prove nothing.
+2. **A hostile policy end to end** — replaced the decision policy with one
+   that always proposes maximum-pressure voice contact, ran 300 real cases
+   through the full loop, and asserted no contact was ever *executed*
+   without an ALLOW certificate behind it. 323 contacts attempted, 0
+   uncertified. This tests deny-by-default as a system property rather than
+   the kernel in isolation.
+3. **5,000 randomised fuzzed states** against independent oracles. Handwritten
+   cases only find the leaks you already thought of.
+
+**Result: 100% block rate, 0 violations, across all three layers.**
+
+**And then I checked whether that number can fail at all.** A suite that
+cannot fail is worthless, so I mutation-tested it the same way as the
+no-LLM-import gate: deliberately sabotaged the contact-hours rule to always
+pass, re-ran, and got **31 violations** — 3 named attacks leaking and 28
+fuzz leaks — then restored the rule and confirmed a clean 0 and an empty git
+diff. So the 100% is a real gate.
+
+Worth noting what that mutation test revealed about the layers: the three
+named contact-hours attacks caught the sabotage, but the fuzz layer caught
+**28** distinct leaking states. The randomised layer is doing substantially
+more work than the handwritten one, which is the argument for having it.
+
+One guard added deliberately: `test_no_legitimate_action_is_wrongly_blocked`.
+A kernel that simply denied everything would score a perfect 100% on the
+attack suite and be completely useless. That test asserts at least one
+legitimate action (a silent retry outside contact hours, which is not
+customer contact) still gets through, so the block rate can't be gamed by
+over-blocking.
+
+125/125 tests passing. `make redteam` wired.
