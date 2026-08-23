@@ -1,6 +1,6 @@
 """TRAI TCCCPR: after opt-out, no consent requests for 90 days unless the
-customer opts back in (spec section 9.2). RETRY is exempt — it's not
-customer contact and opting out of messages doesn't withdraw payment
+customer opts back in (spec section 9.2). RETRY and WAIT are exempt — neither
+is customer contact, and opting out of messages doesn't withdraw payment
 authorisation."""
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ class OptOutRule:
     name = "TCCCPR.OPT_OUT.COOLING"
 
     def evaluate(self, context: RuleContext) -> RuleResult:
-        if context.action_type == ActionType.RETRY:
+        if context.action_type in (ActionType.RETRY, ActionType.WAIT):
             return RuleResult(
                 rule_name=self.name, passed=True,
                 detail={"exempt": True, "reason": "not customer contact"},

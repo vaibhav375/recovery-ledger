@@ -110,7 +110,7 @@ class RecoveryAgent:
             result = self.executor.execute(certificate)
             self.ledger.append(case.case_id, "action_result", result.model_dump())
 
-            reply = self.listener.listen(case.case_id)
+            reply = self.listener.listen(case, decision.action_type, attempts_so_far)
             self.ledger.append(case.case_id, "reply", {"intent": reply.value})
 
             if reply in REPLY_TO_STOP_REASON:

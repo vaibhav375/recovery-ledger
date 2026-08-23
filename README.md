@@ -1,8 +1,9 @@
 # Recovery Ledger
 
-**Status: early build. Tier 1 validation passed; agent loop skeleton and compliance
-kernel run end to end. The core money-measurement pipeline (simulator response
-model, EV policy, real listener) has not started yet — see Status below.**
+**Status: Tier 1 validation passed. B1 (headline incremental ₹ + CI) computed
+for the first time: ₹996,519 per 1,000 cases (95% CI ₹672,862–₹1,342,154) —
+policy dominance under stated assumptions, in simulation, not a real-world
+claim. See Status below for what's real vs. what's still missing.**
 
 An autonomous revenue-recovery agent for Indian payments. It decides *whether, when,
 how, and in what language* to intervene on at-risk revenue — failed payments,
@@ -49,9 +50,13 @@ running.
       fully closed). Full results and reproduction commands:
       [`experiments/tier1_criteo/REPORT.md`](experiments/tier1_criteo/REPORT.md).
 - [x] Event schemas (4 loss types, typed/validated) — real, not stub
-- [ ] Simulator ("the recovery gym") — thin skeleton only so far: deterministic
-      case generation across all 4 loss types. Latent traits, a response
-      model, marginal calibration, and the sensitivity sweep are not built yet.
+- [x] Simulator ("the recovery gym") — hidden latent traits (liquidity,
+      annoyance threshold, dispute propensity), a response model with
+      negative responses (opt-out/dispute risk that rises with
+      over-contacting), retry economics loosely anchored to spec section
+      3.2's published benchmarks. Marginal calibration is loose, not
+      rigorous, and there's no sensitivity sweep yet — both flagged
+      honestly in `experiments/tier2_simulation/REPORT.md`.
 - [x] Compliance kernel — deny-by-default engine, per-action certificates,
       hash-chained into the ledger, no-LLM-import test that fails the build
       (verified: mutation-tested, not just passing vacuously). 11 rules
@@ -61,15 +66,23 @@ running.
       silently resolved. `make demo` shows the kernel genuinely denying a
       real case (a mandate retry attempted before its 24-hour pre-debit
       notice window elapsed), not just passing everything.
-- [x] Agent loop skeleton — detect → diagnose → decide → gate → act → listen →
-      stop runs end to end (`make demo`) for all 4 loss types, every step
-      ledgered, chain verified. Policy and listener are still stubs (fixed
-      action sequence; no real reply channel) — the real uplift-driven EV
-      policy lands after Tier 2 simulator work.
-- [ ] Listener + LLM personas
+- [x] Agent loop — detect → diagnose → decide → gate → act → listen → stop.
+      `make demo` (20 cases, stub fixed-sequence policy, for a fast,
+      dependency-free look at the loop) is unchanged. `make eval` runs the
+      real `EVDecisionPolicy`, uplift-model-driven, over 1000+1000 cases.
+- [x] **B1 — batch run, headline incremental ₹ + CI.** `make eval`:
+      Tier-1-validated T-learner transferred onto simulator-generated
+      randomised data, real EV decisioning, a randomised no-contact holdout
+      arm. **₹996,519 incremental per 1,000 cases (95% CI ₹672,862–₹1,342,154)**.
+      Full method, what's included, and what isn't (4 of 5 baselines, the
+      sensitivity sweep, cost accounting) in
+      [`experiments/tier2_simulation/REPORT.md`](experiments/tier2_simulation/REPORT.md) —
+      **read the claim-scope section before citing this number for anything.**
+- [ ] Real listener + LLM personas (LLM backend decided and built — see
+      above — not yet wired into the loop's Listener)
 - [ ] Negotiation + Section 43B(h) clock
 - [ ] Fleet-level degradation detection
-- [ ] Evaluation: 5 baselines, sensitivity sweep, red-team suite
+- [ ] Remaining 4 of 5 baselines, sensitivity sweep, red-team suite
 - [ ] Dashboard / audit-trail browser
 - [ ] Video + submission
 
@@ -81,22 +94,27 @@ make test             # run the test suite — verified working
 make tier1-hillstrom  # Tier 1 validation on Hillstrom — verified working
 make tier1-criteo     # Tier 1 validation on a 2% Criteo subsample — verified
                        # working; downloads ~340MB from HuggingFace on first run
-make demo             # runs 20 synthetic cases through the full agent loop —
-                       # verified working, deterministic (run twice, diffed)
-make eval             # not yet implemented
+make demo             # runs 20 synthetic cases through the agent loop with the
+                       # stub policy — verified working, deterministic
+make eval             # trains the uplift model + runs the real 1000+1000-case
+                       # batch experiment — verified working, deterministic
+                       # (run twice, diffed byte-identical)
 make redteam          # not yet implemented
 ```
 
 This section only claims a command works once it has actually been run
-successfully. `make demo`/`eval`/`redteam` currently print a clear "not yet
-implemented" message and exit non-zero rather than silently doing nothing.
+successfully. `make redteam` currently prints a clear "not yet implemented"
+message and exits non-zero rather than silently doing nothing.
 
 ## What is NOT claimed
 
-- No real-world causal effect size. Everything in `experiments/tier2_simulation/`
-  is a simulation calibrated to published marginal benchmarks — that calibrates
-  outcome rates, not causal response to intervention. See §7 of the spec for why
-  that distinction matters.
+- No real-world causal effect size. The ₹996,519-per-1,000-cases figure above
+  is a simulation result — policy dominance under stated assumptions, in
+  simulation. Everything in `experiments/tier2_simulation/` runs against a
+  simulator calibrated to published marginal benchmarks — that calibrates
+  outcome rates, not causal response to intervention. See §7 of the spec, and
+  the claim-scope section at the top of `experiments/tier2_simulation/REPORT.md`,
+  for why that distinction matters.
 - No category novelty — dunning agents, uplift modelling, and LLM dunning
   messaging all exist already. See §4 of the spec for what is and isn't claimed
   as novel here.

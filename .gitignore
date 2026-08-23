@@ -15,6 +15,7 @@ data/*.parquet
 !data/.gitkeep
 
 demo_ledger.json
+experiments/tier2_simulation/batch_ledger.json
 
 # local secrets
 .env

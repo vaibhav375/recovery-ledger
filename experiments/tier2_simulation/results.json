@@ -1,0 +1,19 @@
+{
+  "n_eval": 1000,
+  "n_treatment": 501,
+  "n_holdout": 499,
+  "gross_treatment_recovered": 735443.1981805833,
+  "gross_holdout_recovered": 235244.11599295322,
+  "treatment_recovery_rate": 0.3912175648702595,
+  "holdout_recovery_rate": 0.1342685370741483,
+  "incremental_per_1000_cases": {
+    "point": 996519.401196171,
+    "ci_low": 672861.5152286899,
+    "ci_high": 1342154.1311637445
+  },
+  "contacts_sent": 657,
+  "contacts_sent_to_do_not_disturbs": 10,
+  "pct_contacts_to_do_not_disturbs": 0.015220700152207,
+  "ledger_entries": 14875,
+  "ledger_chain_valid": true
+}

@@ -9,6 +9,10 @@ in the real implementation later doesn't require touching the agent loop.
 from __future__ import annotations
 
 from enum import Enum
+from typing import Protocol
+
+from recovery_ledger.events.actions import ActionType
+from recovery_ledger.events.schemas import RecoveryCase
 
 
 class ReplyIntent(str, Enum):
@@ -21,6 +25,14 @@ class ReplyIntent(str, Enum):
     NO_REPLY = "no_reply"
 
 
+class ListenerProtocol(Protocol):
+    def listen(self, case: RecoveryCase, action_type: ActionType, attempt_index: int) -> ReplyIntent: ...
+
+
 class Listener:
-    def listen(self, case_id: str) -> ReplyIntent:
+    """Stub: ignores everything it's given and always reports NO_REPLY.
+    Kept as the default for `make demo` — no reply channel, real or
+    simulated, is wired into the base demo path."""
+
+    def listen(self, case: RecoveryCase, action_type: ActionType, attempt_index: int) -> ReplyIntent:
         return ReplyIntent.NO_REPLY

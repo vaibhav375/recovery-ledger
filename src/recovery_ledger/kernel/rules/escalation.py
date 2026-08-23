@@ -20,7 +20,7 @@ class ToneIntensityCeilingRule:
     name = "RBI.RECOVERY.TONE_CEILING"
 
     def evaluate(self, context: RuleContext) -> RuleResult:
-        if context.action_type == ActionType.RETRY:
+        if context.action_type in (ActionType.RETRY, ActionType.WAIT):
             return RuleResult(rule_name=self.name, passed=True, detail={"exempt": True})
         ceiling = TONE_CEILING_BY_ATTEMPT.get(context.attempts_in_window, TONE_CEILING_DEFAULT)
         ok = context.tone_intensity <= ceiling

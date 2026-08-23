@@ -256,3 +256,80 @@ services" guarantee for the base demo path.
 63/63 tests passing (6 new, including one real integration test against the
 locally running Ollama server — not just a mock-only test suite pretending
 to cover this).
+
+## 2026-08-23 (cont. 4) — B1 achieved: real EV policy, real simulator, real ₹ number
+
+The big gap flagged at the last status checkpoint: nothing in the repo
+computed a ₹ recovery number yet, because policy and listener were both
+stubs. Closed that today.
+
+Built, in order:
+- `sim/environment.py`: the response model ("recovery gym", spec 7.3).
+  Hidden latent traits (liquidity, annoyance_threshold, dispute_propensity)
+  drive a `persuadability(traits)` function that can go negative — the
+  do-not-disturb segment (N2) falls out of the model rather than being
+  hand-coded as a special case. Retry success rates loosely anchored to
+  spec 3.2's published figures (17% generic, 35% subscription smart-retry,
+  1% hard-decline). Every constant is stated as invented in the module
+  docstring — anchoring an aggregate rate doesn't validate a causal
+  response, which is the whole reason Tier 1 had to happen separately.
+- Extended `Listener` to receive the case and action, not just a bare
+  case_id, and added `EnvironmentListener` adapting the response model to
+  that interface — the unmodified agent loop now runs against simulated
+  outcomes with zero changes to `agent/loop.py`'s structure.
+
+**Caught a real bug before it could corrupt anything**, by thinking through
+the holdout-policy design before writing it: audited whether kernel rules
+treat `WAIT` the same as `RETRY` (both "not customer contact"), and found
+only `timing.py` did. `budget.py`, `dpdp.py`, `escalation.py`,
+`opt_out.py`, and `tcccpr.py`'s `_is_customer_contact` all exempted RETRY
+but not WAIT — meaning a "do nothing" holdout policy issuing WAIT would
+have been incorrectly gated by rules meant for outbound communications.
+Fixed all five, added `tests/test_kernel_wait_exempt.py` with a
+"worst-case context" regression test (every field set to whatever would
+deny a real contact action) that confirms WAIT passes everything while the
+identical context correctly still denies NUDGE — proving the test exercises
+the exemption rather than a context that happens to pass regardless of
+action type.
+
+Then: `policy/features.py` (case → numeric vector, observable fields only —
+deliberately excludes anything from `LatentTraits`, or the "learner" would
+just read the answer key), `EVDecisionPolicy` and `DoNothingPolicy` in
+`policy/decision.py` implementing the EV formula from spec 8.3 (simplified:
+no explicit LTV/churn term — modelling per-customer LTV would need
+assumptions with no basis to validate, so it's left out rather than
+invented, and said so in the docstring).
+
+Two test-writing mistakes surfaced real arithmetic I'd gotten wrong before
+committing to it: expected a hard-decline case with zero uplift to STOP,
+but RETRY is free and even a 1%-success free action has positive EV, so it
+correctly chose RETRY instead — fixed the test, not the code, since the
+code was right. Same pattern for an "annoyance eventually dominates"
+test — the modest uplift I'd picked (0.1) was already smaller than the
+fixed retry EV at attempt zero, so NUDGE was never going to win; raised it
+to 0.3 so the test actually exercises what it claims to.
+
+`experiments/tier2_simulation/run_batch.py`: trains a T-learner (the exact
+class Tier 1 validated) on 1000 randomised-contact simulator cases, then
+runs a disjoint 1000-case eval batch split 50/50 into a treatment arm
+(`EVDecisionPolicy`) and a randomised no-contact holdout arm
+(`DoNothingPolicy`), through the same `RecoveryAgent`/kernel/ledger
+machinery. Ran it, checked the output made sense before trusting it: the
+holdout arm's 13.43% recovery rate is close to the organic-resolution math
+(1-0.95³≈14.3%) — the holdout is behaving like a no-contact baseline should,
+not doing anything unaccounted for. Ran it twice, diffed — byte-identical.
+
+**Result: ₹996,519 incremental per 1,000 cases (95% CI ₹672,862–₹1,342,154).**
+CI excludes zero. Full result, method, and — importantly — what's NOT yet
+included (4 of 5 baselines, sensitivity sweep, cost-per-incremental-rupee)
+in `experiments/tier2_simulation/REPORT.md`. Claim scope stated explicitly
+at the top of that report: policy dominance under stated assumptions, in
+simulation, never a real-world effect size.
+
+Wired `make eval` for real (was a stub that printed "not yet implemented").
+`make demo` is untouched — still the stub policy, zero external
+dependencies, fast — kept deliberately separate from `make eval` so the
+base demo path never gets slower or more fragile as the real pipeline grows.
+
+87/87 tests passing (13 new: environment model, WAIT-exemption regression,
+decision policy, batch experiment consistency/determinism).

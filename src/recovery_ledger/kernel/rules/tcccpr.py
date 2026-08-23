@@ -1,9 +1,10 @@
 """TRAI TCCCPR, including 2025 amendments (spec section 9.2). Sources cited
 in full in COMPLIANCE.md.
 
-Silent actions (RETRY) are exempt from every rule here — none of these are
-about payment retries, they're about commercial *communications*, and a
-silent retry sends nothing to the customer.
+Silent actions (RETRY, WAIT) are exempt from every rule here — none of these
+are about payment retries or passive observation, they're about commercial
+*communications*, and neither a silent retry nor waiting sends anything to
+the customer.
 """
 
 from __future__ import annotations
@@ -19,7 +20,7 @@ EXPLICIT_SERVICE_CONSENT_VALIDITY_DAYS = 7
 
 
 def _is_customer_contact(context: RuleContext) -> bool:
-    return context.action_type != ActionType.RETRY
+    return context.action_type not in (ActionType.RETRY, ActionType.WAIT)
 
 
 class DLTRegistrationRule:

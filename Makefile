@@ -20,9 +20,14 @@ tier1-criteo:
 demo:
 	PYTHONPATH=src .venv/bin/python3 -m recovery_ledger.cli
 
-# Not yet implemented — see README.md Status section.
+# Tier 2 batch experiment (spec section 11.1) — the B1 headline number.
+# Trains an uplift model on randomised simulator data, then measures
+# incremental rupees recovered vs a randomised no-contact holdout over a
+# fresh eval batch. See experiments/tier2_simulation/REPORT.md.
 eval:
-	@echo "make eval: not yet implemented"; exit 1
+	PYTHONPATH=src .venv/bin/python3 experiments/tier2_simulation/run_batch.py \
+		--n-train 1000 --n-eval 1000
 
+# Not yet implemented — see README.md Status section.
 redteam:
 	@echo "make redteam: not yet implemented"; exit 1

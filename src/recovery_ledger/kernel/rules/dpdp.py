@@ -22,7 +22,7 @@ class ConsentRecordExistsRule:
     name = "DPDPA.CONSENT_RECORD"
 
     def evaluate(self, context: RuleContext) -> RuleResult:
-        if context.action_type == ActionType.RETRY:
+        if context.action_type in (ActionType.RETRY, ActionType.WAIT):
             return RuleResult(rule_name=self.name, passed=True, detail={"exempt": True})
         ok = context.consent.captured_at is not None
         return RuleResult(rule_name=self.name, passed=ok, detail={"captured_at": str(context.consent.captured_at)})

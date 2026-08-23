@@ -13,7 +13,7 @@ class ContactBudgetRule:
     name = "POLICY.CONTACT_BUDGET"
 
     def evaluate(self, context: RuleContext) -> RuleResult:
-        if context.action_type == ActionType.RETRY:
+        if context.action_type in (ActionType.RETRY, ActionType.WAIT):
             return RuleResult(
                 rule_name=self.name, passed=True,
                 detail={"exempt": True, "reason": "not customer contact"},
