@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines redteam
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam
 
 setup:
 	uv venv --python 3.12
@@ -32,6 +32,12 @@ eval:
 baselines:
 	PYTHONPATH=src:experiments/tier2_simulation .venv/bin/python3 \
 		experiments/tier2_simulation/run_baselines.py --n-train 5000 --n-eval 2000
+
+# Sensitivity sweep (spec section 7.3) — is the policy RANKING stable when the
+# simulator's invented constants are swept across defensible ranges?
+sensitivity:
+	PYTHONPATH=src:experiments/tier2_simulation .venv/bin/python3 \
+		experiments/sensitivity/run_sweep.py --n-train 3000 --n-eval 1500
 
 # Adversarial suite against the compliance kernel (spec section 9.5).
 # Named attacks + a hostile policy end to end + randomised fuzz.

@@ -811,3 +811,61 @@ customer contact) still gets through, so the block rate can't be gamed by
 over-blocking.
 
 125/125 tests passing. `make redteam` wired.
+
+## 2026-08-24 (cont. 7) — Sensitivity sweep: the ranking holds, and one flip worth reporting
+
+Built the sweep spec section 7.3 asks for: "sweep the response-function
+parameters across a defensible range and show the policy ranking is stable.
+Stability of ranking under assumption sweeps is the honest claim, not a
+point estimate."
+
+First a refactor: every invented constant in `sim/environment.py` moved into
+an injectable `ResponseParams` dataclass, defaults reproducing the previous
+module globals exactly (verified — all 125 tests passed unchanged
+immediately after). You cannot sweep a constant you cannot inject.
+
+Chose five parameters, each with a range a reasonable person could have
+picked instead of the default rather than an arbitrary +/- around it. The
+uplift model is **retrained at every setting** — reusing a model fitted
+against different physics would measure staleness, not sensitivity, and
+getting that wrong would have quietly invalidated the whole exercise.
+
+Two claims tested at all 25 settings:
+
+- **C1 — the EV policy beats matched-volume random targeting: 25/25.**
+  Margin ranges 1.65x to 4.24x. This is the claim that matters most, since
+  it is the one asserting the model does real work rather than the result
+  being an artifact of contact volume. It survives the two settings
+  specifically constructed to break it: zero annoyance decay (brute-force
+  persistence never punished) and zero amount-liquidity coupling (the EV
+  policy's amount weighting carries no hidden information about
+  persuadability). Both pinned as tests.
+- **C2 — the EV policy is more contact-efficient than blind mass-contact:
+  24/25.**
+
+**The single flip, stated rather than averaged away.** At
+`base_organic_resolution = 0.12`, mass-contact wins on contact efficiency
+(blast ₹236,770 incremental vs the EV policy's ₹82,576). Mechanism: when
+12% of cases fix themselves, there is little incremental value left to
+target, learned tau shrinks toward zero, the selective policy correctly
+declines to act, and brute force still scrapes up what remains. The honest
+statement is "C2 holds except when organic recovery is very high", not "C2
+holds 96% of the time" — the flip is systematic and explainable, not noise,
+and averaging it into a percentage would hide exactly the condition under
+which the claim fails.
+
+**The best result in the sweep was not one I set out to test.** As
+`amount_liquidity_coupling` strengthens — high-value cases becoming
+increasingly likely to be do-not-disturbs — the EV policy's advantage over
+random targeting *widens* from 1.75x to 4.24x, while blind mass-contact
+collapses from ₹1,015,545 to ₹197,499. So the harder the do-not-disturb
+problem gets, the more targeting is worth. That is novelty claim N2 showing
+up as a measured gradient rather than an assertion, and it is a much better
+argument for the thesis than any single point estimate.
+
+Worth noting the contrast with an earlier entry: the do-not-disturb tension
+was first written up as an embarrassing finding, then partly dissolved by a
+bug fix, and has now turned into the sweep's strongest supporting evidence.
+Same phenomenon, three different readings, each honest at the time.
+
+128/128 tests passing. `make sensitivity` wired.

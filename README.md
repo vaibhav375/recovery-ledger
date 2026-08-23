@@ -109,11 +109,18 @@ running.
       fuzzed states** checked against oracles written from the regulations
       rather than from the rule code. Mutation-tested: sabotaging one rule
       produces 31 violations, so the 100% is a real gate, not a vacuous one.
+- [x] **Sensitivity sweep — ranking stability (spec 7.3).** `make sensitivity`:
+      5 simulator parameters x 5 values, uplift model retrained at every
+      setting. **C1 (targeting beats matched-volume random) holds at 25/25
+      settings**, margin 1.65x–4.24x, including the settings built to be
+      hostile to it. C2 (contact efficiency vs mass-contact) holds at 24/25 —
+      the single flip is reported, not averaged away. Best finding: the
+      *harder* the do-not-disturb problem, the more targeting is worth.
 - [ ] Real listener + LLM personas (LLM backend decided and built — see
       above — not yet wired into the loop's Listener)
 - [ ] Negotiation + Section 43B(h) clock
 - [ ] Fleet-level degradation detection
-- [ ] Sensitivity sweep
+
 - [ ] Dashboard / audit-trail browser
 - [ ] Video + submission
 
@@ -133,6 +140,7 @@ make eval             # trains the uplift model + runs the real 5000+2000-case
 make baselines         # runs all 5 spec-required baselines + a matched-volume
                        # random-targeting control + both EV variants against the
                        # same eval batch — verified working, deterministic
+make sensitivity       # 5-parameter ranking-stability sweep — verified working
 make redteam          # 21 named attacks + hostile policy + 5,000-state fuzz —
                        # verified working, 100% block rate, mutation-tested
 ```

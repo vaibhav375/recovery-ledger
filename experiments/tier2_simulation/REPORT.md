@@ -225,13 +225,60 @@ to be do-not-disturbs. Properly countering it needs the
 implementation omits for lack of any defensible LTV estimate. That remains
 the top open problem.
 
+## Sensitivity sweep — is the ranking stable? (spec section 7.3)
+
+```
+make sensitivity
+```
+
+Every constant in `sim/environment.py` is invented. A single incremental-₹
+figure computed at one arbitrary setting of them is worth little; what can
+honestly be claimed is that the **ordering of policies survives** across the
+range of settings a reasonable person might have chosen instead. Five
+parameters, five values each, uplift model **retrained at every setting**
+(reusing a model fitted against different physics would measure staleness,
+not sensitivity).
+
+Two claims tested at all 25 settings:
+
+| Claim | Holds at |
+|---|---|
+| **C1 — the EV policy beats matched-volume random targeting** | **25/25 settings** (margin 1.65x – 4.24x) |
+| **C2 — the EV policy is more contact-efficient than blind mass-contact** | **24/25 settings** |
+
+**C1 never flips.** That is the claim that matters most, because it is the
+one asserting the uplift model does real work rather than the result being
+an artifact of contact volume. It survives even in the settings built to be
+hostile to it: zero annoyance decay (so brute-force persistence is never
+punished) and zero amount↔liquidity coupling (so the EV policy's amount
+weighting carries no hidden information about persuadability). Both of
+those are pinned as tests in `tests/test_sensitivity.py`.
+
+**Where C2 flips, and why.** At `base_organic_resolution = 0.12` — a world
+where 12% of cases fix themselves with no intervention — blind mass-contact
+becomes more contact-efficient than the EV policy (blast recovers ₹236,770
+incremental against the EV policy's ₹82,576). The mechanism is
+straightforward: when most value arrives on its own, there is little
+incremental value left to target, learned τ̂ shrinks toward zero, and the
+selective policy correctly declines to act while brute force still scrapes
+up the remainder. Reported rather than averaged away — the honest statement
+is "C2 holds except when organic recovery is very high", not "C2 holds 96%
+of the time".
+
+**The most interesting result in the sweep** is the
+`amount_liquidity_coupling` row. As the coupling strengthens — meaning
+high-value cases become increasingly likely to be do-not-disturbs — the EV
+policy's advantage over random targeting *widens sharply*, from 1.75x at
+zero coupling to **4.24x** at 0.55, while blind mass-contact collapses from
+₹1,015,545 to ₹197,499. In other words: **the harder the do-not-disturb
+problem gets, the more targeting is worth.** That is the project's central
+thesis (novelty claim N2) showing up as a measured gradient rather than an
+assertion.
+
+Chart: `experiments/sensitivity/sensitivity_sweep.png`.
+
 ## What this experiment still does NOT include
 
-- **No sensitivity sweep** over the response model's parameters — spec
-  section 7.3 requires this before any result here can be called more than
-  a single point estimate. Especially warranted given how much the
-  do-not-disturb finding above depends on one modelling choice (the
-  amount↔liquidity coupling).
 - **Do-not-disturb contact rate is 20.2%** — level with untargeted policies,
   not meaningfully better, and nowhere near the ≈0 target novelty claim N2
   aspires to. The single most important open problem in this project.

@@ -50,6 +50,44 @@ BASE_PROMISE_TO_PAY_PROB_PER_CONTACT = 0.10
 
 
 @dataclass(frozen=True)
+class ResponseParams:
+    """Every invented constant in this simulator, in one injectable place.
+
+    These exist as a parameter object rather than module globals because
+    spec section 7.3 requires showing that the *policy ranking* is stable
+    when they are swept across a defensible range — "stability of ranking
+    under assumption sweeps is the honest claim, not a point estimate".
+    You cannot sweep a constant you cannot inject.
+
+    Defaults reproduce the module-level constants exactly, so nothing that
+    does not opt in changes behaviour.
+    """
+
+    base_organic_resolution: float = BASE_ORGANIC_RESOLUTION_PROB
+    retry_success_generic: float = RETRY_SUCCESS_PROB_GENERIC
+    retry_success_subscription: float = RETRY_SUCCESS_PROB_SUBSCRIPTION
+    retry_success_hard_decline: float = HARD_DECLINE_RETRY_SUCCESS_PROB
+    opt_out_per_contact: float = BASE_OPT_OUT_PROB_PER_CONTACT
+    dispute_per_contact: float = BASE_DISPUTE_PROB_PER_CONTACT
+    promise_per_contact: float = BASE_PROMISE_TO_PAY_PROB_PER_CONTACT
+    # How fast repeated contact erodes willingness to pay. This one is
+    # load-bearing: the near-independence of successive contacts is what
+    # made blind persistence competitive in the baseline comparison, so a
+    # ranking that only holds at one value of it is not a real result.
+    annoyance_decay_per_excess_contact: float = 0.05
+    # Strength of the amount <-> liquidity coupling, which drives the
+    # do-not-disturb tension (amount and true persuadability correlate
+    # -0.45 at the default).
+    amount_liquidity_coupling: float = 0.25
+    b2b_liquidity_shift: float = 0.35
+    dispute_shift: float = 0.35
+    channel_annoyance_shift: float = 0.30
+
+
+DEFAULT_PARAMS = ResponseParams()
+
+
+@dataclass(frozen=True)
 class LatentTraits:
     """Hidden — never observed by the policy or the uplift learner."""
 
@@ -58,7 +96,9 @@ class LatentTraits:
     dispute_propensity: float  # 0..1, higher = more likely to dispute when contacted
 
 
-def generate_population(cases: list[RecoveryCase], *, seed: int) -> dict[str, LatentTraits]:
+def generate_population(
+    cases: list[RecoveryCase], *, seed: int, params: ResponseParams = DEFAULT_PARAMS
+) -> dict[str, LatentTraits]:
     """Hidden traits, generated with a DECLARED, modest dependence on each
     case's observable fields — not pure noise independent of everything the
     policy can see.
@@ -92,20 +132,20 @@ def generate_population(cases: list[RecoveryCase], *, seed: int) -> dict[str, La
     traits: dict[str, LatentTraits] = {}
     for case in cases:
         liquidity_shift = (
-            (0.35 if case.customer.is_b2b else 0.0)
-            - 0.25 * min(case.amount_at_risk / 5000.0, 1.0)
+            (params.b2b_liquidity_shift if case.customer.is_b2b else 0.0)
+            - params.amount_liquidity_coupling * min(case.amount_at_risk / 5000.0, 1.0)
         )
         liquidity = float(np.clip(rng.beta(2, 2) + liquidity_shift, 0.0, 1.0))
 
-        dispute_shift = 0.35 if (case.customer.is_b2b or case.loss_type == LossType.OVERDUE_RECEIVABLE) else 0.0
+        dispute_shift = params.dispute_shift if (case.customer.is_b2b or case.loss_type == LossType.OVERDUE_RECEIVABLE) else 0.0
         if case.loss_type == LossType.CHECKOUT_ABANDONMENT:
             dispute_shift -= 0.05  # nothing was ever charged; little to dispute
         dispute_propensity = float(np.clip(rng.beta(1.5, 8) + dispute_shift, 0.0, 1.0))
 
         if case.customer.channel_pref == Channel.WHATSAPP:
-            annoyance_shift = 0.30
+            annoyance_shift = params.channel_annoyance_shift
         elif case.customer.channel_pref == Channel.SMS:
-            annoyance_shift = -0.30
+            annoyance_shift = -params.channel_annoyance_shift
         else:
             annoyance_shift = 0.0
         annoyance_threshold = float(np.clip(rng.beta(2, 2) + annoyance_shift, 0.0, 1.0))
@@ -131,12 +171,12 @@ def persuadability(traits: LatentTraits) -> float:
     ))
 
 
-def _retry_success_prob(case: RecoveryCase) -> float:
+def _retry_success_prob(case: RecoveryCase, params: ResponseParams = DEFAULT_PARAMS) -> float:
     if isinstance(case, FailedSubscriptionCase):
-        return RETRY_SUCCESS_PROB_SUBSCRIPTION
+        return params.retry_success_subscription
     if isinstance(case, FailedPaymentCase) and case.is_hard_decline:
-        return HARD_DECLINE_RETRY_SUCCESS_PROB
-    return RETRY_SUCCESS_PROB_GENERIC
+        return params.retry_success_hard_decline
+    return params.retry_success_generic
 
 
 @dataclass
@@ -166,8 +206,12 @@ class SimulationEnvironment:
     the policy's decisions rather than by RNG bookkeeping.
     """
 
-    def __init__(self, traits_by_case: dict[str, LatentTraits], *, seed: int):
+    def __init__(
+        self, traits_by_case: dict[str, LatentTraits], *, seed: int,
+        params: ResponseParams = DEFAULT_PARAMS,
+    ):
         self._traits = traits_by_case
+        self._params = params
         self._seed = seed
         self._rngs: dict[str, np.random.Generator] = {}
         self._contacts: dict[str, int] = {}
@@ -186,13 +230,14 @@ class SimulationEnvironment:
     def step(self, case: RecoveryCase, action_type: ActionType, attempt_index: int) -> StepResult:
         traits = self._traits[case.case_id]
         rng = self._rng_for(case.case_id)
+        p = self._params
 
         if action_type == ActionType.WAIT:
-            paid = bool(rng.random() < BASE_ORGANIC_RESOLUTION_PROB)
+            paid = bool(rng.random() < p.base_organic_resolution)
             return StepResult(reply=ReplyIntent.PAID if paid else ReplyIntent.NO_REPLY, paid=paid)
 
         if action_type == ActionType.RETRY:
-            paid = bool(rng.random() < _retry_success_prob(case))
+            paid = bool(rng.random() < _retry_success_prob(case, p))
             return StepResult(reply=ReplyIntent.PAID if paid else ReplyIntent.NO_REPLY, paid=paid)
 
         # customer-contact actions (NUDGE / NEGOTIATE / ESCALATE_HUMAN)
@@ -200,16 +245,16 @@ class SimulationEnvironment:
         self._contacts[case.case_id] = n_contacts + 1
 
         tau = persuadability(traits)
-        pay_prob = np.clip(BASE_ORGANIC_RESOLUTION_PROB + tau, 0.0, 0.9)
+        pay_prob = np.clip(p.base_organic_resolution + tau, 0.0, 0.9)
 
         # annoyance accumulates faster for low-annoyance-threshold customers;
         # past that point, opt-out/dispute risk rises and pay probability decays
         annoyance_capacity = 1 + 3 * traits.annoyance_threshold
         overcontacted = max(0, n_contacts - annoyance_capacity)
-        pay_prob = float(np.clip(pay_prob - 0.05 * overcontacted, 0.0, 0.9))
-        opt_out_prob = BASE_OPT_OUT_PROB_PER_CONTACT * (1 + overcontacted) * (1.5 - traits.annoyance_threshold)
-        dispute_prob = BASE_DISPUTE_PROB_PER_CONTACT * (1 + 4 * traits.dispute_propensity)
-        promise_prob = BASE_PROMISE_TO_PAY_PROB_PER_CONTACT
+        pay_prob = float(np.clip(pay_prob - p.annoyance_decay_per_excess_contact * overcontacted, 0.0, 0.9))
+        opt_out_prob = p.opt_out_per_contact * (1 + overcontacted) * (1.5 - traits.annoyance_threshold)
+        dispute_prob = p.dispute_per_contact * (1 + 4 * traits.dispute_propensity)
+        promise_prob = p.promise_per_contact
 
         draw = float(rng.random())
         cumulative = 0.0

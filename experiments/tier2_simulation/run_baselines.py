@@ -77,8 +77,9 @@ def _paired_bootstrap_ci(
     return point, float(lo), float(hi)
 
 
-def run_one_policy(policy_name: str, policy, cases, traits, *, seed: int) -> dict:
-    env = SimulationEnvironment(traits, seed=seed)
+def run_one_policy(policy_name: str, policy, cases, traits, *, seed: int, params=None) -> dict:
+    from recovery_ledger.sim.environment import DEFAULT_PARAMS
+    env = SimulationEnvironment(traits, seed=seed, params=params or DEFAULT_PARAMS)
     listener = EnvironmentListener(env)
     ledger = Ledger()
     agent = RecoveryAgent(
