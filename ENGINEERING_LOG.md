@@ -632,3 +632,71 @@ whole day keeps teaching: write the claim after the measurement, not before.
 
 102/102 tests passing (2 new: random-targeting determinism/rate, and a
 paired-vs-unpaired bootstrap width test).
+
+## 2026-08-24 (cont. 4) — Auditing the code I had just written, and finding the real formula bug
+
+Asked, fairly, what about bugs in the work I had *just* done — I had audited
+the experimental methodology but the code implementing those fixes was hours
+old and barely scrutinised. Three things came out of it.
+
+**A false alarm I raised on myself, and correctly retracted.** Wrote a check
+for whether the new per-case RNG had collapsed (distinct cases sharing a
+stream). It reported "distinct cases have distinct streams: False", which
+looked alarming. Rather than immediately "fixing" it, checked the raw
+per-case draws directly: they were plainly distinct (0.676… vs 0.532… vs
+0.392…). **My test was the artifact, not the code** — it ran 200 nudges at
+one case, by which point annoyance saturation drives pay probability to zero
+for every case, so both sequences trivially became all-False. Worth
+recording: the instinct to "fix" on a red signal without confirming the
+signal is itself sound would have made the code worse.
+
+**A latent fragility, checked and found harmless.** The categorical outcome
+sampler in `step()` walks a cumulative-probability ladder; if the four
+outcome probabilities ever summed above 1.0, later categories (promise-to-pay)
+would be truncated and `no_reply` would become impossible. `opt_out_prob`
+grows linearly in overcontact and is unbounded in principle. Swept the
+reachable parameter space: max total mass is **0.6875**, safe — but only
+because the loop's hard step cap keeps overcontact small. Documented rather
+than "fixed", since there is no actual defect to fix.
+
+**A genuine, consequential bug in the EV objective itself.** NUDGE was valued
+at `τ̂ × amount`, where τ̂ is an **incremental** effect (CATE). RETRY was
+valued at `p_retry × amount`, where `p_retry` is an **absolute** probability.
+Both fed the same `max()`. That is apples-to-oranges, and the spec's formula
+is explicitly `Δp_pay(action) × ₹amount` — a delta for *every* action. The
+bug overvalued RETRY by `0.05 × amount` on every case (~40% overstatement of
+its relative worth at the mean case size). A hard-decline retry — 1% success
+against a 5% organic rate, therefore worth precisely nothing — was being
+valued at `0.01 × amount`. Fixed with
+`_retry_incremental_prob() = max(p_retry − base, 0)`.
+
+**The best part: this fix substantially resolved the "unflattering finding" I
+had written up hours earlier.** I had reported, prominently, that the EV
+policy contacted *more* true do-not-disturbs (22.1%) than random targeting
+(20.4%) — and had root-caused it to a structural tension between `τ̂ × amount`
+and do-not-disturb avoidance. After the formula fix that rate fell to
+**20.19%**, level with mass-contact and better than random. So the finding
+was, in significant part, a *symptom of the bug* rather than the inherent
+property I had confidently attributed it to. The structural pressure is real
+(amount and persuadability correlate -0.45 here) but far smaller than it
+looked. Corrected the report rather than leaving the more dramatic earlier
+narrative standing.
+
+Also verified, because it looked too neat to trust: random_targeting and
+ev_policy_greedy had landed on *exactly* 2,021 contacts each. Checked whether
+that was an aliasing bug by recomputing both selections independently —
+Jaccard 0.435, selections genuinely different, totals coincidentally equal.
+Real coincidence, not a defect.
+
+Net effect on results: headline ₹284,957 → ₹258,796 (CI ₹101,137–₹426,996,
+still excludes zero). Baseline comparison improved: EV policy now edges
+blind mass-contact (340,988 vs 330,108 incremental/1000) using 48% fewer
+contacts, and beats matched-volume random targeting 2.85x with
+non-overlapping CIs. Greedy and lookahead converged to identical recovery
+once the formula was right — so the lookahead reformulation, which an
+earlier entry credited as a marginal win, is now doing essentially nothing.
+Said so in the report rather than letting the earlier credit stand.
+
+104/104 tests passing (2 new regression tests pinning the incremental-vs-
+absolute distinction, plus two stale test comments corrected because they
+described the old, buggy arithmetic).

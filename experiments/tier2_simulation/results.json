@@ -3,18 +3,18 @@
   "n_treatment": 1037,
   "n_holdout": 963,
   "uplift_model_correlation_with_true_persuadability": 0.34910052867754476,
-  "gross_treatment_recovered": 801323.1721817337,
+  "gross_treatment_recovered": 774193.5779498871,
   "gross_holdout_recovered": 469726.7535589823,
-  "treatment_recovery_rate": 0.3481195756991321,
+  "treatment_recovery_rate": 0.3365477338476374,
   "holdout_recovery_rate": 0.15472481827622014,
   "incremental_per_1000_cases": {
-    "point": 284957.67843211844,
-    "ci_low": 128725.49816443938,
-    "ci_high": 451482.65391146985
+    "point": 258796.06393660593,
+    "ci_low": 101136.69041999037,
+    "ci_high": 426996.17462961405
   },
-  "contacts_sent": 1038,
-  "contacts_sent_to_do_not_disturbs": 249,
-  "pct_contacts_to_do_not_disturbs": 0.2398843930635838,
-  "ledger_entries": 32969,
+  "contacts_sent": 1182,
+  "contacts_sent_to_do_not_disturbs": 260,
+  "pct_contacts_to_do_not_disturbs": 0.21996615905245348,
+  "ledger_entries": 32754,
   "ledger_chain_valid": true
 }

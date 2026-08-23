@@ -85,35 +85,35 @@
     },
     {
       "policy": "ev_policy_greedy",
-      "gross_recovered": 1568203.0049403207,
+      "gross_recovered": 1570179.9901669696,
       "recovery_rate": 0.3645,
-      "contacts_sent": 2021,
-      "contacts_sent_to_do_not_disturbs": 447,
-      "pct_contacts_to_do_not_disturbs": 0.22117763483424047,
-      "approx_channel_cost": 659.9,
+      "contacts_sent": 2259,
+      "contacts_sent_to_do_not_disturbs": 456,
+      "pct_contacts_to_do_not_disturbs": 0.20185922974767595,
+      "approx_channel_cost": 730.9,
       "incremental_per_1000_cases": {
-        "point": 339999.61938288884,
-        "ci_low": 271212.9993749579,
-        "ci_high": 407782.43830277043
+        "point": 340988.1119962134,
+        "ci_low": 274087.93505199195,
+        "ci_high": 408856.1640400568
       },
-      "cost_per_incremental_rupee": 0.0019408845256878272,
-      "incremental_rupees_per_contact": 336.4667188351201
+      "cost_per_incremental_rupee": 0.0021434764857964214,
+      "incremental_rupees_per_contact": 301.89297210820126
     },
     {
       "policy": "ev_policy_lookahead",
-      "gross_recovered": 1561261.4002078918,
-      "recovery_rate": 0.363,
-      "contacts_sent": 1972,
-      "contacts_sent_to_do_not_disturbs": 445,
-      "pct_contacts_to_do_not_disturbs": 0.22565922920892495,
-      "approx_channel_cost": 646.2,
+      "gross_recovered": 1570179.9901669696,
+      "recovery_rate": 0.3645,
+      "contacts_sent": 2253,
+      "contacts_sent_to_do_not_disturbs": 454,
+      "pct_contacts_to_do_not_disturbs": 0.20150909897913893,
+      "approx_channel_cost": 728.3,
       "incremental_per_1000_cases": {
-        "point": 336528.8170166745,
-        "ci_low": 267697.7092801154,
-        "ci_high": 404717.2316243753
+        "point": 340988.1119962134,
+        "ci_low": 274087.93505199195,
+        "ci_high": 408856.1640400568
       },
-      "cost_per_incremental_rupee": 0.0019201921717389861,
-      "incremental_rupees_per_contact": 341.3071166497712
+      "cost_per_incremental_rupee": 0.0021358515865447167,
+      "incremental_rupees_per_contact": 302.69694806587955
     }
   ]
 }

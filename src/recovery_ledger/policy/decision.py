@@ -79,13 +79,34 @@ RETRY_SUCCESS_PROB_SUBSCRIPTION = 0.35
 RETRY_SUCCESS_PROB_HARD_DECLINE = 0.01
 RETRY_SUCCESS_PROB_GENERIC = 0.17
 
+# The rate at which a case resolves on its own with no action at all. Needed
+# to convert RETRY's ABSOLUTE success probability into an INCREMENTAL one, so
+# it can be compared like-for-like against the uplift model's tau_hat.
+#
+# This mattered: until 2026-08-24 the EV formula compared `tau_hat * amount`
+# (incremental — CATE is P(pay|contact) - P(pay|no contact)) directly against
+# `p_retry * amount` (absolute). Apples to oranges, in the same max(). It
+# overvalued RETRY by base_resolution_prob * amount on every case — roughly a
+# 40% overstatement of retry's relative worth at the mean case size — and the
+# spec's formula is explicitly "Delta p_pay(action) x amount" (section 8.3),
+# a delta for every action, not just for contact.
+BASE_RESOLUTION_PROB = 0.05
+
 
 def _retry_success_prob(case: RecoveryCase) -> float:
+    """ABSOLUTE probability that a retry resolves the case."""
     if isinstance(case, FailedSubscriptionCase):
         return RETRY_SUCCESS_PROB_SUBSCRIPTION
     if isinstance(case, FailedPaymentCase) and case.is_hard_decline:
         return RETRY_SUCCESS_PROB_HARD_DECLINE
     return RETRY_SUCCESS_PROB_GENERIC
+
+
+def _retry_incremental_prob(case: RecoveryCase) -> float:
+    """INCREMENTAL lift from retrying, versus letting the case sit. This is
+    the quantity comparable to the uplift model's tau_hat, and the one the
+    EV formula must use."""
+    return max(_retry_success_prob(case) - BASE_RESOLUTION_PROB, 0.0)
 
 
 @dataclass
@@ -130,7 +151,7 @@ class EVDecisionPolicy:
         )
 
         retry_applicable = isinstance(case, (FailedPaymentCase, FailedSubscriptionCase))
-        ev_retry = _retry_success_prob(case) * case.amount_at_risk if retry_applicable else float("-inf")
+        ev_retry = _retry_incremental_prob(case) * case.amount_at_risk if retry_applicable else float("-inf")
 
         ev_wait = 0.0  # the reference point every other action must beat
 
@@ -255,7 +276,12 @@ class LookaheadEVDecisionPolicy:
         }
         if isinstance(case, (FailedPaymentCase, FailedSubscriptionCase)):
             p_retry = _retry_success_prob(case)
-            options[ActionType.RETRY] = (p_retry * case.amount_at_risk, p_retry, None)
+            # value uses the INCREMENTAL lift; p_resolve (the continuation
+            # discount) correctly uses the ABSOLUTE probability, since what
+            # ends the case is the case actually resolving.
+            options[ActionType.RETRY] = (
+                _retry_incremental_prob(case) * case.amount_at_risk, p_retry, None,
+            )
         return options
 
     def _solve(self, case: RecoveryCase, tau_hat: float, attempts_so_far: int):

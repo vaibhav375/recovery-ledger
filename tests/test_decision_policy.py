@@ -115,8 +115,9 @@ def test_hard_decline_retry_has_much_lower_ev_than_soft_decline():
     policy = EVDecisionPolicy(uplift_model=FakeUpliftModel(cate=0.05))  # modest uplift: 50 EV before costs
     hard_decision = policy.decide(hard, DIAGNOSER.diagnose(hard), attempts_so_far=0)
     soft_decision = policy.decide(soft, DIAGNOSER.diagnose(soft), attempts_so_far=0)
-    # hard decline retry EV = 0.01*1000=10 < nudge EV (~49.5) -> nudge wins
-    # soft decline retry EV = 0.17*1000=170 > nudge EV (~49.5) -> retry wins
+    # incremental retry lift = max(p_retry - 0.05, 0):
+    #   hard decline -> max(0.01-0.05,0)=0    -> EV 0    < nudge EV (~49.5) -> nudge wins
+    #   soft decline -> 0.17-0.05=0.12        -> EV 120  > nudge EV (~49.5) -> retry wins
     assert hard_decision.action_type == ActionType.NUDGE
     assert soft_decision.action_type == ActionType.RETRY
 
@@ -125,7 +126,8 @@ def test_subscription_retry_beaten_by_strong_positive_uplift_nudge():
     case = _subscription_case(amount_at_risk=1000.0)
     policy = EVDecisionPolicy(uplift_model=FakeUpliftModel(cate=0.5))  # 0.5 * 1000 = 500 EV
     decision = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=0)
-    # subscription retry EV = 0.35 * 1000 = 350, nudge EV = 500 - cost - annoyance(0) ~= 499.5
+    # subscription incremental retry EV = (0.35-0.05) * 1000 = 300,
+    # nudge EV = 500 - cost - annoyance(0) ~= 499.5 -> nudge wins
     assert decision.action_type == ActionType.NUDGE
 
 
@@ -238,3 +240,43 @@ def test_lookahead_values_a_sequence_at_least_as_highly_as_one_step():
 
     greedy_immediate = 0.2 * 1000.0 - CHANNEL_COST[Channel.SMS]
     assert seq_value >= greedy_immediate
+
+
+def test_retry_is_valued_incrementally_not_absolutely():
+    """Regression test for a real bug (2026-08-24): the EV formula compared
+    NUDGE's value (tau_hat x amount — an INCREMENTAL effect, since CATE is
+    P(pay|contact) - P(pay|no contact)) directly against RETRY's
+    (p_retry x amount — an ABSOLUTE probability) inside the same max().
+    Mixing the two scales overvalued RETRY by base_resolution_prob x amount
+    on every single case.
+
+    A retry whose absolute success probability is at or below the rate at
+    which cases resolve on their own adds nothing, and must be valued at
+    zero — not at p_retry x amount."""
+    from recovery_ledger.policy.decision import (
+        BASE_RESOLUTION_PROB,
+        _retry_incremental_prob,
+        _retry_success_prob,
+    )
+
+    soft = _payment_case(is_hard_decline=False)
+    hard = _payment_case(is_hard_decline=True)
+
+    # hard-decline retry succeeds 1% of the time, below the 5% organic rate:
+    # it has no incremental value at all.
+    assert _retry_success_prob(hard) < BASE_RESOLUTION_PROB
+    assert _retry_incremental_prob(hard) == 0.0
+
+    # a soft-decline retry is worth its lift over organic, not its raw rate
+    assert _retry_incremental_prob(soft) == _retry_success_prob(soft) - BASE_RESOLUTION_PROB
+    assert _retry_incremental_prob(soft) < _retry_success_prob(soft)
+
+
+def test_worthless_retry_does_not_beat_a_positive_uplift_nudge():
+    """Consequence of the fix above: on a hard decline (1% retry success,
+    below the 5% organic rate) a genuinely positive-uplift nudge must win.
+    Before the fix, retry's phantom 0.01 x amount could look competitive."""
+    case = _payment_case(is_hard_decline=True, amount_at_risk=1000.0)
+    policy = EVDecisionPolicy(uplift_model=FakeUpliftModel(cate=0.05))
+    decision = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=0)
+    assert decision.action_type == ActionType.NUDGE
