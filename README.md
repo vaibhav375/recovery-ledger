@@ -29,9 +29,20 @@ Build history and honest failures are in [`ENGINEERING_LOG.md`](ENGINEERING_LOG.
       open finding (DR estimator bias under treatment-ratio imbalance, not
       fully closed). Full results and reproduction commands:
       [`experiments/tier1_criteo/REPORT.md`](experiments/tier1_criteo/REPORT.md).
-- [ ] Event schemas + simulator ("the recovery gym")
-- [ ] Compliance kernel (deterministic, no LLM, per-action certificates)
-- [ ] Agent loop + policy (EV decisioning, budget constraints, 11 stopping rules)
+- [x] Event schemas (4 loss types, typed/validated) — real, not stub
+- [ ] Simulator ("the recovery gym") — thin skeleton only so far: deterministic
+      case generation across all 4 loss types. Latent traits, a response
+      model, marginal calibration, and the sensitivity sweep are not built yet.
+- [x] Compliance kernel skeleton — deny-by-default engine, per-action
+      certificates, hash-chained into the ledger, no-LLM-import test that
+      fails the build (verified: mutation-tested, not just passing vacuously).
+      3 real rules so far (contact hours, opt-out cooling, contact budget);
+      the full TCCCPR/DLT/e-mandate rule set is a dedicated later phase.
+- [x] Agent loop skeleton — detect → diagnose → decide → gate → act → listen →
+      stop runs end to end (`make demo`) for all 4 loss types, every step
+      ledgered, chain verified. Policy and listener are still stubs (fixed
+      action sequence; no real reply channel) — the real uplift-driven EV
+      policy lands after Tier 2 simulator work.
 - [ ] Listener + LLM personas
 - [ ] Negotiation + Section 43B(h) clock
 - [ ] Fleet-level degradation detection
@@ -47,7 +58,8 @@ make test             # run the test suite — verified working
 make tier1-hillstrom  # Tier 1 validation on Hillstrom — verified working
 make tier1-criteo     # Tier 1 validation on a 2% Criteo subsample — verified
                        # working; downloads ~340MB from HuggingFace on first run
-make demo             # not yet implemented
+make demo             # runs 20 synthetic cases through the full agent loop —
+                       # verified working, deterministic (run twice, diffed)
 make eval             # not yet implemented
 make redteam          # not yet implemented
 ```

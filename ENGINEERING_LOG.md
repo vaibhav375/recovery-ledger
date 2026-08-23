@@ -112,3 +112,50 @@ next fix (better-calibrated outcome model, more cross-fitting folds).
 
 Awaiting go-ahead before starting Tier 2 (domain simulator), per the
 project's own non-negotiable rule that Tier 1 is a hard stop.
+
+## 2026-08-23 (cont.) — Agent loop skeleton runs end to end
+
+Go-ahead received. Built the thin, fully-real (not fake-stub) skeleton
+flagged as a deliberate reordering back in the first log entry: event
+schemas for all 4 loss types (`events/schemas.py`, pydantic, discriminated
+union on `loss_type`), a hash-chained append-only ledger
+(`ledger/ledger.py`), a deny-by-default compliance kernel
+(`kernel/engine.py`) with 3 real rules (contact hours, opt-out cooling,
+contact budget) and the mechanically-enforced no-LLM-import test
+(`tests/test_kernel_no_llm_imports.py` — verified it actually catches a
+violation, not just passes vacuously, by temporarily dropping an
+`import anthropic` into `kernel/` and confirming the test fails, then
+removing it), and the orchestrator (`agent/loop.py`) tying detector,
+diagnoser, policy, kernel, executor, and listener together with a hard
+step cap as a termination safety net.
+
+`make demo` runs 20 synthetic cases across all 4 loss types through the full
+loop and writes a verified-valid hash chain. Confirmed determinism isn't
+just claimed: ran it twice and diffed the output — byte-identical.
+
+One real bug caught by actually running it, not just writing it: the
+synthetic case generator (`sim/generator.py`) used
+`numpy.random.Generator.choice()` directly on a list of `str`-subclassed
+`Enum` members (`Language`, `Channel`, `LossType`). NumPy silently coerces
+enum members into a bogus fixed-width string dtype when building its
+internal array — the values that came back out weren't valid enum members
+at all (`np.str_('Language')` instead of `Language.EN`), which pydantic
+correctly rejected. Fixed by sampling an index and indexing back into the
+plain Python list instead of asking NumPy to touch the enums.
+
+Also caught before it became a nasty repro-mismatch bug later: `cli.py`'s
+first draft used wall-clock `datetime.now()` as the simulated world's
+reference time, which would have made `make demo`'s case set different on
+every run despite the fixed `--seed` — exactly the kind of thing spec's
+"a judge re-running the repo must get my numbers" rule exists to catch.
+Pinned to a fixed reference datetime; ledger entry timestamps (which record
+when the run actually happened, correctly) are unaffected.
+
+Everything in this loop except the ledger and the 3 kernel rules is still a
+stub: the policy proposes a fixed 2-step sequence rather than real EV
+decisioning, and the listener always returns `NO_REPLY` (no reply channel
+wired). That's why every demo case currently ends in `negative_ev` — the
+stub policy exhausting its fixed sequence, not a real decision. Expected,
+not a bug; will change once the uplift/EV policy is transferred in.
+
+35/35 tests passing (`make test`).

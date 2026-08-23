@@ -17,10 +17,10 @@ tier1-criteo:
 	PYTHONPATH=src .venv/bin/python3 experiments/tier1_criteo/run_validation.py \
 		--dataset criteo --sample-frac 0.02 --target-col visit
 
-# Not yet implemented — see README.md Status section.
 demo:
-	@echo "make demo: not yet implemented (agent loop skeleton is next)"; exit 1
+	PYTHONPATH=src .venv/bin/python3 -m recovery_ledger.cli
 
+# Not yet implemented — see README.md Status section.
 eval:
 	@echo "make eval: not yet implemented"; exit 1
 
