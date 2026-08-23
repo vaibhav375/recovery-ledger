@@ -211,3 +211,48 @@ is still a stub.
 
 57/57 tests passing (35 existing + 22 new rule tests), all added and green
 before this was committed.
+
+## 2026-08-23 (cont. 3) — LLM provider decision: local Ollama, qwen2.5:3b
+
+Asked which LLM provider to build the persona simulation / listener /
+drafting / negotiation components against. Answer: best available
+open-source model, no subscription — meaning local inference, not a paid
+API. This is a real constraint change from the original spec's assumption
+of an API-based LLM and needed an actual decision, not a default guess.
+
+Checked the hardware first rather than assume a model size: this machine is
+a MacBook Air, Apple M1, **8GB RAM**. That's tight for anything above a 7B
+model. Ollama was already installed with `qwen2.5:3b`, `qwen2.5:7b`,
+`qwen3:4b`, and `llama3.2:3b` already pulled.
+
+Ran the actual task (generate a Hinglish customer reply about paying after
+salary on the 5th) on all three plausible candidates rather than pick by
+spec-sheet size:
+
+| Model | Time | Result |
+|---|---|---|
+| qwen2.5:3b | 8.7s | Correct Hinglish: "subscription pay fail ho gayi hai... salary aaye to pay karenge" |
+| qwen2.5:7b | 30.3s | Mostly **English** despite the same instruction — worse fit, 3.5x slower |
+| qwen3:4b | 110.8s | Best quality Hinglish, but a "thinking" model — even with `/no_think` it burned ~2 min per call. Unusable at batch scale (hundreds of simulated cases) |
+
+**Decision: qwen2.5:3b as the default local model.** Counterintuitive
+result worth keeping on record: the smaller model won on the one property
+that actually mattered for this project (reliably switching into Hinglish
+on instruction), and the "thinking" model that reasoned its way to the best
+single answer is disqualified by its own latency the moment you need to run
+it hundreds of times in a batch, which B1 explicitly requires.
+
+Built `src/recovery_ledger/llm/client.py`: an `LLMClient` Protocol, a real
+`OllamaClient` (HTTP against `localhost:11434`, confirmed working against
+the actual running server, not just plausible-looking code), and a
+`MockLLMClient` that isn't a temporary stand-in — it's what keeps `make
+demo` working for anyone who clones this repo without Ollama installed.
+`build_default_client()` checks Ollama's actual availability at call time
+and falls back to the mock rather than crash. None of this is wired into
+`cli.py`'s default demo agent yet (still the stub Listener) — that's next,
+and it has to preserve the "runs from a clean clone with zero external
+services" guarantee for the base demo path.
+
+63/63 tests passing (6 new, including one real integration test against the
+locally running Ollama server — not just a mock-only test suite pretending
+to cover this).

@@ -14,12 +14,10 @@ dependencies = [
     "pydantic>=2.6",
     "click>=8.1",
     "rich>=13.7",
+    "requests>=2.31",
 ]
 
 [project.optional-dependencies]
-llm = [
-    "anthropic>=0.40",
-]
 dashboard = [
     "streamlit>=1.35",
 ]

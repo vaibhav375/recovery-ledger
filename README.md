@@ -1,6 +1,8 @@
 # Recovery Ledger
 
-**Status: early build — Tier 1 validation in progress. Numbers below are placeholders until computed by code in this repo.**
+**Status: early build. Tier 1 validation passed; agent loop skeleton and compliance
+kernel run end to end. The core money-measurement pipeline (simulator response
+model, EV policy, real listener) has not started yet — see Status below.**
 
 An autonomous revenue-recovery agent for Indian payments. It decides *whether, when,
 how, and in what language* to intervene on at-risk revenue — failed payments,
@@ -21,6 +23,23 @@ Build history and honest failures are in [`ENGINEERING_LOG.md`](ENGINEERING_LOG.
    a large share of failed payments recover on their own.
 3. **The compliance kernel is deliberately not an LLM.** Headline design decision:
    an agent that is 99% compliant is 100% undeployable in a regulated business.
+
+## LLM backend
+
+Local, open-source, no subscription (explicit decision, not a default —
+see `ENGINEERING_LOG.md`, 2026-08-23). Persona simulation, reply-intent
+parsing, message drafting, and negotiation dialogue all go through the one
+interface in [`src/recovery_ledger/llm/client.py`](src/recovery_ledger/llm/client.py):
+a real `OllamaClient` (default model `qwen2.5:3b`, chosen after actually
+timing it against `qwen2.5:7b` and `qwen3:4b` on real hardware — the 3B
+model won on both speed and correctly switching into Hinglish on
+instruction) and a `MockLLMClient` fallback. `kernel/` is mechanically
+forbidden from importing this module at all.
+
+To use the real backend: `brew install ollama && ollama pull qwen2.5:3b`.
+Without it, anything that calls through this interface falls back to the
+mock automatically — the base `make demo` never requires Ollama to be
+running.
 
 ## Status
 
