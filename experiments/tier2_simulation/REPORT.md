@@ -108,15 +108,107 @@ still beats the no-contact baseline.
   confirmed again this run.
 - **Ledger**: 28,851 entries, hash chain verified valid.
 
+## 5-baseline comparison (spec section 11.3)
+
+```
+uv run python experiments/tier2_simulation/run_baselines.py --n-train 5000 --n-eval 2000
+```
+
+All 5 policies run against the SAME 2000-case eval batch (same population,
+same hidden traits, each through its own freshly-seeded environment).
+Incremental ₹ here is computed against `do_nothing`'s outcome on that same
+batch — a different comparison design from the headline number above
+(which uses a genuine random holdout split); this script answers "how does
+each policy rank against 4 named alternatives on identical cases," not a
+second independent measurement of the same headline figure.
+
+| Policy | Recovery rate | Gross ₹ | Incremental ₹/1000 (95% CI) | Contacts | % to do-not-disturbs |
+|---|---:|---:|---:|---:|---:|
+| do_nothing | 13.85% | 888,188 | — (reference) | 0 | n/a |
+| blast_everyone | 35.90% | 1,598,606 | 355,209 (233,271–473,252) | 4,393 | 20.49% |
+| razorpay_current | 16.20% | 1,026,125 | 68,968 (-53,530–188,898) | 0 | n/a |
+| rules_based_dunning | 35.90% | 1,598,606 | 355,209 (233,271–473,252) | 4,393 | 20.49% |
+| **ev_policy** | 30.60% | 1,071,579 | 91,696 (-7,020–184,722) | 1,680 | **14.76%** |
+
+Chart: `experiments/tier2_simulation/baselines_comparison.png`.
+
+### Two things worth being direct about, not smoothing over
+
+**`blast_everyone` and `rules_based_dunning` are identical in this
+simulation.** Same recovery rate, same gross ₹, same contact count, to the
+decimal. Both policies just mean "NUDGE every attempt, up to 3, regardless
+of signal" — `sim/environment.py`'s response model doesn't yet
+differentiate outcomes by *channel* (SMS vs. WhatsApp vs. email all have
+identical simulated pay probability), so two policies that differ only in
+default channel choice produce identical outcomes. They still differ in
+`approx_channel_cost` (SMS/WhatsApp/voice cost more per contact than
+email), so they're not entirely redundant as comparison rows, but this is
+a real simulator limitation, not a coincidence, and it's noted here rather
+than left for a reader to wonder about.
+
+**`ev_policy` currently recovers LESS gross/incremental ₹ than blindly
+contacting everyone, and its incremental CI includes zero.** This is not
+the result a "smarter" policy is supposed to produce, and it's reported as
+found rather than tuned away. Investigated rather than assumed benign:
+swept `lambda_annoyance` down to 0 (removing the EV policy's annoyance
+penalty entirely) and recovery only moved from 30.60% to 31.25% — nowhere
+close to closing the 4.65-point gap to `blast_everyone`'s 35.90%, so
+annoyance-cost miscalibration is not the main driver. The more likely
+explanation: `sim/environment.py` treats each NUDGE attempt as
+close to an independent Bernoulli trial (probability doesn't decay much
+until a customer is meaningfully overcontacted), so *persistence* compounds
+— three independent tries at even a modest probability beats one. The EV
+policy makes a single-attempt, single-estimate greedy decision each round
+(spec section 8.3 explicitly allows this simplification: "a well-justified
+greedy-EV-under-budget baseline is acceptable if a full constrained solver
+doesn't fit the timeline") and can give up on a case after one or two
+attempts if that round's `tau_hat` estimate looks weak — forfeiting the
+compounding value a persistent policy captures automatically, especially
+given the uplift model's `tau_hat` is only 0.41-correlated with the true
+signal (noisy point estimates near a stopping threshold will sometimes be
+wrong in the "stop too early" direction).
+
+**What the EV policy IS doing better**: its do-not-disturb contact rate
+(14.76%) is meaningfully lower than blind targeting's (20.49%) — a ~28%
+relative reduction, on real (if imperfect) learned signal, not noise (see
+the correlation regression test above). That's a genuine, measured
+targeting-quality advantage this comparison's raw ₹ figures don't capture
+on their own — and it's exactly the dimension "gross ₹ recovered" as a
+sole metric obscures: repeatedly contacting genuine do-not-disturbs has
+real costs (churn, complaints, regulatory exposure under TCCCPR's
+complaint-threshold provisions) that aren't priced into this batch's
+short-horizon recovery accounting.
+
+**Honest summary**: on this specific metric, over this specific batch, the
+current EV policy is not yet unambiguously better than the naive
+baselines — it trades some recovered ₹ for meaningfully better targeting
+discipline, and the raw-₹ gap has a plausible, investigated (not just
+assumed) mechanism. Next concrete steps, not yet done: model multi-attempt
+value properly (a small-horizon dynamic-programming or lookahead
+correction to the greedy EV, rather than a single-shot estimate per round)
+and try the X-learner or causal forest (already implemented in
+`policy/uplift/learners.py`, not yet swapped in) to see if a better-
+calibrated `tau_hat` closes the gap without sacrificing the do-not-disturb
+improvement.
+
 ## What this experiment still does NOT include
 
-- **Only one baseline comparison** (EV policy vs. do-nothing). Spec section
-  11.3 requires 5.
-- **No sensitivity sweep** over the response model's parameters.
-- **Cost accounting is incomplete** — no "cost per incremental rupee
-  recovered" yet.
+- **No sensitivity sweep** over the response model's parameters — spec
+  section 7.3 requires this before either result above can be called more
+  than a single point estimate, given how much the baseline comparison's
+  outcome (EV policy behind naive persistence) turned out to depend on
+  specifics of the response model's per-attempt independence structure.
+- **`cost_per_incremental_rupee` is computed but only from an approximate
+  channel-cost tally** (contact count × per-channel unit cost from
+  `policy/decision.py`'s `CHANNEL_COST`), not a full accounting including
+  annoyance/churn cost.
 - **First-contact CATE only** — RETRY's effect is a fixed calibrated
   constant, not learned; NEGOTIATE/ESCALATE_HUMAN aren't in training data.
-- **Only the T-learner is used.** Given the do-not-disturb leakage above,
-  trying the X-learner or causal forest next is a concrete, motivated next
-  step, not just "more thorough coverage for its own sake."
+- **Only the T-learner is used.** Given both the do-not-disturb leakage and
+  the raw-₹ underperformance above, trying the X-learner or causal forest
+  next is a concrete, motivated next step, not just "more thorough
+  coverage for its own sake."
+- **The greedy, single-attempt EV formula doesn't model multi-attempt
+  compounding** — identified above as the more likely driver of the
+  baseline-comparison gap than annoyance-cost miscalibration (which was
+  checked, not assumed).

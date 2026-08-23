@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval redteam
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines redteam
 
 setup:
 	uv venv --python 3.12
@@ -27,6 +27,11 @@ demo:
 eval:
 	PYTHONPATH=src .venv/bin/python3 experiments/tier2_simulation/run_batch.py \
 		--n-train 5000 --n-eval 2000
+
+# 5-baseline comparison (spec section 11.3). See experiments/tier2_simulation/REPORT.md.
+baselines:
+	PYTHONPATH=src:experiments/tier2_simulation .venv/bin/python3 \
+		experiments/tier2_simulation/run_baselines.py --n-train 5000 --n-eval 2000
 
 # Not yet implemented — see README.md Status section.
 redteam:

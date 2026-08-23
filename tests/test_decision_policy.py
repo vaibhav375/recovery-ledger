@@ -10,7 +10,13 @@ from recovery_ledger.events.schemas import (
     FailedPaymentCase,
     FailedSubscriptionCase,
 )
-from recovery_ledger.policy.decision import DoNothingPolicy, EVDecisionPolicy
+from recovery_ledger.policy.decision import (
+    BlastEveryonePolicy,
+    DoNothingPolicy,
+    EVDecisionPolicy,
+    RazorpayCurrentPolicy,
+    RulesBasedDunningPolicy,
+)
 
 NOW = datetime(2026, 8, 23, 12, 0, tzinfo=timezone.utc)
 DIAGNOSER = CaseDiagnoser()
@@ -137,5 +143,34 @@ def test_do_nothing_policy_always_waits_until_max_attempts():
     for attempt in range(3):
         decision = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=attempt)
         assert decision.action_type == ActionType.WAIT
+    final = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=3)
+    assert final.action_type == ActionType.STOP
+
+
+def test_blast_everyone_always_nudges_regardless_of_case():
+    policy = BlastEveryonePolicy(max_attempts=3)
+    case = _payment_case()
+    for attempt in range(3):
+        decision = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=attempt)
+        assert decision.action_type == ActionType.NUDGE
+    final = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=3)
+    assert final.action_type == ActionType.STOP
+
+
+def test_razorpay_current_retries_once_then_stops():
+    policy = RazorpayCurrentPolicy()
+    case = _payment_case()
+    first = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=0)
+    second = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=1)
+    assert first.action_type == ActionType.RETRY
+    assert second.action_type == ActionType.STOP
+
+
+def test_rules_based_dunning_fixed_three_contact_ladder():
+    policy = RulesBasedDunningPolicy(max_attempts=3)
+    case = _payment_case()
+    for attempt in range(3):
+        decision = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=attempt)
+        assert decision.action_type == ActionType.NUDGE
     final = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=3)
     assert final.action_type == ActionType.STOP

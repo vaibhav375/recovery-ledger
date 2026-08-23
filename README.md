@@ -80,16 +80,24 @@ running.
       (Revises a 2026-08-23 figure of ₹996,519, found the next day to be an
       artifact of a simulator bug — the uplift model had nothing real to
       learn from — not a genuine result. Full account in the report below.)
-      Full method, what's included, and what isn't (4 of 5 baselines, the
-      sensitivity sweep, cost accounting, do-not-disturb leakage still at
-      16%) in
+      Full method and what still isn't included (sensitivity sweep, full
+      cost accounting) in
       [`experiments/tier2_simulation/REPORT.md`](experiments/tier2_simulation/REPORT.md) —
       **read the claim-scope section before citing this number for anything.**
+- [x] **5-baseline comparison (spec section 11.3).** `make baselines`: all
+      5 policies (do-nothing, blast-everyone, Razorpay-current, rules-based
+      dunning, EV policy) run against the same eval batch. Honest, not
+      flattering: naive blind-contact baselines currently recover MORE raw
+      ₹ than the EV policy (whose incremental CI includes zero here), while
+      the EV policy contacts meaningfully fewer true do-not-disturbs
+      (14.76% vs. 20.49%, ~28% relative reduction). Full investigation of
+      why, and what's next, in the report's baseline-comparison section —
+      not smoothed over.
 - [ ] Real listener + LLM personas (LLM backend decided and built — see
       above — not yet wired into the loop's Listener)
 - [ ] Negotiation + Section 43B(h) clock
 - [ ] Fleet-level degradation detection
-- [ ] Remaining 4 of 5 baselines, sensitivity sweep, red-team suite
+- [ ] Sensitivity sweep, red-team suite
 - [ ] Dashboard / audit-trail browser
 - [ ] Video + submission
 
@@ -103,9 +111,11 @@ make tier1-criteo     # Tier 1 validation on a 2% Criteo subsample — verified
                        # working; downloads ~340MB from HuggingFace on first run
 make demo             # runs 20 synthetic cases through the agent loop with the
                        # stub policy — verified working, deterministic
-make eval             # trains the uplift model + runs the real 1000+1000-case
+make eval             # trains the uplift model + runs the real 5000+2000-case
                        # batch experiment — verified working, deterministic
                        # (run twice, diffed byte-identical)
+make baselines         # runs all 5 spec-required baselines against the same
+                       # eval batch — verified working, deterministic
 make redteam          # not yet implemented
 ```
 

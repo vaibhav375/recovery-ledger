@@ -422,3 +422,55 @@ seeded, and a real seeding gap wouldn't produce results this stable across
 repeats. Corrected `experiments/tier1_criteo/REPORT.md`'s reproducibility
 claim to state this precisely rather than the blanket "reproduce it
 exactly" it said before.
+
+## 2026-08-24 (cont.) — 5-baseline comparison: an uncomfortable, honest result
+
+Next planned step after the bug fix: spec section 11.3's required 5-way
+baseline comparison (do-nothing, blast-everyone, Razorpay-current,
+rules-based dunning, this project's EV policy). Added
+`BlastEveryonePolicy`, `RazorpayCurrentPolicy`, `RulesBasedDunningPolicy` to
+`policy/decision.py` and `experiments/tier2_simulation/run_baselines.py`,
+running all 5 against the same 2000-case eval batch.
+
+Two findings surfaced by actually running it, not by assuming the ranking
+would come out favourably:
+
+1. `blast_everyone` and `rules_based_dunning` produce byte-identical
+   outcomes. Traced immediately: `sim/environment.py`'s response model
+   doesn't differentiate pay probability by channel at all, so two
+   "different" always-contact policies that differ only in default channel
+   choice are the same policy from the simulator's point of view. Not
+   fixed today (documented instead) — real simulator gap worth revisiting.
+
+2. **The EV policy currently recovers LESS gross/incremental ₹ than blind
+   contact, and its incremental CI includes zero** (₹91,696 vs
+   blast-everyone's ₹355,209 per 1,000 cases). This is not the result a
+   "smarter" policy is supposed to produce. Investigated rather than
+   filed away: swept `lambda_annoyance` from 30 down to 0 — recovery moved
+   only 30.60%→31.25%, nowhere near closing the 4.65-point gap to
+   blast-everyone's 35.90%, ruling out annoyance-cost miscalibration as
+   the main driver. Best working explanation: `sim/environment.py` treats
+   each NUDGE as close to an independent Bernoulli trial (probability
+   barely decays until real overcontact), so persistence compounds — three
+   independent tries beat one greedy estimate. The EV policy makes a
+   single-attempt, single-estimate decision each round and can give up
+   early on a case whose noisy `tau_hat` (0.41-correlated, not 1.0) looks
+   weak that specific round, forfeiting compounding value a policy with no
+   judgement at all captures automatically. Spec section 8.3 explicitly
+   permits the greedy simplification; this is a concrete, evidenced case
+   of the cost of taking it, not a hypothetical one.
+
+Also checked what the EV policy IS doing better, instead of only reporting
+the bad news: its do-not-disturb contact rate (14.76%) is genuinely lower
+than blind targeting's (20.49%) — measured on the real, correlation-tested
+signal, not noise. Reported both halves plainly in
+`experiments/tier2_simulation/REPORT.md`: not yet unambiguously better than
+naive persistence on raw ₹ this batch, measurably better at avoiding
+customers who shouldn't be contacted at all. Concrete next steps identified
+and left for later, not attempted today under time pressure: proper
+multi-attempt value modelling (lookahead/DP correction to the greedy EV,
+not a single-shot estimate per round) and trying the X-learner or causal
+forest already implemented but not yet swapped in.
+
+94/94 tests passing (4 new: one per new baseline policy, one integration
+test running all 5 against the same batch).

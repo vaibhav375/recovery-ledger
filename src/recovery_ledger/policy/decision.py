@@ -175,3 +175,68 @@ class DoNothingPolicy:
             action_type=ActionType.WAIT, channel=None,
             rationale="holdout: no-contact baseline",
         )
+
+
+@dataclass
+class BlastEveryonePolicy:
+    """Contact every case, every attempt, no discrimination between
+    persuadables and do-not-disturbs — the naive "when in doubt, reach out"
+    policy this project's whole thesis is that you can beat (spec section
+    11.3, baseline 2)."""
+
+    max_attempts: int = 3
+    default_channel: Channel = Channel.SMS
+
+    def decide(self, case: RecoveryCase, diagnosis: Diagnosis, attempts_so_far: int) -> ActionDecision:
+        if attempts_so_far >= self.max_attempts:
+            return ActionDecision(
+                action_type=ActionType.STOP, channel=None,
+                rationale=f"blast-everyone: reached max_attempts={self.max_attempts}",
+            )
+        channel = case.customer.channel_pref or self.default_channel
+        return ActionDecision(
+            action_type=ActionType.NUDGE, channel=channel,
+            rationale="blast-everyone: always contact, no targeting",
+        )
+
+
+class RazorpayCurrentPolicy:
+    """A single automated retry, then hand the case back to the merchant
+    (spec section 3.3): "Razorpay Subscriptions currently retries a failed
+    recurring charge once... then moves the subscription to halted."
+    Modelled as: one silent RETRY, then STOP — everything after that first
+    retry is, by design, unowned by this policy (spec section 11.3,
+    baseline 3)."""
+
+    def decide(self, case: RecoveryCase, diagnosis: Diagnosis, attempts_so_far: int) -> ActionDecision:
+        if attempts_so_far == 0:
+            return ActionDecision(
+                action_type=ActionType.RETRY, channel=None,
+                rationale="razorpay-current: single automated retry",
+            )
+        return ActionDecision(
+            action_type=ActionType.STOP, channel=None,
+            rationale="razorpay-current: halted after first retry, handed back to merchant",
+        )
+
+
+@dataclass
+class RulesBasedDunningPolicy:
+    """The industry-standard fixed cadence — a 3-contact ladder regardless
+    of any signal about who's actually persuadable (spec section 11.3,
+    baseline 4: "fixed 3-email ladder — the industry standard")."""
+
+    max_attempts: int = 3
+    default_channel: Channel = Channel.EMAIL
+
+    def decide(self, case: RecoveryCase, diagnosis: Diagnosis, attempts_so_far: int) -> ActionDecision:
+        if attempts_so_far >= self.max_attempts:
+            return ActionDecision(
+                action_type=ActionType.STOP, channel=None,
+                rationale="rules-based dunning: fixed 3-contact ladder complete",
+            )
+        channel = case.customer.channel_pref or self.default_channel
+        return ActionDecision(
+            action_type=ActionType.NUDGE, channel=channel,
+            rationale=f"rules-based dunning: fixed contact {attempts_so_far + 1}/{self.max_attempts}",
+        )

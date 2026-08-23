@@ -1,0 +1,82 @@
+{
+  "n_train": 5000,
+  "n_eval": 2000,
+  "eval_seed": 20262823,
+  "policies": [
+    {
+      "policy": "do_nothing",
+      "gross_recovered": 888188.016138741,
+      "recovery_rate": 0.1385,
+      "contacts_sent": 0,
+      "contacts_sent_to_do_not_disturbs": 0,
+      "pct_contacts_to_do_not_disturbs": null,
+      "approx_channel_cost": 0,
+      "incremental_per_1000_cases": {
+        "point": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0
+      },
+      "cost_per_incremental_rupee": null
+    },
+    {
+      "policy": "blast_everyone",
+      "gross_recovered": 1598606.0159354913,
+      "recovery_rate": 0.359,
+      "contacts_sent": 4393,
+      "contacts_sent_to_do_not_disturbs": 900,
+      "pct_contacts_to_do_not_disturbs": 0.2048713862963806,
+      "approx_channel_cost": 1347.1,
+      "incremental_per_1000_cases": {
+        "point": 355208.9998983751,
+        "ci_low": 233270.8385587815,
+        "ci_high": 473252.22079764894
+      },
+      "cost_per_incremental_rupee": 0.003792415170745684
+    },
+    {
+      "policy": "razorpay_current",
+      "gross_recovered": 1026124.8772665921,
+      "recovery_rate": 0.162,
+      "contacts_sent": 0,
+      "contacts_sent_to_do_not_disturbs": 0,
+      "pct_contacts_to_do_not_disturbs": null,
+      "approx_channel_cost": 0,
+      "incremental_per_1000_cases": {
+        "point": 68968.43056392555,
+        "ci_low": -53530.050908679834,
+        "ci_high": 188897.74959224896
+      },
+      "cost_per_incremental_rupee": 0.0
+    },
+    {
+      "policy": "rules_based_dunning",
+      "gross_recovered": 1598606.0159354913,
+      "recovery_rate": 0.359,
+      "contacts_sent": 4393,
+      "contacts_sent_to_do_not_disturbs": 900,
+      "pct_contacts_to_do_not_disturbs": 0.2048713862963806,
+      "approx_channel_cost": 1347.1,
+      "incremental_per_1000_cases": {
+        "point": 355208.9998983751,
+        "ci_low": 233270.8385587815,
+        "ci_high": 473252.22079764894
+      },
+      "cost_per_incremental_rupee": 0.003792415170745684
+    },
+    {
+      "policy": "ev_policy",
+      "gross_recovered": 1071579.2042382369,
+      "recovery_rate": 0.306,
+      "contacts_sent": 1680,
+      "contacts_sent_to_do_not_disturbs": 248,
+      "pct_contacts_to_do_not_disturbs": 0.14761904761904762,
+      "approx_channel_cost": 499.2,
+      "incremental_per_1000_cases": {
+        "point": 91695.59404974786,
+        "ci_low": -7019.557849449151,
+        "ci_high": 184722.23020338523
+      },
+      "cost_per_incremental_rupee": 0.005444100179220908
+    }
+  ]
+}
