@@ -3,18 +3,29 @@
   "n_treatment": 1037,
   "n_holdout": 963,
   "uplift_model_correlation_with_true_persuadability": 0.34910052867754476,
-  "gross_treatment_recovered": 774193.5779498871,
+  "gross_treatment_recovered": 805234.2400952105,
   "gross_holdout_recovered": 469726.7535589823,
-  "treatment_recovery_rate": 0.3365477338476374,
+  "treatment_recovery_rate": 0.36837029893924783,
   "holdout_recovery_rate": 0.15472481827622014,
   "incremental_per_1000_cases": {
-    "point": 258796.06393660593,
-    "ci_low": 101136.69041999037,
-    "ci_high": 426996.17462961405
+    "point": 288729.2000458859,
+    "ci_low": 133923.91458783878,
+    "ci_high": 432362.0437832107
   },
-  "contacts_sent": 1182,
-  "contacts_sent_to_do_not_disturbs": 260,
-  "pct_contacts_to_do_not_disturbs": 0.21996615905245348,
-  "ledger_entries": 32754,
+  "contacts_sent": 1369,
+  "contacts_sent_to_do_not_disturbs": 312,
+  "pct_contacts_to_do_not_disturbs": 0.2279035792549306,
+  "stop_reason_counts": {
+    "do_not_disturb": 92,
+    "resolved": 382,
+    "budget_exhausted": 507,
+    "dispute_raised": 34,
+    "opt_out": 19,
+    "human_escalation_threshold": 2,
+    "hard_decline": 1
+  },
+  "distinct_stop_reasons_fired": 7,
+  "unresolved_exceptions": 655,
+  "ledger_entries": 34081,
   "ledger_chain_valid": true
 }

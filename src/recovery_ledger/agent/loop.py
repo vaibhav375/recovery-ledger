@@ -9,11 +9,12 @@ the product" rule (spec section 0) — even while the components it calls
 from __future__ import annotations
 
 from collections.abc import Callable
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from recovery_ledger.detector.detector import CaseDetector
 from recovery_ledger.diagnoser.diagnoser import CaseDiagnoser
 from recovery_ledger.events.actions import ActionType, StopReason
+from recovery_ledger.events.outcomes import CaseOutcome
 from recovery_ledger.events.schemas import Channel, RecoveryCase
 from recovery_ledger.executor.executor import SimulatedExecutor
 from recovery_ledger.kernel.certificate import Decision
@@ -26,8 +27,29 @@ REPLY_TO_STOP_REASON = {
     ReplyIntent.PAID: StopReason.RESOLVED,
     ReplyIntent.OPT_OUT: StopReason.OPT_OUT,
     ReplyIntent.DISPUTE: StopReason.DISPUTE_RAISED,
-    ReplyIntent.PROMISE_TO_PAY: StopReason.PROMISE_TO_PAY_ACTIVE,
 }
+
+# How long after a promised payment date the agent waits before working the
+# case again — the "+ grace" in spec section 10, rule 6.
+PROMISE_GRACE = timedelta(days=2)
+
+
+class KillSwitch:
+    """Operator halt (spec section 10, rule 11). Shared across agents so a
+    single operator action stops the whole fleet, not one case."""
+
+    def __init__(self, engaged: bool = False):
+        self._engaged = engaged
+
+    def engage(self) -> None:
+        self._engaged = True
+
+    def release(self) -> None:
+        self._engaged = False
+
+    @property
+    def engaged(self) -> bool:
+        return self._engaged
 
 DEFAULT_ATTEMPT_CAP = 3
 DEFAULT_WINDOW_DAYS = 7
@@ -47,6 +69,8 @@ class RecoveryAgent:
         listener: Listener,
         ledger: Ledger,
         clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
+        kill_switch: "KillSwitch | None" = None,
+        respect_promise_windows: bool = True,
     ):
         self.detector = detector
         self.diagnoser = diagnoser
@@ -56,10 +80,21 @@ class RecoveryAgent:
         self.listener = listener
         self.ledger = ledger
         self.clock = clock
+        self.kill_switch = kill_switch or KillSwitch()
+        self.respect_promise_windows = respect_promise_windows
+        # case_id -> datetime the customer promised to pay by (+ grace).
+        # Survives across resumptions so the kernel can enforce silence.
+        self.promises: dict[str, datetime] = {}
 
-    def _stop(self, case: RecoveryCase, reason: StopReason) -> StopReason:
+    def _stop(self, case: RecoveryCase, reason: StopReason) -> CaseOutcome:
         self.ledger.append(case.case_id, "stop", {"reason": reason.value})
-        return reason
+        return CaseOutcome.terminated(case.case_id, reason)
+
+    def _pause(self, case: RecoveryCase, resume_at: datetime, reason: StopReason) -> CaseOutcome:
+        self.ledger.append(
+            case.case_id, "pause", {"reason": reason.value, "resume_at": resume_at.isoformat()},
+        )
+        return CaseOutcome.paused(case.case_id, resume_at, reason)
 
     def _rule_context(
         self,
@@ -90,13 +125,29 @@ class RecoveryAgent:
             includes_opt_out_option=True,
             sender_number_series="160",
             tone_intensity=min(attempts_so_far, 3),
+            promise_to_pay_until=(
+                self.promises.get(case.case_id) if self.respect_promise_windows else None
+            ),
         )
 
-    def run_case(self, case: RecoveryCase) -> StopReason:
-        self.ledger.append(case.case_id, "case_ingested", case.model_dump(mode="json"))
+    def run_case(self, case: RecoveryCase, *, start_attempt: int = 0) -> CaseOutcome:
+        """Work a case until it terminates or must pause.
+
+        `start_attempt` lets a resumed case continue spending the attempt
+        budget it had already partly used, rather than getting a fresh
+        allowance every time it wakes up — otherwise a customer could be
+        contacted indefinitely by promising to pay each time.
+        """
+        if start_attempt == 0:
+            self.ledger.append(case.case_id, "case_ingested", case.model_dump(mode="json"))
 
         resolved = False
-        for attempts_so_far in range(HARD_MAX_STEPS):
+        for attempts_so_far in range(start_attempt, HARD_MAX_STEPS):
+            # Rule 11 — operator halt. Checked first and every iteration, so
+            # engaging it stops in-flight work rather than only new work.
+            if self.kill_switch.engaged:
+                return self._stop(case, StopReason.GLOBAL_KILL_SWITCH)
+
             if not self.detector.is_at_risk(case, resolved=resolved):
                 return self._stop(case, StopReason.RESOLVED)
 
@@ -107,7 +158,15 @@ class RecoveryAgent:
             self.ledger.append(case.case_id, "decision", decision.model_dump())
 
             if decision.action_type == ActionType.STOP:
-                return self._stop(case, StopReason.NEGATIVE_EV)
+                # Attribute what the policy actually said, rather than
+                # assuming NEGATIVE_EV for every stop — that conflation hid
+                # budget exhaustion entirely (see ENGINEERING_LOG.md).
+                return self._stop(case, decision.stop_reason or StopReason.NEGATIVE_EV)
+
+            if decision.action_type == ActionType.ESCALATE_HUMAN:
+                return self._stop(
+                    case, decision.stop_reason or StopReason.HUMAN_ESCALATION_THRESHOLD
+                )
 
             certificate = self.kernel.issue_certificate(
                 self._rule_context(case, decision.action_type, decision.channel, attempts_so_far)
@@ -147,6 +206,15 @@ class RecoveryAgent:
 
             reply = self.listener.listen(case, executed_action, attempts_so_far)
             self.ledger.append(case.case_id, "reply", {"intent": reply.value})
+
+            if reply == ReplyIntent.PROMISE_TO_PAY:
+                # Rule 6 — a promise is a PAUSE, not an ending. Record when
+                # the agent may speak again and hand the case back to the
+                # runner; the kernel enforces silence until then.
+                promised_by = self.clock() + PROMISE_GRACE
+                self.promises[case.case_id] = promised_by
+                if self.respect_promise_windows:
+                    return self._pause(case, promised_by, StopReason.PROMISE_TO_PAY_ACTIVE)
 
             if reply in REPLY_TO_STOP_REASON:
                 if reply == ReplyIntent.PAID:

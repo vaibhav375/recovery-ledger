@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from pydantic import BaseModel
 
 from recovery_ledger.diagnoser.diagnoser import Diagnosis
-from recovery_ledger.events.actions import ActionType
+from recovery_ledger.events.actions import ActionType, StopReason
 from recovery_ledger.events.schemas import (
     Channel,
     FailedPaymentCase,
@@ -30,6 +30,15 @@ class ActionDecision(BaseModel):
     action_type: ActionType
     channel: Channel | None
     rationale: str
+    # Why the policy chose to stop, when action_type is STOP. Without this the
+    # agent loop has to guess, and it guessed wrong: every policy STOP was
+    # attributed to NEGATIVE_EV, including the STOP returned on reaching
+    # max_attempts. Budget exhaustion and "nothing has positive expected
+    # value" are different terminations that the ledger must distinguish
+    # (spec section 10, rules 3 and 4). Found 2026-08-24 — the last full run
+    # reported 1,335 negative_ev stops and 0 budget_exhausted, which was an
+    # artifact of that conflation, not a property of the policy.
+    stop_reason: StopReason | None = None
 
 
 class DecisionPolicy:
@@ -44,6 +53,7 @@ class DecisionPolicy:
         if attempts_so_far >= self.max_attempts:
             return ActionDecision(
                 action_type=ActionType.STOP, channel=None,
+                stop_reason=StopReason.BUDGET_EXHAUSTED,
                 rationale=f"stub policy: reached max_attempts={self.max_attempts}",
             )
         if attempts_so_far == 0:
@@ -109,6 +119,68 @@ def _retry_incremental_prob(case: RecoveryCase) -> float:
     return max(_retry_success_prob(case) - BASE_RESOLUTION_PROB, 0.0)
 
 
+def _check_autonomy_limit(case: RecoveryCase, limit: float) -> ActionDecision | None:
+    """Stopping rule 8 — amount exceeds the agent's autonomy limit, so the
+    case goes to a human instead of being worked automatically."""
+    if case.amount_at_risk > limit:
+        return ActionDecision(
+            action_type=ActionType.ESCALATE_HUMAN, channel=None,
+            stop_reason=StopReason.HUMAN_ESCALATION_THRESHOLD,
+            rationale=(
+                f"amount at risk Rs {case.amount_at_risk:,.0f} exceeds the agent's "
+                f"autonomy limit of Rs {limit:,.0f}; handing to a human"
+            ),
+        )
+    return None
+
+
+def _terminal_reason(
+    case: RecoveryCase, tau_hat: float, retry_applicable: bool, *, ever_worthwhile: bool = True
+) -> StopReason:
+    """WHY this case is finished, once its attempt budget is spent.
+
+    Design note, because this is subtle and a naive version of it caused a
+    real regression. Do-not-disturb (rule 5) and hard decline (rule 9) are
+    *classifications of why the agent never acted*, not licences to abandon
+    the case the moment they are detected. Terminating early on them looks
+    reasonable and is actively harmful: it forfeits the organic
+    self-resolution the customer might reach anyway, which is precisely the
+    bug that had the EV policy recovering 8.1% of overdue receivables
+    against the do-nothing baseline's 13.9% (see ENGINEERING_LOG.md,
+    2026-08-24).
+
+    So the agent still waits out the window costlessly — contacting nobody,
+    spending nothing — and only when the budget is spent does it record
+    which of these three actually describes the case. The customer is never
+    disturbed either way; the difference is purely whether the case keeps
+    its free shot at resolving, and whether the ledger records a meaningful
+    reason or a catch-all.
+    """
+    is_hard_decline = isinstance(case, FailedPaymentCase) and case.is_hard_decline
+
+    # Rule 5 — negative predicted uplift: contact destroys value, so the
+    # agent deliberately never contacted. Silent retry may still have been
+    # admissible (spec: "never contact — may still allow silent retry"), so
+    # this only describes the case when retry was not on the table.
+    if tau_hat < 0 and not retry_applicable:
+        return StopReason.DO_NOT_DISTURB
+
+    # Rule 9 — non-retryable failure code, and no contact was worth making.
+    if is_hard_decline and tau_hat <= 0:
+        return StopReason.HARD_DECLINE
+
+    # Rule 4 — nothing was ever worth doing. Distinct from rule 3: the agent
+    # did not spend a budget, it declined to act at all because no admissible
+    # action had positive expected value even on the first attempt. Expected
+    # value is monotonically non-increasing in attempts (annoyance cost only
+    # grows), so "not worthwhile at attempt 0" implies "never worthwhile".
+    if not ever_worthwhile:
+        return StopReason.NEGATIVE_EV
+
+    # Rule 3 — the agent worked the case and ran out of attempts.
+    return StopReason.BUDGET_EXHAUSTED
+
+
 @dataclass
 class EVDecisionPolicy:
     """EV(action | state) = delta_p_pay(action) x amount_at_risk
@@ -132,16 +204,47 @@ class EVDecisionPolicy:
     uplift_model: UpliftModel
     lambda_annoyance: float = 30.0
     max_attempts: int = 3
+    # Above this amount the agent must hand off rather than act autonomously
+    # (spec section 10, rule 8: "amount or sensitivity exceeds autonomy
+    # limit"). Set deliberately high so it fires on genuinely large cases
+    # rather than routinely.
+    autonomy_limit_rupees: float = 25_000.0
+
+    def _best_ev(self, case: RecoveryCase, tau_hat: float, *, attempt_index: int) -> float:
+        """Best expected value available at a given attempt index. Used both
+        to choose an action and, at the horizon, to tell "never worth acting"
+        (rule 4) apart from "acted until the budget ran out" (rule 3)."""
+        channel = case.customer.channel_pref or Channel.SMS
+        ev_nudge = (
+            tau_hat * case.amount_at_risk
+            - CHANNEL_COST[channel]
+            - self.lambda_annoyance * attempt_index
+        )
+        ev_retry = (
+            _retry_incremental_prob(case) * case.amount_at_risk
+            if isinstance(case, (FailedPaymentCase, FailedSubscriptionCase))
+            else float("-inf")
+        )
+        return max(ev_nudge, ev_retry, 0.0 if attempt_index < 0 else float("-inf"))
 
     def decide(self, case: RecoveryCase, diagnosis: Diagnosis, attempts_so_far: int) -> ActionDecision:
-        if attempts_so_far >= self.max_attempts:
-            return ActionDecision(
-                action_type=ActionType.STOP, channel=None,
-                rationale=f"EV policy: reached max_attempts={self.max_attempts}",
-            )
+        escalation = _check_autonomy_limit(case, self.autonomy_limit_rupees)
+        if escalation is not None:
+            return escalation
 
         features = case_to_features(case).reshape(1, -1)
         tau_hat = float(self.uplift_model.predict_cate(features)[0])
+        retry_available = isinstance(case, (FailedPaymentCase, FailedSubscriptionCase))
+
+        if attempts_so_far >= self.max_attempts:
+            reason = _terminal_reason(
+                case, tau_hat, retry_available,
+                ever_worthwhile=self._best_ev(case, tau_hat, attempt_index=0) > 0,
+            )
+            return ActionDecision(
+                action_type=ActionType.STOP, channel=None, stop_reason=reason,
+                rationale=f"EV policy: terminal reason {reason.value} (max_attempts={self.max_attempts})",
+            )
 
         channel = case.customer.channel_pref or Channel.SMS
         ev_nudge = (
@@ -207,6 +310,7 @@ class DoNothingPolicy:
         if attempts_so_far >= self.max_attempts:
             return ActionDecision(
                 action_type=ActionType.STOP, channel=None,
+                stop_reason=StopReason.BUDGET_EXHAUSTED,
                 rationale=f"holdout: reached max_attempts={self.max_attempts}",
             )
         return ActionDecision(
@@ -257,6 +361,7 @@ class LookaheadEVDecisionPolicy:
     lambda_annoyance: float = 30.0
     max_attempts: int = 3
     base_resolution_prob: float = 0.05
+    autonomy_limit_rupees: float = 25_000.0
 
     def _immediate_and_resolve(
         self, case: RecoveryCase, tau_hat: float, attempt_index: int
@@ -305,14 +410,23 @@ class LookaheadEVDecisionPolicy:
         return best_at_current
 
     def decide(self, case: RecoveryCase, diagnosis: Diagnosis, attempts_so_far: int) -> ActionDecision:
-        if attempts_so_far >= self.max_attempts:
-            return ActionDecision(
-                action_type=ActionType.STOP, channel=None,
-                rationale=f"lookahead EV: reached max_attempts={self.max_attempts}",
-            )
-
+        escalation = _check_autonomy_limit(case, self.autonomy_limit_rupees)
+        if escalation is not None:
+            return escalation
         features = case_to_features(case).reshape(1, -1)
         tau_hat = float(self.uplift_model.predict_cate(features)[0])
+        retry_available = isinstance(case, (FailedPaymentCase, FailedSubscriptionCase))
+
+        if attempts_so_far >= self.max_attempts:
+            _, _, value_from_start = self._solve(case, tau_hat, 0)
+            reason = _terminal_reason(
+                case, tau_hat, retry_available, ever_worthwhile=value_from_start > 0,
+            )
+            return ActionDecision(
+                action_type=ActionType.STOP, channel=None, stop_reason=reason,
+                rationale=f"lookahead EV: terminal reason {reason.value} (max_attempts={self.max_attempts})",
+            )
+
         action, channel, value = self._solve(case, tau_hat, attempts_so_far)
 
         if action == ActionType.STOP or value <= 0:
@@ -362,6 +476,7 @@ class RandomTargetingPolicy:
         if attempts_so_far >= self.max_attempts:
             return ActionDecision(
                 action_type=ActionType.STOP, channel=None,
+                stop_reason=StopReason.BUDGET_EXHAUSTED,
                 rationale=f"random targeting: reached max_attempts={self.max_attempts}",
             )
         if not self._contacts_this_case(case):
@@ -390,6 +505,7 @@ class BlastEveryonePolicy:
         if attempts_so_far >= self.max_attempts:
             return ActionDecision(
                 action_type=ActionType.STOP, channel=None,
+                stop_reason=StopReason.BUDGET_EXHAUSTED,
                 rationale=f"blast-everyone: reached max_attempts={self.max_attempts}",
             )
         channel = case.customer.channel_pref or self.default_channel

@@ -87,33 +87,33 @@
       "policy": "ev_policy_greedy",
       "gross_recovered": 1570179.9901669696,
       "recovery_rate": 0.3645,
-      "contacts_sent": 2259,
-      "contacts_sent_to_do_not_disturbs": 456,
-      "pct_contacts_to_do_not_disturbs": 0.20185922974767595,
-      "approx_channel_cost": 730.9,
+      "contacts_sent": 2257,
+      "contacts_sent_to_do_not_disturbs": 454,
+      "pct_contacts_to_do_not_disturbs": 0.20115197164377493,
+      "approx_channel_cost": 729.9,
       "incremental_per_1000_cases": {
         "point": 340988.1119962134,
         "ci_low": 274087.93505199195,
         "ci_high": 408856.1640400568
       },
-      "cost_per_incremental_rupee": 0.0021434764857964214,
-      "incremental_rupees_per_contact": 301.89297210820126
+      "cost_per_incremental_rupee": 0.0021405438322380736,
+      "incremental_rupees_per_contact": 302.1604891415271
     },
     {
       "policy": "ev_policy_lookahead",
       "gross_recovered": 1570179.9901669696,
       "recovery_rate": 0.3645,
-      "contacts_sent": 2253,
-      "contacts_sent_to_do_not_disturbs": 454,
-      "pct_contacts_to_do_not_disturbs": 0.20150909897913893,
-      "approx_channel_cost": 728.3,
+      "contacts_sent": 2251,
+      "contacts_sent_to_do_not_disturbs": 452,
+      "pct_contacts_to_do_not_disturbs": 0.20079964460239894,
+      "approx_channel_cost": 727.3,
       "incremental_per_1000_cases": {
         "point": 340988.1119962134,
         "ci_low": 274087.93505199195,
         "ci_high": 408856.1640400568
       },
-      "cost_per_incremental_rupee": 0.0021358515865447167,
-      "incremental_rupees_per_contact": 302.69694806587955
+      "cost_per_incremental_rupee": 0.002132918932986369,
+      "incremental_rupees_per_contact": 302.96589248886124
     }
   ]
 }

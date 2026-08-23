@@ -22,6 +22,7 @@ from recovery_ledger.kernel.rules.dpdp import ConsentRecordExistsRule
 from recovery_ledger.kernel.rules.emandate_2026 import PreDebitNotificationRule
 from recovery_ledger.kernel.rules.escalation import ToneIntensityCeilingRule
 from recovery_ledger.kernel.rules.opt_out import OptOutRule
+from recovery_ledger.kernel.rules.promise import PromiseToPayWindowRule
 from recovery_ledger.kernel.rules.tcccpr import (
     ConsentValidityRule,
     DLTRegistrationRule,
@@ -46,6 +47,7 @@ def build_default_agent(ledger: Ledger, *, clock) -> RecoveryAgent:
             DLTRegistrationRule(), HeaderClassMatchRule(), ConsentValidityRule(),
             OptOutOptionPresentRule(), NumberSeriesRule(),
             PreDebitNotificationRule(), ConsentRecordExistsRule(), ToneIntensityCeilingRule(),
+        PromiseToPayWindowRule(),
         ]),
         executor=SimulatedExecutor(),
         listener=Listener(),
@@ -76,7 +78,8 @@ def main() -> None:
     print(f"Running {len(cases)} synthetic cases through the agent loop (seed={args.seed})\n")
     stop_reasons: Counter[str] = Counter()
     for case in cases:
-        reason = agent.run_case(case)
+        outcome = agent.run_case(case)
+        reason = outcome.stop_reason or outcome.pause_reason
         stop_reasons[reason.value] += 1
         print(f"  {case.case_id:12s} [{case.loss_type.value:22s}] ₹{case.amount_at_risk:9.2f} -> {reason.value}")
 

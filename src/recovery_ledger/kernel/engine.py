@@ -74,6 +74,9 @@ class RuleContext:
     dlt: DLTInfo = field(default_factory=DLTInfo)
     mandate: MandateInfo = field(default_factory=MandateInfo)
     includes_opt_out_option: bool = True
+    # Set when the customer has promised payment by a date; contact is
+    # inadmissible until then (spec section 10, rule 6).
+    promise_to_pay_until: datetime | None = None
     sender_number_series: Literal["140", "160", "other"] = "160"
     tone_intensity: int = 0  # 0 (neutral) .. 3 (firm) — see rules/escalation.py
 

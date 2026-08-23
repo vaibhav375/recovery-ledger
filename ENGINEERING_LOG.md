@@ -700,3 +700,61 @@ Said so in the report rather than letting the earlier credit stand.
 104/104 tests passing (2 new regression tests pinning the incremental-vs-
 absolute distinction, plus two stale test comments corrected because they
 described the old, buggy arithmetic).
+
+## 2026-08-24 (cont. 5) — B3: all 11 stopping rules, and two defects the design surfaced
+
+Implemented the approved B3 design. Two defects were found while designing
+it, before any code was written, which is the useful part.
+
+**Defect 1 — `BUDGET_EXHAUSTED` was mis-attributed as `NEGATIVE_EV`.** The
+loop mapped *every* policy `STOP` to `NEGATIVE_EV`, including the one
+returned on reaching `max_attempts`. So the last full run's 1,335
+`negative_ev` stops were mostly budget exhaustion wearing the wrong label,
+and `budget_exhausted` read 0 — not because it never happened, but because
+it was never recorded. Fixed by having `ActionDecision` carry its own
+`stop_reason` so the loop attributes rather than guesses.
+
+**Defect 2 — promise-to-pay was terminal.** Spec rule 6 is "pause until the
+promised date + grace, then re-evaluate". Treating it as an ending
+abandoned 115 cases at exactly the moment the customer signalled intent to
+pay.
+
+**A design collision worth recording.** My first implementation had
+do-not-disturb and hard-decline terminate the case the moment they were
+detected. That is intuitive and it is wrong — it re-creates the earlier bug
+where abandoning a case forfeits the free organic resolution it would
+otherwise get (the one that had the EV policy recovering 8.1% of overdue
+receivables against do-nothing's 13.9%). The test suite caught it
+immediately. Restructured so these are *classifications of why the agent
+never acted*, applied when the budget is spent, rather than licences to
+abandon early: the agent still waits out the window costlessly, contacts
+nobody, and records an accurate terminal reason.
+
+**The B3 test caught a second gap in my own design.** With that restructure,
+`NEGATIVE_EV` became genuinely unreachable — everything routed to
+do-not-disturb, hard-decline, or budget-exhausted. The
+"every rule must fire" test failed and named the missing rule. Fixed by
+distinguishing "never worth acting at all" (rule 4) from "acted until the
+budget ran out" (rule 3), which is sound because expected value is
+monotonically non-increasing in attempts, so not-worthwhile-at-attempt-0
+implies never-worthwhile. That test paid for itself within an hour of being
+written.
+
+**Results.** A real 2,000-case batch now fires **7 of 11** reasons naturally
+(do_not_disturb 92, resolved 382, budget_exhausted 507, dispute 34, opt_out
+19, human_escalation 2, hard_decline 1). The remaining four need conditions
+a normal batch doesn't produce — an engaged kill switch, a kernel that
+denies literally everything, a case where nothing is ever worthwhile, and
+promise-to-pay which is now a *pause* and resolves later rather than
+terminating. All 11 are proven reachable by
+`tests/test_all_stopping_rules.py::test_every_stopping_rule_is_reachable`,
+which is the honest way to claim B3: 7 occur naturally, 11 are demonstrably
+reachable, and the distinction is stated rather than blurred.
+
+Headline moved ₹258,796 → **₹288,729** (CI ₹133,924–₹432,362) — the promise
+resumption recovers cases that were previously abandoned. Baselines
+unchanged in shape; EV policy still ~2.85x matched-volume random targeting.
+655 cases land in the honest exception list.
+
+121/121 tests passing (17 new: 11 per-rule, the all-rules-reachable test,
+and 5 for the resumption queue). All experiments re-verified deterministic.

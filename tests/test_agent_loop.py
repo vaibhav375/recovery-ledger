@@ -51,18 +51,23 @@ def _build_agent(*, clock, rules=None) -> tuple[RecoveryAgent, Ledger]:
 
 def test_full_run_produces_valid_hash_chain():
     agent, ledger = _build_agent(clock=lambda: DAYTIME)
-    reason = agent.run_case(_case())
+    outcome = agent.run_case(_case())
     assert ledger.verify_chain() is True
     assert len(ledger) > 0
-    assert isinstance(reason, StopReason)
+    assert outcome.is_terminated
+    assert isinstance(outcome.stop_reason, StopReason)
 
 
-def test_stub_policy_eventually_stops_with_negative_ev():
+def test_stub_policy_terminates_with_budget_exhausted():
     """The stub policy (Listener always returns NO_REPLY, so nothing ever
-    resolves) must still provably terminate — this is B3, not a detail."""
+    resolves) must still provably terminate — this is B3, not a detail.
+
+    It stops because it runs out of attempts, so the ledger must say
+    BUDGET_EXHAUSTED. Until 2026-08-24 every policy STOP was recorded as
+    NEGATIVE_EV regardless of cause, which hid budget exhaustion entirely."""
     agent, ledger = _build_agent(clock=lambda: DAYTIME)
-    reason = agent.run_case(_case())
-    assert reason == StopReason.NEGATIVE_EV
+    outcome = agent.run_case(_case())
+    assert outcome.stop_reason == StopReason.BUDGET_EXHAUSTED
 
 
 def test_kernel_deny_outside_contact_hours_blocks_the_contact_but_does_not_kill_the_case():
@@ -130,9 +135,9 @@ def test_every_case_has_a_terminal_ledger_entry():
 def test_deterministic_given_same_clock_and_case():
     agent_a, ledger_a = _build_agent(clock=lambda: DAYTIME)
     agent_b, ledger_b = _build_agent(clock=lambda: DAYTIME)
-    reason_a = agent_a.run_case(_case())
-    reason_b = agent_b.run_case(_case())
-    assert reason_a == reason_b
+    outcome_a = agent_a.run_case(_case())
+    outcome_b = agent_b.run_case(_case())
+    assert outcome_a.stop_reason == outcome_b.stop_reason
     # entry_type sequence should match exactly, even though timestamps/hashes differ
     types_a = [e.entry_type for e in ledger_a.entries_for_case("case_1")]
     types_b = [e.entry_type for e in ledger_b.entries_for_case("case_1")]

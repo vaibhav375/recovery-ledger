@@ -9,8 +9,9 @@ an LLM client — mechanically enforced by
 temporary `import anthropic` inside `kernel/` was confirmed to fail the
 test, then removed — see `ENGINEERING_LOG.md`, 2026-08-23).
 
-11 rules are implemented so far, all with passing unit tests in
-`tests/test_kernel_engine.py` and `tests/test_kernel_rules_new.py`.
+12 rules are implemented so far, all with passing unit tests in
+`tests/test_kernel_engine.py`, `tests/test_kernel_rules_new.py`, and
+`tests/test_runner.py` (the promise-to-pay window).
 
 ## RBI recovery-agent norms
 
@@ -57,6 +58,19 @@ schemas (`events/schemas.py`) only carrying fields each loss type actually
 needs, and retention is currently an honest gap — the ledger has no
 automatic purge/expiry policy yet. Recording that gap here rather than
 writing a rule that doesn't check anything real.
+
+## Promise-to-pay silence window (internal policy, harassment-adjacent)
+
+| Rule | File | What it checks | Source |
+|---|---|---|---|
+| `POLICY.PROMISE_TO_PAY_WINDOW` | `rules/promise.py` | No customer contact while a promised-payment date (plus grace) is still in the future. Silent retries and waiting are exempt. | Spec section 10, rule 6 ("pause until the promised date + grace, then re-evaluate") |
+
+Placed in the kernel rather than the agent loop deliberately. Contacting
+someone on the 3rd who said they would pay on the 5th is not merely
+suboptimal targeting — it is the pestering pattern the RBI recovery-agent
+norms exist to prevent. Encoding it as an admissibility rule means the
+silence is *justified in the audit trail* with a certificate naming the
+promised date, rather than being an invisible branch in control flow.
 
 ## Contact budget (internal policy, not a specific regulation)
 

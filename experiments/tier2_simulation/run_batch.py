@@ -43,6 +43,7 @@ from pathlib import Path
 import numpy as np
 
 from recovery_ledger.agent.loop import RecoveryAgent
+from recovery_ledger.agent.runner import BatchRunner, exception_report
 from recovery_ledger.detector.detector import CaseDetector
 from recovery_ledger.diagnoser.diagnoser import CaseDiagnoser
 from recovery_ledger.events.actions import ActionType
@@ -53,6 +54,7 @@ from recovery_ledger.kernel.rules.dpdp import ConsentRecordExistsRule
 from recovery_ledger.kernel.rules.emandate_2026 import PreDebitNotificationRule
 from recovery_ledger.kernel.rules.escalation import ToneIntensityCeilingRule
 from recovery_ledger.kernel.rules.opt_out import OptOutRule
+from recovery_ledger.kernel.rules.promise import PromiseToPayWindowRule
 from recovery_ledger.kernel.rules.tcccpr import (
     ConsentValidityRule,
     DLTRegistrationRule,
@@ -79,6 +81,7 @@ def build_kernel() -> KernelEngine:
         DLTRegistrationRule(), HeaderClassMatchRule(), ConsentValidityRule(),
         OptOutOptionPresentRule(), NumberSeriesRule(),
         PreDebitNotificationRule(), ConsentRecordExistsRule(), ToneIntensityCeilingRule(),
+        PromiseToPayWindowRule(),
     ])
 
 
@@ -138,10 +141,11 @@ def run_eval(n_eval: int, uplift_model: TLearnerModel, *, seed: int) -> dict:
         kernel=kernel, executor=executor, listener=listener, ledger=ledger, clock=lambda: NOW,
     )
 
-    for case in treatment_cases:
-        treatment_agent.run_case(case)
-    for case in holdout_cases:
-        holdout_agent.run_case(case)
+    # Run through the resumption queue rather than a single pass, so a case
+    # that pauses on a promise-to-pay actually gets picked up again after the
+    # promised date rather than being abandoned mid-negotiation.
+    treatment_result = BatchRunner(treatment_agent).run(treatment_cases, now=NOW)
+    holdout_result = BatchRunner(holdout_agent).run(holdout_cases, now=NOW)
 
     treatment_recovered = np.array([
         case.amount_at_risk if case.case_id in listener.paid_cases else 0.0 for case in treatment_cases
@@ -163,6 +167,9 @@ def run_eval(n_eval: int, uplift_model: TLearnerModel, *, seed: int) -> dict:
     tau_hat_eval = uplift_model.predict_cate(X_eval)
     tau_true_eval = np.array([persuadability(traits[c.case_id]) for c in cases])
     uplift_model_correlation = float(np.corrcoef(tau_hat_eval, tau_true_eval)[0, 1])
+
+    stop_reason_counts = treatment_result.stop_reason_counts()
+    exceptions = exception_report(treatment_result)
 
     n_contacts = sum(
         1 for e in ledger._entries
@@ -189,6 +196,9 @@ def run_eval(n_eval: int, uplift_model: TLearnerModel, *, seed: int) -> dict:
         "contacts_sent": n_contacts,
         "contacts_sent_to_do_not_disturbs": do_not_disturb_contacts,
         "pct_contacts_to_do_not_disturbs": (do_not_disturb_contacts / n_contacts) if n_contacts else None,
+        "stop_reason_counts": stop_reason_counts,
+        "distinct_stop_reasons_fired": len(stop_reason_counts),
+        "unresolved_exceptions": len(exceptions),
         "ledger_entries": len(ledger),
         "ledger_chain_valid": ledger.verify_chain(),
     }, ledger

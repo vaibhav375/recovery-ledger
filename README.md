@@ -1,7 +1,7 @@
 # Recovery Ledger
 
-**Status: Tier 1 validation passed. B1 headline: ₹258,796 incremental recovery
-per 1,000 cases (95% CI ₹101,137–₹426,996).** The decisive test: against a
+**Status: Tier 1 validation passed. B1 headline: ₹288,729 incremental recovery
+per 1,000 cases (95% CI ₹133,924–₹432,362).** The decisive test: against a
 control contacting a comparable number of cases *at random*, the agent
 recovers **2.85x more incremental revenue with non-overlapping confidence
 intervals** — so the targeting model, not merely contact volume, is doing the
@@ -79,7 +79,7 @@ running.
       dependency-free look at the loop) is unchanged. `make eval` runs the
       real `LookaheadEVDecisionPolicy`, uplift-model-driven, over 5000+2000 cases.
 - [x] **B1 — batch run, headline incremental ₹ + CI.** `make eval`:
-      **₹258,796 incremental per 1,000 cases (95% CI ₹101,137–₹426,996)**;
+      **₹288,729 incremental per 1,000 cases (95% CI ₹133,924–₹432,362)**;
       holdout recovers 15.47% unaided, which is exactly why this reports
       incremental rather than gross.
 - [x] **Baseline comparison + falsification test.** `make baselines`: the
@@ -92,6 +92,14 @@ running.
       better, and far from the ≈0 target. Honestly reported as the top open
       problem; the principled fix is the `λ_churn × P(churn) × LTV` term the
       spec includes and this omits for lack of a defensible LTV estimate.
+- [x] **B3 — all 11 stopping rules, provably reachable.** `tests/test_all_stopping_rules.py`
+      runs a crafted scenario suite and asserts **every one of the 11 reasons
+      fires at least once** — B3 as an executable property, not a README claim.
+      A real 2,000-case batch now fires **7 of 11 naturally** (the other four
+      need operator action or an all-deny kernel). Promise-to-pay is a genuine
+      **pause with scheduled resumption**, enforced as a compliance-kernel
+      silence window; cases still paused at the horizon become the honest
+      exception list.
 - [ ] Real listener + LLM personas (LLM backend decided and built — see
       above — not yet wired into the loop's Listener)
 - [ ] Negotiation + Section 43B(h) clock
@@ -125,7 +133,7 @@ message and exits non-zero rather than silently doing nothing.
 
 ## What is NOT claimed
 
-- No real-world causal effect size. The ₹258,796-per-1,000-cases figure above
+- No real-world causal effect size. The ₹288,729-per-1,000-cases figure above
   is a simulation result — policy dominance under stated assumptions, in
   simulation. Everything in `experiments/tier2_simulation/` runs against a
   simulator calibrated to published marginal benchmarks — that calibrates
