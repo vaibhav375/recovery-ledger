@@ -1,12 +1,13 @@
 # Recovery Ledger
 
-**Status: Tier 1 validation passed. B1 (headline incremental ₹ + CI): ₹220,074
-per 1,000 cases (95% CI ₹90,448–₹341,757) — policy dominance under stated
-assumptions, in simulation, not a real-world claim. This revises an earlier
-(2026-08-23) figure of ₹996,519 that was found to be an artifact of a
-simulator bug, not a real result — see
+**Status: Tier 1 validation passed. B1 headline: ₹376,484 incremental recovery
+per 1,000 cases (95% CI ₹203,979–₹554,243). Against the 5 required baselines,
+the agent matches blind mass-contact on recovery while using 61% fewer contacts
+and costing 2.5x less per incremental rupee. Policy dominance under stated
+assumptions, in simulation — not a real-world claim. Two earlier headline
+figures were withdrawn after checks found real bugs; both are documented in
 [`experiments/tier2_simulation/REPORT.md`](experiments/tier2_simulation/REPORT.md)
-for the full account. See Status below for what's real vs. what's still missing.**
+rather than quietly replaced.**
 
 An autonomous revenue-recovery agent for Indian payments. It decides *whether, when,
 how, and in what language* to intervene on at-risk revenue — failed payments,
@@ -72,27 +73,20 @@ running.
 - [x] Agent loop — detect → diagnose → decide → gate → act → listen → stop.
       `make demo` (20 cases, stub fixed-sequence policy, for a fast,
       dependency-free look at the loop) is unchanged. `make eval` runs the
-      real `EVDecisionPolicy`, uplift-model-driven, over 5000+2000 cases.
+      real `LookaheadEVDecisionPolicy`, uplift-model-driven, over 5000+2000 cases.
 - [x] **B1 — batch run, headline incremental ₹ + CI.** `make eval`:
       Tier-1-validated T-learner transferred onto simulator-generated
-      randomised data, real EV decisioning, a randomised no-contact holdout
-      arm. **₹220,074 incremental per 1,000 cases (95% CI ₹90,448–₹341,757)**.
-      (Revises a 2026-08-23 figure of ₹996,519, found the next day to be an
-      artifact of a simulator bug — the uplift model had nothing real to
-      learn from — not a genuine result. Full account in the report below.)
-      Full method and what still isn't included (sensitivity sweep, full
-      cost accounting) in
-      [`experiments/tier2_simulation/REPORT.md`](experiments/tier2_simulation/REPORT.md) —
-      **read the claim-scope section before citing this number for anything.**
+      randomised data, lookahead EV decisioning, randomised no-contact
+      holdout arm. **₹376,484 incremental per 1,000 cases (95% CI
+      ₹203,979–₹554,243)**, holdout recovering 15.37% on its own — which is
+      exactly why this reports incremental, not gross.
 - [x] **5-baseline comparison (spec section 11.3).** `make baselines`: all
-      5 policies (do-nothing, blast-everyone, Razorpay-current, rules-based
-      dunning, EV policy) run against the same eval batch. Honest, not
-      flattering: naive blind-contact baselines currently recover MORE raw
-      ₹ than the EV policy (whose incremental CI includes zero here), while
-      the EV policy contacts meaningfully fewer true do-not-disturbs
-      (14.76% vs. 20.49%, ~28% relative reduction). Full investigation of
-      why, and what's next, in the report's baseline-comparison section —
-      not smoothed over.
+      5 required policies plus both EV variants, same eval batch. The agent
+      is statistically indistinguishable from blind mass-contact on
+      recovery (₹353,755 vs ₹355,209, overlapping CIs) using **1,733
+      contacts instead of 4,393** — 2.5x better cost per incremental rupee,
+      and fewer do-not-disturbs reached (17.54% vs 20.49%). Efficiency, not
+      a bigger headline number, is the honest claim.
 - [ ] Real listener + LLM personas (LLM backend decided and built — see
       above — not yet wired into the loop's Listener)
 - [ ] Negotiation + Section 43B(h) clock
@@ -125,7 +119,7 @@ message and exits non-zero rather than silently doing nothing.
 
 ## What is NOT claimed
 
-- No real-world causal effect size. The ₹220,074-per-1,000-cases figure above
+- No real-world causal effect size. The ₹376,484-per-1,000-cases figure above
   is a simulation result — policy dominance under stated assumptions, in
   simulation. Everything in `experiments/tier2_simulation/` runs against a
   simulator calibrated to published marginal benchmarks — that calibrates

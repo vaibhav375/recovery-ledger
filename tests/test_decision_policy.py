@@ -11,9 +11,11 @@ from recovery_ledger.events.schemas import (
     FailedSubscriptionCase,
 )
 from recovery_ledger.policy.decision import (
+    CHANNEL_COST,
     BlastEveryonePolicy,
     DoNothingPolicy,
     EVDecisionPolicy,
+    LookaheadEVDecisionPolicy,
     RazorpayCurrentPolicy,
     RulesBasedDunningPolicy,
 )
@@ -76,11 +78,13 @@ def test_zero_uplift_prefers_retry_over_nudge_when_retry_has_positive_ev():
     assert decision.action_type == ActionType.RETRY
 
 
-def test_no_retry_available_and_zero_uplift_stops():
+def test_no_retry_available_and_zero_uplift_waits_rather_than_abandoning():
     """RETRY is only modelled for FailedPayment/FailedSubscription cases —
-    for a CheckoutAbandonmentCase there's no free fallback action, so zero
-    uplift genuinely means every action has non-positive EV and the policy
-    must stop rather than nudge for no expected benefit."""
+    for a CheckoutAbandonmentCase there's no positive-EV action at zero
+    uplift. The policy must NOT nudge (no expected benefit), but it must
+    also not STOP: waiting is free and preserves the chance of organic
+    self-resolution. Conflating those two was a real bug (2026-08-24) that
+    made the EV policy perform worse than doing nothing on some segments."""
     from recovery_ledger.events.schemas import CheckoutAbandonmentCase
 
     case = CheckoutAbandonmentCase(
@@ -90,6 +94,14 @@ def test_no_retry_available_and_zero_uplift_stops():
     )
     policy = EVDecisionPolicy(uplift_model=FakeUpliftModel(cate=0.0))
     decision = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=0)
+    assert decision.action_type == ActionType.WAIT
+
+
+def test_ev_policy_still_terminates_at_max_attempts():
+    """The WAIT-instead-of-STOP fix must not remove termination (B3)."""
+    policy = EVDecisionPolicy(uplift_model=FakeUpliftModel(cate=0.0), max_attempts=3)
+    case = _payment_case()
+    decision = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=3)
     assert decision.action_type == ActionType.STOP
 
 
@@ -174,3 +186,55 @@ def test_rules_based_dunning_fixed_three_contact_ladder():
         assert decision.action_type == ActionType.NUDGE
     final = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=3)
     assert final.action_type == ActionType.STOP
+
+
+# --- LookaheadEVDecisionPolicy ------------------------------------------------
+
+def test_lookahead_high_uplift_nudges():
+    policy = LookaheadEVDecisionPolicy(uplift_model=FakeUpliftModel(cate=0.5))
+    case = _payment_case()
+    decision = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=0)
+    assert decision.action_type == ActionType.NUDGE
+
+
+def test_lookahead_negative_uplift_never_nudges():
+    """Do-not-disturb protection (N2) must survive the lookahead
+    reformulation — continuation value must never make contacting a
+    negative-uplift customer look attractive."""
+    case = _payment_case(amount_at_risk=50000.0)
+    policy = LookaheadEVDecisionPolicy(uplift_model=FakeUpliftModel(cate=-0.5))
+    for attempt in range(3):
+        decision = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=attempt)
+        assert decision.action_type != ActionType.NUDGE
+
+
+def test_lookahead_terminates_at_max_attempts():
+    policy = LookaheadEVDecisionPolicy(uplift_model=FakeUpliftModel(cate=0.5), max_attempts=3)
+    case = _payment_case()
+    decision = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=3)
+    assert decision.action_type == ActionType.STOP
+
+
+def test_lookahead_waits_rather_than_abandoning_when_nothing_is_worthwhile():
+    from recovery_ledger.events.schemas import CheckoutAbandonmentCase
+
+    case = CheckoutAbandonmentCase(
+        case_id="case_9", customer=CustomerProfile(customer_id="cust_9", channel_pref=Channel.SMS),
+        amount_at_risk=10.0, detected_at=NOW, cart_id="cart_9", items_count=1,
+        checkout_started_at=NOW,
+    )
+    policy = LookaheadEVDecisionPolicy(uplift_model=FakeUpliftModel(cate=-0.5))
+    decision = policy.decide(case, DIAGNOSER.diagnose(case), attempts_so_far=0)
+    assert decision.action_type == ActionType.WAIT
+
+
+def test_lookahead_values_a_sequence_at_least_as_highly_as_one_step():
+    """The whole point of the lookahead reformulation: the value it assigns
+    to acting now includes the option to keep working the case, so it can
+    never be lower than the single-step value the greedy policy sees."""
+    case = _payment_case(amount_at_risk=1000.0)
+    policy = LookaheadEVDecisionPolicy(uplift_model=FakeUpliftModel(cate=0.2), lambda_annoyance=0.0)
+    _, _, seq_value = policy._solve(case, tau_hat=0.2, attempts_so_far=0)
+
+    greedy_immediate = 0.2 * 1000.0 - CHANNEL_COST[Channel.SMS]
+    assert seq_value >= greedy_immediate

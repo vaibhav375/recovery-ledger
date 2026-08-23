@@ -139,9 +139,25 @@ class EVDecisionPolicy:
         )
 
         if best_ev <= 0:
+            # WAIT, not STOP. These are NOT equivalent, and conflating them
+            # was a real bug (found 2026-08-24): STOP abandons the case and
+            # forfeits the organic self-resolution the customer might have
+            # reached anyway, while WAIT costs nothing, contacts nobody, and
+            # keeps the case eligible for that free recovery. Before this
+            # fix the EV policy recovered only 8.1% of overdue receivables
+            # against the do-nothing baseline's 13.9% — i.e. it was doing
+            # actively WORSE than not having an agent at all on that segment,
+            # purely by giving up on cases too eagerly.
+            #
+            # Terminating on genuinely exhausted budget is still correct and
+            # still happens, via max_attempts above.
             return ActionDecision(
-                action_type=ActionType.STOP, channel=None,
-                rationale=f"EV policy: best action {best_action.value} has EV={best_ev:.2f} <= 0",
+                action_type=ActionType.WAIT, channel=None,
+                rationale=(
+                    f"EV policy: no action beats waiting "
+                    f"(best was {best_action.value} at EV={best_ev:.2f}); "
+                    f"waiting is free and preserves organic recovery"
+                ),
             )
         if best_action == ActionType.NUDGE:
             return ActionDecision(
@@ -174,6 +190,118 @@ class DoNothingPolicy:
         return ActionDecision(
             action_type=ActionType.WAIT, channel=None,
             rationale="holdout: no-contact baseline",
+        )
+
+
+@dataclass
+class LookaheadEVDecisionPolicy:
+    """EV policy that values the WHOLE REMAINING ATTEMPT SEQUENCE rather
+    than one greedy step.
+
+    Why this exists: the 5-baseline comparison (2026-08-24) found the
+    greedy `EVDecisionPolicy` recovering *less* than blindly contacting
+    everyone. Investigation ruled out annoyance-cost miscalibration
+    (sweeping `lambda_annoyance` to 0 barely moved recovery) and pointed at
+    the greedy formulation itself: `sim/environment.py` treats each contact
+    as close to an independent trial, so persistence compounds. A policy
+    that asks only "is one more nudge worth it *right now*" gives up on
+    cases where the sequence of remaining attempts is collectively
+    worthwhile — and does so more often when `tau_hat` is noisy, which it
+    is (~0.4 correlation with truth, not 1.0).
+
+    The fix is a small finite-horizon dynamic program over the remaining
+    attempt budget, solved by backward induction:
+
+        V(k) = max over admissible actions a of
+                   [ immediate_value(a, k) + (1 - p_resolve(a)) * V(k+1) ]
+        V(max_attempts) = 0        # horizon: no attempts left
+
+    `immediate_value` is the same incremental-EV expression the greedy
+    policy uses (Δp × ₹amount − channel cost − annoyance cost). The
+    `(1 - p_resolve)` factor is what the greedy version was missing: an
+    action's value includes the option to keep working the case if it
+    doesn't resolve now.
+
+    STATED ASSUMPTION: `p_resolve` for a contact is approximated as
+    `base_resolution_prob + tau_hat`, since the uplift model estimates the
+    *incremental* effect (CATE) and not an absolute payment probability.
+    That approximation is the weakest link in this policy and is why
+    `base_resolution_prob` is an explicit parameter rather than a hidden
+    constant — a real deployment would estimate absolute payment
+    probability directly, alongside the CATE.
+    """
+
+    uplift_model: UpliftModel
+    lambda_annoyance: float = 30.0
+    max_attempts: int = 3
+    base_resolution_prob: float = 0.05
+
+    def _immediate_and_resolve(
+        self, case: RecoveryCase, tau_hat: float, attempt_index: int
+    ) -> dict[ActionType, tuple[float, float, Channel | None]]:
+        """(immediate incremental value, P(resolve), channel) per action."""
+        channel = case.customer.channel_pref or Channel.SMS
+        nudge_value = (
+            tau_hat * case.amount_at_risk
+            - CHANNEL_COST[channel]
+            - self.lambda_annoyance * attempt_index
+        )
+        nudge_resolve = float(min(max(self.base_resolution_prob + tau_hat, 0.0), 0.95))
+
+        options: dict[ActionType, tuple[float, float, Channel | None]] = {
+            ActionType.NUDGE: (nudge_value, nudge_resolve, channel),
+            ActionType.WAIT: (0.0, self.base_resolution_prob, None),
+        }
+        if isinstance(case, (FailedPaymentCase, FailedSubscriptionCase)):
+            p_retry = _retry_success_prob(case)
+            options[ActionType.RETRY] = (p_retry * case.amount_at_risk, p_retry, None)
+        return options
+
+    def _solve(self, case: RecoveryCase, tau_hat: float, attempts_so_far: int):
+        """Backward induction from the horizon back to the current attempt.
+        Returns (best_action, channel, value_of_acting_now)."""
+        future_value = 0.0
+        best_at_current: tuple[ActionType, Channel | None, float] | None = None
+
+        for k in range(self.max_attempts - 1, attempts_so_far - 1, -1):
+            options = self._immediate_and_resolve(case, tau_hat, k)
+            best_action, best_channel, best_value = ActionType.STOP, None, 0.0
+            for action, (immediate, p_resolve, channel) in options.items():
+                total = immediate + (1.0 - p_resolve) * future_value
+                if total > best_value:
+                    best_action, best_channel, best_value = action, channel, total
+            future_value = best_value
+            if k == attempts_so_far:
+                best_at_current = (best_action, best_channel, best_value)
+
+        assert best_at_current is not None
+        return best_at_current
+
+    def decide(self, case: RecoveryCase, diagnosis: Diagnosis, attempts_so_far: int) -> ActionDecision:
+        if attempts_so_far >= self.max_attempts:
+            return ActionDecision(
+                action_type=ActionType.STOP, channel=None,
+                rationale=f"lookahead EV: reached max_attempts={self.max_attempts}",
+            )
+
+        features = case_to_features(case).reshape(1, -1)
+        tau_hat = float(self.uplift_model.predict_cate(features)[0])
+        action, channel, value = self._solve(case, tau_hat, attempts_so_far)
+
+        if action == ActionType.STOP or value <= 0:
+            # WAIT rather than STOP, for the same reason as EVDecisionPolicy —
+            # waiting is free and preserves organic recovery, abandoning the
+            # case throws it away.
+            return ActionDecision(
+                action_type=ActionType.WAIT, channel=None,
+                rationale=(
+                    f"lookahead EV: no remaining action sequence beats waiting "
+                    f"(tau_hat={tau_hat:.4f}); waiting is free"
+                ),
+            )
+        return ActionDecision(
+            action_type=action, channel=channel,
+            rationale=f"lookahead EV: tau_hat={tau_hat:.4f}, sequence value={value:.2f}",
         )
 
 

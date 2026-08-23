@@ -65,24 +65,56 @@ def test_stub_policy_eventually_stops_with_negative_ev():
     assert reason == StopReason.NEGATIVE_EV
 
 
-def test_kernel_deny_outside_contact_hours_stops_case():
+def test_kernel_deny_outside_contact_hours_blocks_the_contact_but_does_not_kill_the_case():
+    """Spec section 10, stopping rule 10 is "the kernel denies ALL remaining
+    actions", not "one proposed action was denied". A nudge outside contact
+    hours must be blocked, but the case should fall back to WAIT and stay
+    alive rather than being abandoned (changed 2026-08-24 — see
+    ENGINEERING_LOG.md)."""
     agent, ledger = _build_agent(clock=lambda: NIGHTTIME)
     reason = agent.run_case(_case())
-    assert reason == StopReason.REGULATORY_CEILING
+
     certs = [e for e in ledger.entries_for_case("case_1") if e.entry_type == "certificate"]
-    assert certs, "expected at least one certificate entry before stopping"
-    assert certs[0].payload["decision"] == "DENY"
+    assert certs, "expected at least one certificate entry"
+    assert certs[0].payload["decision"] == "DENY", "the out-of-hours nudge must be denied"
+    assert reason != StopReason.REGULATORY_CEILING, (
+        "a single denied action must not terminate the case while WAIT is still admissible"
+    )
+    # and the denied nudge must never have actually gone out
+    executed_contacts = [
+        e for e in ledger.entries_for_case("case_1")
+        if e.entry_type == "action_result"
+        and e.payload["executed"]
+        and e.payload["action_type"] not in ("wait", "retry")
+    ]
+    assert not executed_contacts, "no customer contact may be executed outside contact hours"
 
 
 def test_opted_out_customer_is_never_contacted():
+    """The safety property that must hold regardless of how the loop's
+    fallback behaviour changes: an opted-out customer receives no
+    customer-facing contact, ever."""
     case = _case(customer=CustomerProfile(
         customer_id="cust_1", opted_out=True, opted_out_at=datetime(2026, 8, 1, tzinfo=timezone.utc),
     ))
     agent, ledger = _build_agent(clock=lambda: DAYTIME)
-    reason = agent.run_case(case)
-    assert reason == StopReason.REGULATORY_CEILING
-    action_results = [e for e in ledger.entries_for_case("case_1") if e.entry_type == "action_result"]
-    assert all(not e.payload["executed"] for e in action_results)
+    agent.run_case(case)
+
+    executed_contacts = [
+        e for e in ledger.entries_for_case("case_1")
+        if e.entry_type == "action_result"
+        and e.payload["executed"]
+        and e.payload["action_type"] not in ("wait", "retry")
+    ]
+    assert not executed_contacts, "an opted-out customer must never be contacted"
+
+    # every contact-type certificate issued for this case must have been denied
+    contact_certs = [
+        e for e in ledger.entries_for_case("case_1")
+        if e.entry_type == "certificate" and e.payload["action_type"] not in ("wait", "retry")
+    ]
+    assert contact_certs, "expected the policy to have proposed at least one contact"
+    assert all(c.payload["decision"] == "DENY" for c in contact_certs)
 
 
 def test_every_case_has_a_terminal_ledger_entry():

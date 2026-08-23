@@ -40,6 +40,7 @@ from recovery_ledger.policy.decision import (
     BlastEveryonePolicy,
     DoNothingPolicy,
     EVDecisionPolicy,
+    LookaheadEVDecisionPolicy,
     RazorpayCurrentPolicy,
     RulesBasedDunningPolicy,
 )
@@ -113,7 +114,8 @@ def main() -> None:
         "blast_everyone": BlastEveryonePolicy(max_attempts=3),
         "razorpay_current": RazorpayCurrentPolicy(),
         "rules_based_dunning": RulesBasedDunningPolicy(max_attempts=3),
-        "ev_policy": EVDecisionPolicy(uplift_model=uplift_model),
+        "ev_policy_greedy": EVDecisionPolicy(uplift_model=uplift_model),
+        "ev_policy_lookahead": LookaheadEVDecisionPolicy(uplift_model=uplift_model),
     }
 
     print(f"Running {len(policies)} policies against the same {args.n_eval}-case batch...")
@@ -166,7 +168,7 @@ def _plot_comparison(comparison: list[dict]) -> None:
 
     fig, ax = plt.subplots(figsize=(9, 6))
     colors = ["#888" if n == "do_nothing" else "#2b6cb0" for n in names]
-    colors = ["#2f855a" if n == "ev_policy" else c for n, c in zip(names, colors)]
+    colors = ["#2f855a" if n.startswith("ev_policy") else c for n, c in zip(names, colors)]
     ax.bar(names, points, yerr=[err_low, err_high], capsize=5, color=colors)
     ax.axhline(0, color="black", linewidth=0.8)
     ax.set_ylabel("Incremental ₹ recovered per 1,000 cases\n(vs. do-nothing, same eval batch)")

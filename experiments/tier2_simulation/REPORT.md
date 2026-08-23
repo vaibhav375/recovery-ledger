@@ -1,8 +1,8 @@
 # Tier 2 batch experiment — B1 headline result
 
-**Every number below was produced by `experiments/tier2_simulation/run_batch.py`,
-run on 2026-08-24 (superseding the 2026-08-23 run — see "A bug in the first
-version" below, this is not a minor revision).** Reproduce with `make eval`
+**Every number below was produced by `run_batch.py` / `run_baselines.py` in
+this directory, run on 2026-08-24.** Two earlier headline figures have been
+withdrawn — see "Revision history" below before citing anything here. Reproduce with `make eval`
 (or the command below) — seeds are fixed throughout; re-running gives
 identical output (verified: ran it twice, diffed, byte-identical).
 
@@ -21,47 +21,59 @@ learning + EV decisioning) was validated on real data, in Tier 1. Every
 number in this report describes what happens *inside this simulation*,
 under *this simulation's assumptions*.
 
-## A bug in the first version of this experiment (2026-08-23) — read this before the numbers
+## Revision history — read this before the numbers
 
-The first run of this experiment reported ₹996,519 incremental per 1,000
-cases with a suspiciously clean-looking result: only 1.52% of contacts went
-to predicted do-not-disturbs. That number was **not evidence of good
-targeting**. It was checked, not assumed, the next day: `sim/environment.py`'s
-`generate_population()` originally drew every hidden trait (liquidity,
-annoyance_threshold, dispute_propensity) **fully independently of every
-observable case field**. Since the true treatment effect
-(`persuadability()`) is a function only of those hidden traits, it was
-therefore **statistically independent of every feature the uplift model was
-trained on, by construction** — there was nothing for the model to learn,
-no matter how good the learner was.
+This report has been revised twice, both times because a check turned up a
+real defect rather than because the numbers were merely re-tuned. Both
+withdrawn figures are recorded here rather than quietly replaced.
 
-Confirmed by computing `corr(tau_hat, tau_true)` on held-out data:
-**-0.02** — indistinguishable from zero. The reported 1.52%
-do-not-disturb-contact rate wasn't the policy avoiding do-not-disturbs; the
-true population do-not-disturb rate was itself only 1.5%, so an
-essentially-random targeting policy would have shown almost the same number
-by coincidence.
+**2026-08-23, ₹996,519 — WITHDRAWN, was an artifact.** The first run
+reported a suspiciously clean result: only 1.52% of contacts going to
+predicted do-not-disturbs. Checked the next day rather than assumed:
+`sim/environment.py`'s `generate_population()` drew every hidden trait
+**fully independently of every observable case field**. Since the true
+treatment effect (`persuadability()`) is a function only of those hidden
+traits, it was **statistically independent of every feature the uplift
+model was trained on, by construction** — nothing to learn, no matter how
+good the learner. Confirmed by computing `corr(tau_hat, tau_true)` on
+held-out data: **-0.02**. The 1.52% figure wasn't targeting skill; the true
+population do-not-disturb rate was itself ~1.5%, so random targeting scored
+about the same by coincidence. Fixed by giving traits a declared, measured
+dependence on observable fields (correlation now rises monotonically with
+training size: 0.15 → 0.24 → 0.42 at n=1000 → 2000 → 5000, the shape that
+distinguishes real signal from an artifact). Now computed and regression-
+tested on every run.
 
-**Fix**: `generate_population()` now derives each trait with a declared,
-non-trivial dependence on observable fields (e.g. B2B customers and
-lower-amount cases skew more liquid; B2B and overdue-receivable cases skew
-more dispute-prone; WhatsApp-preferring customers tolerate more contact than
-SMS-only ones). The first attempt at this fix used shifts of 0.10-0.15
-against traits with ~0.2 natural standard deviation — still too weak:
-`corr(tau_hat, tau_true)` was noisy and non-monotonic across training sizes
-(0.15 at n=1000, 0.16 at n=5000, dropping to 0.08 at n=20000 — the signature
-of a signal too marginal to reliably detect, not a data-size problem).
-Roughly doubled the shift magnitudes; correlation became monotonic and
-substantial: 0.15 → 0.24 → 0.42 as training size went 1000 → 2000 → 5000.
-That monotonic-with-data pattern is itself the evidence the signal is now
-real, not an artifact.
+**2026-08-24, ₹220,074 — SUPERSEDED by two agent bugs, not by re-tuning.**
+The first 5-baseline comparison showed the EV policy *losing to blindly
+contacting everyone*. Rather than accept or tune that, it was instrumented —
+after two wrong hypotheses (annoyance-cost miscalibration, ruled out by
+sweeping `lambda_annoyance` to 0 and seeing recovery move only
+30.60%→31.25%; and missing multi-attempt compounding, ruled out by building
+a lookahead policy that changed almost nothing). Instrumenting the actual
+action mix and stop reasons found two genuine defects:
 
-**This correlation is now computed and reported on every run**
-(`uplift_model_correlation_with_true_persuadability` in `results.json`) and
-has a regression test (`tests/test_uplift_model_correlates_with_true_persuadability`)
-that fails the build if it ever drops back toward zero.
+1. **A single denied action killed the whole case.** `agent/loop.py` mapped
+   any kernel `DENY` straight to `REGULATORY_CEILING` and terminated. Spec
+   section 10, rule 10 is "the kernel denies *all remaining* actions". The
+   EV policy prefers RETRY on mandate cases, ~half of which the 24-hour
+   pre-debit-notice rule denies — so **240 of its cases were killed outright
+   while `blast_everyone`, which never proposes RETRY, tripped that rule
+   zero times.** An artificial penalty for using more of the action space.
+   Now the loop falls back to WAIT (exempt from every contact rule) and only
+   stops when that is denied too.
+2. **The policy abandoned cases where waiting was free.** `EVDecisionPolicy`
+   returned STOP whenever no action had positive EV — treating STOP and WAIT
+   as equivalent. They are not: WAIT costs nothing, contacts nobody, and
+   preserves organic self-resolution. Measured consequence: the EV policy
+   recovered only **8.1% of overdue receivables against do-nothing's 13.9%**
+   — actively worse than having no agent at all on that segment.
 
-## Method (unchanged from 2026-08-23)
+Both are fixed, both have regression tests, and together they closed
+essentially the whole gap to the naive baselines (EV policy gross went
+1,131,714 → 1,595,699 on the comparison batch).
+
+## Method
 
 1. **Train** (n=5000): generate cases, randomly assign contact/no-contact
    50/50 (a mini RCT against the simulator, same logic Tier 1 validated on
@@ -69,44 +81,39 @@ that fails the build if it ever drops back toward zero.
    — the same class Tier 1 validated) on the result.
 2. **Eval** (n=2000, disjoint from training — different seed, no case
    overlap): split ~50/50 into a **treatment arm** (full agent loop,
-   `EVDecisionPolicy` driven by the fitted uplift model, all 11 compliance
-   rules active) and a **randomised no-contact holdout arm**
+   `LookaheadEVDecisionPolicy` driven by the fitted uplift model, all 11
+   compliance rules active) and a **randomised no-contact holdout arm**
    (`DoNothingPolicy` — always WAIT, same attempt budget).
 
 ## Result
 
 | | Treatment (n=1037) | Holdout (n=963) |
 |---|---:|---:|
-| Recovery rate | 32.59% | 14.54% |
-| Gross ₹ recovered | 643,747 | 385,878 |
-| Gross ₹ recovered per case | 621 | 401 |
+| Recovery rate | 33.75% | 15.37% |
+| Gross ₹ recovered | 880,178 | 454,814 |
+| Gross ₹ recovered per case | 849 | 472 |
 
-**Incremental ₹ recovered per 1,000 at-risk cases: ₹220,074 (95% CI: ₹90,448 – ₹341,757)**
+**Incremental ₹ recovered per 1,000 at-risk cases: ₹376,484 (95% CI: ₹203,979 – ₹554,243)**
 
-Smaller than the withdrawn 2026-08-23 figure (₹996,519) — expected and
-correct. That figure was inflated by a policy that was, in effect, not
-targeting on real signal at all while still benefiting from RETRY and
-NUDGE's *average* effect across the whole population. This figure reflects
-a policy genuinely using (imperfect, 0.41-correlated) learned heterogeneity.
-The CI still excludes zero: under this simulation's assumptions, the policy
-still beats the no-contact baseline.
+CI excludes zero. Note the holdout arm recovers 15.37% of cases entirely on
+its own — that is precisely why this project reports incremental rather
+than gross. A vendor quoting the ₹880,178 gross figure would be taking
+credit for the ₹454,814 that would have arrived with no agent at all.
 
-## Policy quality — the more honest picture
+## Policy quality
 
-- **uplift_model_correlation_with_true_persuadability: 0.41.** Real, but
-  far from perfect — this is a genuinely hard prediction problem with a
-  T-learner on 5000 noisy Bernoulli outcomes, the same kind of
-  signal-to-noise challenge Tier 1 flagged for Criteo's 0.29% conversion
-  rate.
-- **947 contacts sent, 154 (16.26%) to predicted-negative-uplift cases.**
-  Not close to spec's ≈0 target. This is the honest number the 2026-08-23
-  run's 1.52% was masking. Room for real improvement here: try the X-learner
-  or causal forest (already implemented in `policy/uplift/learners.py`,
-  not yet swapped in), more training data, or a stricter EV threshold
-  before proposing NUDGE.
-- **100% certificate coverage**, structurally guaranteed by the loop design,
-  confirmed again this run.
-- **Ledger**: 28,851 entries, hash chain verified valid.
+- **uplift_model_correlation_with_true_persuadability: 0.42.** Real, but
+  far from perfect — a genuinely hard prediction problem with a T-learner on
+  5,000 noisy Bernoulli outcomes, the same signal-to-noise challenge Tier 1
+  flagged for Criteo's 0.29% conversion rate.
+- **905 contacts sent, 167 (18.45%) to true-negative-uplift cases.** Not
+  close to spec's ≈0 target, and slightly *worse* than the 16.26% recorded
+  before the loop fixes — a direct, expected consequence of those fixes:
+  cases that were previously killed outright by a single kernel denial now
+  stay alive and get contacted, so more do-not-disturbs get reached. Real
+  tradeoff, reported rather than buried.
+- **100% certificate coverage**, structurally guaranteed by the loop design.
+- **Ledger**: 33,301 entries, hash chain verified valid.
 
 ## 5-baseline comparison (spec section 11.3)
 
@@ -114,101 +121,81 @@ still beats the no-contact baseline.
 uv run python experiments/tier2_simulation/run_baselines.py --n-train 5000 --n-eval 2000
 ```
 
-All 5 policies run against the SAME 2000-case eval batch (same population,
-same hidden traits, each through its own freshly-seeded environment).
-Incremental ₹ here is computed against `do_nothing`'s outcome on that same
-batch — a different comparison design from the headline number above
-(which uses a genuine random holdout split); this script answers "how does
-each policy rank against 4 named alternatives on identical cases," not a
-second independent measurement of the same headline figure.
+All 6 policies (the spec's 5, plus both EV variants) run against the SAME
+2,000-case eval batch. Incremental ₹ here is computed against `do_nothing`'s
+outcome on that same batch — a different design from the headline number
+above (which uses a genuine random holdout split), answering "how does each
+policy rank against named alternatives on identical cases".
 
-| Policy | Recovery rate | Gross ₹ | Incremental ₹/1000 (95% CI) | Contacts | % to do-not-disturbs |
-|---|---:|---:|---:|---:|---:|
-| do_nothing | 13.85% | 888,188 | — (reference) | 0 | n/a |
-| blast_everyone | 35.90% | 1,598,606 | 355,209 (233,271–473,252) | 4,393 | 20.49% |
-| razorpay_current | 16.20% | 1,026,125 | 68,968 (-53,530–188,898) | 0 | n/a |
-| rules_based_dunning | 35.90% | 1,598,606 | 355,209 (233,271–473,252) | 4,393 | 20.49% |
-| **ev_policy** | 30.60% | 1,071,579 | 91,696 (-7,020–184,722) | 1,680 | **14.76%** |
+| Policy | Recovery rate | Incremental ₹/1000 (95% CI) | Contacts | Channel cost | Cost per incremental ₹ | % to do-not-disturbs |
+|---|---:|---:|---:|---:|---:|---:|
+| do_nothing | 13.85% | — (reference) | 0 | 0 | n/a | n/a |
+| blast_everyone | 35.90% | 355,209 (233,271–473,252) | 4,393 | 1,347 | 0.003792 | 20.49% |
+| rules_based_dunning | 35.90% | 355,209 (233,271–473,252) | 4,393 | 1,347 | 0.003792 | 20.49% |
+| razorpay_current | 16.55% | 130,228 (6,823–256,378) | 0 | 0 | n/a | n/a |
+| ev_policy_greedy | 34.15% | 348,644 (230,016–480,680) | 1,794 | 545 | 0.001562 | 16.83% |
+| **ev_policy_lookahead** | 34.25% | **353,755 (236,316–483,965)** | **1,733** | **527** | **0.001490** | 17.54% |
 
 Chart: `experiments/tier2_simulation/baselines_comparison.png`.
 
-### Two things worth being direct about, not smoothing over
+### What this actually shows
 
-**`blast_everyone` and `rules_based_dunning` are identical in this
-simulation.** Same recovery rate, same gross ₹, same contact count, to the
-decimal. Both policies just mean "NUDGE every attempt, up to 3, regardless
-of signal" — `sim/environment.py`'s response model doesn't yet
-differentiate outcomes by *channel* (SMS vs. WhatsApp vs. email all have
-identical simulated pay probability), so two policies that differ only in
-default channel choice produce identical outcomes. They still differ in
-`approx_channel_cost` (SMS/WhatsApp/voice cost more per contact than
-email), so they're not entirely redundant as comparison rows, but this is
-a real simulator limitation, not a coincidence, and it's noted here rather
-than left for a reader to wonder about.
+**The EV policy matches blind contact on recovery while using 61% fewer
+contacts.** ₹353,755 vs ₹355,209 incremental — a 0.4% difference with
+heavily overlapping confidence intervals, i.e. statistically
+indistinguishable — from 1,733 contacts instead of 4,393. Cost per
+incremental rupee is **2.5x better** (0.001490 vs 0.003792), and it reaches
+fewer do-not-disturbs (17.54% vs 20.49%).
 
-**`ev_policy` currently recovers LESS gross/incremental ₹ than blindly
-contacting everyone, and its incremental CI includes zero.** This is not
-the result a "smarter" policy is supposed to produce, and it's reported as
-found rather than tuned away. Investigated rather than assumed benign:
-swept `lambda_annoyance` down to 0 (removing the EV policy's annoyance
-penalty entirely) and recovery only moved from 30.60% to 31.25% — nowhere
-close to closing the 4.65-point gap to `blast_everyone`'s 35.90%, so
-annoyance-cost miscalibration is not the main driver. The more likely
-explanation: `sim/environment.py` treats each NUDGE attempt as
-close to an independent Bernoulli trial (probability doesn't decay much
-until a customer is meaningfully overcontacted), so *persistence* compounds
-— three independent tries at even a modest probability beats one. The EV
-policy makes a single-attempt, single-estimate greedy decision each round
-(spec section 8.3 explicitly allows this simplification: "a well-justified
-greedy-EV-under-budget baseline is acceptable if a full constrained solver
-doesn't fit the timeline") and can give up on a case after one or two
-attempts if that round's `tau_hat` estimate looks weak — forfeiting the
-compounding value a persistent policy captures automatically, especially
-given the uplift model's `tau_hat` is only 0.41-correlated with the true
-signal (noisy point estimates near a stopping threshold will sometimes be
-wrong in the "stop too early" direction).
+That efficiency, not a higher headline ₹, is the honest claim. In this
+simulation the ceiling on recovery is set mostly by how many times you are
+willing to contact someone; the value of targeting is getting the same
+result for far less contact volume, spend, and customer annoyance — all of
+which carry real costs (churn, complaints, TCCCPR complaint-threshold
+exposure) that this batch's short-horizon ₹ accounting does not price in.
 
-**What the EV policy IS doing better**: its do-not-disturb contact rate
-(14.76%) is meaningfully lower than blind targeting's (20.49%) — a ~28%
-relative reduction, on real (if imperfect) learned signal, not noise (see
-the correlation regression test above). That's a genuine, measured
-targeting-quality advantage this comparison's raw ₹ figures don't capture
-on their own — and it's exactly the dimension "gross ₹ recovered" as a
-sole metric obscures: repeatedly contacting genuine do-not-disturbs has
-real costs (churn, complaints, regulatory exposure under TCCCPR's
-complaint-threshold provisions) that aren't priced into this batch's
-short-horizon recovery accounting.
+**`blast_everyone` and `rules_based_dunning` remain byte-identical.** Both
+reduce to "NUDGE every attempt, up to 3, regardless of signal", and
+`sim/environment.py` doesn't differentiate pay probability by channel — so
+two policies differing only in default channel are the same policy to the
+simulator. They differ only in `approx_channel_cost`. A real simulator
+limitation, documented rather than hidden.
 
-**Honest summary**: on this specific metric, over this specific batch, the
-current EV policy is not yet unambiguously better than the naive
-baselines — it trades some recovered ₹ for meaningfully better targeting
-discipline, and the raw-₹ gap has a plausible, investigated (not just
-assumed) mechanism. Next concrete steps, not yet done: model multi-attempt
-value properly (a small-horizon dynamic-programming or lookahead
-correction to the greedy EV, rather than a single-shot estimate per round)
-and try the X-learner or causal forest (already implemented in
-`policy/uplift/learners.py`, not yet swapped in) to see if a better-
-calibrated `tau_hat` closes the gap without sacrificing the do-not-disturb
-improvement.
+**The lookahead reformulation is a marginal win, not the fix.** It edges
+greedy EV on both recovery (₹353,755 vs ₹348,644) and contact efficiency
+(1,733 vs 1,794 contacts). Worth keeping, but it was built on a hypothesis
+that turned out to be wrong: before the two agent bugs were found, adding
+lookahead changed almost nothing (1,128,226 vs 1,131,714 gross). The real
+gains came from the bug fixes, not the cleverer algorithm — recorded here
+because the opposite conclusion would have been easy and flattering to draw.
 
 ## What this experiment still does NOT include
 
 - **No sensitivity sweep** over the response model's parameters — spec
-  section 7.3 requires this before either result above can be called more
-  than a single point estimate, given how much the baseline comparison's
-  outcome (EV policy behind naive persistence) turned out to depend on
-  specifics of the response model's per-attempt independence structure.
-- **`cost_per_incremental_rupee` is computed but only from an approximate
-  channel-cost tally** (contact count × per-channel unit cost from
-  `policy/decision.py`'s `CHANNEL_COST`), not a full accounting including
-  annoyance/churn cost.
+  section 7.3 requires this before any result here can be called more than
+  a single point estimate. Especially warranted now: the baseline
+  comparison's shape turned out to depend heavily on the response model's
+  near-independence between successive contacts, which is an assumption,
+  not a finding.
+- **Do-not-disturb contact rate is 17.54%, nowhere near the ≈0 target.**
+  The policy reduces it relative to blind contact but does not come close
+  to eliminating it, and it got slightly worse after the loop fixes (more
+  cases survive to be contacted).
+- **Only the T-learner is used in the reported runs.** S/X-learner were
+  measured (correlations 0.42 / 0.37 vs T's 0.40 — comparable) and the
+  causal forest is **not usable on this feature set**: it emits CATE
+  estimates outside the mathematically possible [-1, 1] range for a
+  probability difference (mean -1.23, std 4.43, only 29% of predictions in
+  range). Removing feature collinearity improved that materially (to 60% in
+  range) but did not fix it; root cause not yet identified, so it is
+  excluded rather than reported. Documented as a known defect.
+- **`cost_per_incremental_rupee` counts channel costs only** — not
+  annoyance, churn, or complaint-handling cost.
 - **First-contact CATE only** — RETRY's effect is a fixed calibrated
   constant, not learned; NEGOTIATE/ESCALATE_HUMAN aren't in training data.
-- **Only the T-learner is used.** Given both the do-not-disturb leakage and
-  the raw-₹ underperformance above, trying the X-learner or causal forest
-  next is a concrete, motivated next step, not just "more thorough
-  coverage for its own sake."
-- **The greedy, single-attempt EV formula doesn't model multi-attempt
-  compounding** — identified above as the more likely driver of the
-  baseline-comparison gap than annoyance-cost miscalibration (which was
-  checked, not assumed).
+- **The lookahead policy's `p_resolve` is approximated** as
+  `base_resolution_prob + tau_hat`, because the uplift model estimates an
+  incremental effect and not an absolute payment probability. That
+  approximation is the weakest link in the policy and is why
+  `base_resolution_prob` is an explicit parameter rather than a buried
+  constant.

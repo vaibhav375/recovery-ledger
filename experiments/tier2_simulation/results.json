@@ -2,19 +2,19 @@
   "n_eval": 2000,
   "n_treatment": 1037,
   "n_holdout": 963,
-  "uplift_model_correlation_with_true_persuadability": 0.411092989501221,
-  "gross_treatment_recovered": 643747.0146340416,
-  "gross_holdout_recovered": 385878.2415227879,
-  "treatment_recovery_rate": 0.32594021215043395,
-  "holdout_recovery_rate": 0.14537902388369678,
+  "uplift_model_correlation_with_true_persuadability": 0.4162636803165717,
+  "gross_treatment_recovered": 880177.9103783838,
+  "gross_holdout_recovered": 454814.14284397336,
+  "treatment_recovery_rate": 0.33751205400192863,
+  "holdout_recovery_rate": 0.1536863966770509,
   "incremental_per_1000_cases": {
-    "point": 220073.9198296979,
-    "ci_low": 90448.37973944627,
-    "ci_high": 341756.6038378006
+    "point": 376484.4688029745,
+    "ci_low": 203979.22148854693,
+    "ci_high": 554242.7061850282
   },
-  "contacts_sent": 947,
-  "contacts_sent_to_do_not_disturbs": 154,
-  "pct_contacts_to_do_not_disturbs": 0.16261879619852165,
-  "ledger_entries": 28851,
+  "contacts_sent": 905,
+  "contacts_sent_to_do_not_disturbs": 167,
+  "pct_contacts_to_do_not_disturbs": 0.18453038674033148,
+  "ledger_entries": 33301,
   "ledger_chain_valid": true
 }

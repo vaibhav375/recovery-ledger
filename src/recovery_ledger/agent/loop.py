@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from recovery_ledger.detector.detector import CaseDetector
 from recovery_ledger.diagnoser.diagnoser import CaseDiagnoser
 from recovery_ledger.events.actions import ActionType, StopReason
-from recovery_ledger.events.schemas import RecoveryCase
+from recovery_ledger.events.schemas import Channel, RecoveryCase
 from recovery_ledger.executor.executor import SimulatedExecutor
 from recovery_ledger.kernel.certificate import Decision
 from recovery_ledger.kernel.engine import ConsentInfo, DLTInfo, KernelEngine, MandateInfo, RuleContext
@@ -61,6 +61,37 @@ class RecoveryAgent:
         self.ledger.append(case.case_id, "stop", {"reason": reason.value})
         return reason
 
+    def _rule_context(
+        self,
+        case: RecoveryCase,
+        action_type: ActionType,
+        channel: Channel | None,
+        attempts_so_far: int,
+    ) -> RuleContext:
+        return RuleContext(
+            case=case,
+            action_type=action_type,
+            channel=channel,
+            now_ist=self.clock(),
+            attempts_in_window=attempts_so_far,
+            attempt_cap=DEFAULT_ATTEMPT_CAP,
+            window_days=DEFAULT_WINDOW_DAYS,
+            message_class="service",
+            # Consent inferred from the existing transaction/subscription/
+            # invoice relationship the case arose from, captured at
+            # detection time — not marketing outreach to a stranger.
+            consent=ConsentInfo(basis="inferred", captured_at=case.detected_at, contract_active=True),
+            dlt=DLTInfo(registered=True, header="RZPRCV-S", template_class="service"),
+            # Modelling choice: the case's detection is treated as when the
+            # pre-debit notice would have gone out, so a mandate RETRY
+            # genuinely can get denied here if it's attempted too soon —
+            # this isn't forced to always pass.
+            mandate=MandateInfo(pre_debit_notice_sent_at=case.detected_at),
+            includes_opt_out_option=True,
+            sender_number_series="160",
+            tone_intensity=min(attempts_so_far, 3),
+        )
+
     def run_case(self, case: RecoveryCase) -> StopReason:
         self.ledger.append(case.case_id, "case_ingested", case.model_dump(mode="json"))
 
@@ -78,39 +109,43 @@ class RecoveryAgent:
             if decision.action_type == ActionType.STOP:
                 return self._stop(case, StopReason.NEGATIVE_EV)
 
-            context = RuleContext(
-                case=case,
-                action_type=decision.action_type,
-                channel=decision.channel,
-                now_ist=self.clock(),
-                attempts_in_window=attempts_so_far,
-                attempt_cap=DEFAULT_ATTEMPT_CAP,
-                window_days=DEFAULT_WINDOW_DAYS,
-                message_class="service",
-                # Consent inferred from the existing transaction/subscription/
-                # invoice relationship the case arose from, captured at
-                # detection time — not marketing outreach to a stranger.
-                consent=ConsentInfo(basis="inferred", captured_at=case.detected_at, contract_active=True),
-                dlt=DLTInfo(registered=True, header="RZPRCV-S", template_class="service"),
-                # Modelling choice: the case's detection is treated as when the
-                # pre-debit notice would have gone out, so a mandate RETRY
-                # genuinely can get denied here if it's attempted too soon —
-                # this isn't forced to always pass.
-                mandate=MandateInfo(pre_debit_notice_sent_at=case.detected_at),
-                includes_opt_out_option=True,
-                sender_number_series="160",
-                tone_intensity=min(attempts_so_far, 3),
+            certificate = self.kernel.issue_certificate(
+                self._rule_context(case, decision.action_type, decision.channel, attempts_so_far)
             )
-            certificate = self.kernel.issue_certificate(context)
             self.ledger.append(case.case_id, "certificate", certificate.model_dump(mode="json"))
 
+            executed_action = decision.action_type
             if certificate.decision == Decision.DENY:
-                return self._stop(case, StopReason.REGULATORY_CEILING)
+                # Spec section 10, stopping rule 10 is "the kernel denies ALL
+                # remaining actions" — NOT "the kernel denied the one action
+                # the policy happened to propose first". Falling back to WAIT
+                # (which is never customer contact, and is exempt from every
+                # rule in the kernel) keeps the case alive for organic
+                # resolution instead of abandoning it over a single
+                # inadmissible action.
+                #
+                # This matters more than it sounds: before this fix, the EV
+                # policy's preference for RETRY on mandate cases meant ~12%
+                # of its cases were killed outright by the 24-hour pre-debit
+                # notice rule, while a policy that only ever nudged never
+                # tripped that rule at all — an artificial penalty for using
+                # more of the action space (measured 2026-08-24, see
+                # ENGINEERING_LOG.md).
+                fallback_certificate = self.kernel.issue_certificate(
+                    self._rule_context(case, ActionType.WAIT, None, attempts_so_far)
+                )
+                self.ledger.append(
+                    case.case_id, "certificate", fallback_certificate.model_dump(mode="json")
+                )
+                if fallback_certificate.decision == Decision.DENY:
+                    return self._stop(case, StopReason.REGULATORY_CEILING)
+                certificate = fallback_certificate
+                executed_action = ActionType.WAIT
 
             result = self.executor.execute(certificate)
             self.ledger.append(case.case_id, "action_result", result.model_dump())
 
-            reply = self.listener.listen(case, decision.action_type, attempts_so_far)
+            reply = self.listener.listen(case, executed_action, attempts_so_far)
             self.ledger.append(case.case_id, "reply", {"intent": reply.value})
 
             if reply in REPLY_TO_STOP_REASON:

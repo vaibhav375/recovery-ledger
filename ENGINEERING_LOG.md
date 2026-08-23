@@ -474,3 +474,84 @@ forest already implemented but not yet swapped in.
 
 94/94 tests passing (4 new: one per new baseline policy, one integration
 test running all 5 against the same batch).
+
+## 2026-08-24 (cont. 2) — Chasing the EV policy's underperformance: two wrong hypotheses, then two real bugs
+
+Started on the prioritised follow-up list, item 1: the EV policy losing to
+naive mass-contact. This entry is the most useful one in this log so far,
+because most of it is wrong turns.
+
+**Wrong hypothesis 1 — a better learner would fix it.** Compared all four
+uplift learners on correlation with true persuadability. Result: s=0.42,
+t=0.40, x=0.37 — all comparable, none a fix. Also found `causal_forest`
+emitting CATE estimates with mean **-1.21 and std 4.84**, which are
+*impossible* for a treatment effect on a probability (must be in [-1,1]);
+only 29% of its predictions were even in range. Caught only because I
+printed the distribution rather than just the correlation.
+
+Two feature defects surfaced while investigating that: `amount_at_risk` was
+~4000x the scale of every other (0/1) feature, and the full one-hot
+encoding made the design matrix rank-deficient (rank 11 of 16 — three
+constant-zero columns, plus each one-hot group summing to 1 creating
+dependencies *between* groups). Fixed both: log1p the amount, drop the
+first level of each categorical (which is what Tier 1's
+`pd.get_dummies(drop_first=True)` was already doing — the domain pipeline
+had quietly diverged from the validated one). Honest outcome: **this did
+not fix causal_forest** (in-range went 29%→60%, still broken). I had
+written a comment claiming the scaling fixed it before verifying; deleted
+that claim rather than leave a false statement in the code. Causal forest
+is now documented as a known defect and excluded, not silently dropped.
+
+**Wrong hypothesis 2 — missing multi-attempt compounding.** Built
+`LookaheadEVDecisionPolicy`: a finite-horizon DP over the remaining attempt
+budget, so an action's value includes the option to keep working the case
+if it doesn't resolve now. Measured: gross 1,128,226 vs greedy's 1,131,714.
+**Essentially no change.** Two hypotheses, two misses.
+
+**Then stopped guessing and instrumented.** Logged the actual action mix,
+stop reasons, and per-loss-type recovery for both policies. That found it
+immediately, and it was nothing I'd guessed:
+
+1. `greedy_ev` had **240 `regulatory_ceiling` stops; `blast_everyone` had
+   zero.** The loop mapped any single kernel DENY straight to case
+   termination. The EV policy prefers RETRY on mandate cases, ~half of
+   which the 24h pre-debit-notice rule denies — so it was being killed for
+   using more of the action space, while a policy that only ever nudges
+   never tripped that rule at all. Spec section 10 rule 10 says stop when
+   the kernel denies *all remaining* actions; the loop was implementing
+   "denied the first action we happened to propose". A spec-compliance bug
+   masquerading as a policy-quality problem.
+2. Per-loss-type recovery showed `greedy_ev` at **8.1% on overdue
+   receivables vs do-nothing's 13.9%** — the agent was doing actively worse
+   than not existing on that segment. Cause: `if best_ev <= 0: STOP`
+   conflated STOP with WAIT. WAIT is free, contacts nobody, and preserves
+   organic self-resolution; STOP throws the case away. The policy was
+   abandoning cases rather than costlessly waiting.
+
+Fixed both (loop falls back to WAIT and only stops when that is also
+denied; policies return WAIT instead of STOP when nothing has positive EV).
+Together these closed essentially the whole gap: EV policy gross went
+1,131,714 → 1,595,699 against blast_everyone's 1,598,606.
+
+**Where that leaves the claim.** The agent is now statistically
+indistinguishable from blind mass-contact on recovery (₹353,755 vs
+₹355,209, overlapping CIs) using **1,733 contacts instead of 4,393** — 2.5x
+better cost per incremental rupee, fewer do-not-disturbs reached. So the
+defensible claim is *efficiency*, not a bigger headline number, and the
+report says exactly that rather than implying the agent "wins".
+
+Headline B1 re-run with the lookahead policy: **₹376,484 per 1,000 cases
+(95% CI ₹203,979–₹554,243)**, up from ₹220,074. Both experiments verified
+deterministic again (run twice, diffed, byte-identical).
+
+One honest regression to note: do-not-disturb contact rate went *up*
+slightly (16.26% → 18.45%) — a direct consequence of the loop fix, since
+cases that were previously killed by a single denial now survive and get
+contacted. Real tradeoff, recorded rather than buried.
+
+100/100 tests passing (5 new lookahead-policy tests, including one that
+verifies do-not-disturb protection survives the reformulation; 3 existing
+tests updated because the WAIT-instead-of-STOP behaviour is deliberately
+different — the opt-out test was rewritten to assert the actual safety
+property, "an opted-out customer is never contacted", rather than the
+incidental stop-reason it previously checked).

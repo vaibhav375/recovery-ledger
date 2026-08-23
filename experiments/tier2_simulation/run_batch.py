@@ -62,7 +62,7 @@ from recovery_ledger.kernel.rules.tcccpr import (
 )
 from recovery_ledger.kernel.rules.timing import ContactHoursRule
 from recovery_ledger.ledger.ledger import Ledger
-from recovery_ledger.policy.decision import DoNothingPolicy, EVDecisionPolicy
+from recovery_ledger.policy.decision import DoNothingPolicy, LookaheadEVDecisionPolicy
 from recovery_ledger.policy.features import cases_to_feature_matrix
 from recovery_ledger.policy.uplift.learners import TLearnerModel
 from recovery_ledger.sim.environment import EnvironmentListener, SimulationEnvironment, generate_population, persuadability
@@ -130,7 +130,7 @@ def run_eval(n_eval: int, uplift_model: TLearnerModel, *, seed: int) -> dict:
     detector, diagnoser, executor = CaseDetector(), CaseDiagnoser(), SimulatedExecutor()
 
     treatment_agent = RecoveryAgent(
-        detector=detector, diagnoser=diagnoser, policy=EVDecisionPolicy(uplift_model=uplift_model),
+        detector=detector, diagnoser=diagnoser, policy=LookaheadEVDecisionPolicy(uplift_model=uplift_model),
         kernel=kernel, executor=executor, listener=listener, ledger=ledger, clock=lambda: NOW,
     )
     holdout_agent = RecoveryAgent(
