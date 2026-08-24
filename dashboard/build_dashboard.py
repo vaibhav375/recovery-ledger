@@ -22,6 +22,8 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
+from recovery_ledger.kernel.provenance import registry_json
+
 HERE = Path(__file__).parent
 ROOT = HERE.parent
 
@@ -84,9 +86,23 @@ def case_card(case_id: str, entries: list[dict]) -> dict:
                     else (f"paused: {pause['payload']['reason']}" if pause else "open")),
         "denied": sum(1 for c in certs if c["payload"]["decision"] == "DENY"),
         "certificates": len(certs),
+        # Full hashes, plus case_id and timestamp, because these are exactly the
+        # fields the chain commits to. They were previously truncated to 12
+        # characters and the other two dropped, which saved about 150 KB and
+        # made the stored trail unverifiable: nothing downstream could re-derive
+        # an entry's hash, so "hash-chained" was a claim the artifact itself
+        # could not support. The live console's tamper check feeds these back to
+        # the real `Ledger.verify_chain_detail`, which needs them intact.
         "timeline": [
-            {"type": e["entry_type"], "seq": e["seq"], "hash": e["hash"][:12],
-             "prev": e["prev_hash"][:12], "payload": e["payload"]}
+            {
+                "type": e["entry_type"],
+                "seq": e["seq"],
+                "case_id": e["case_id"],
+                "timestamp": e["timestamp"],
+                "hash": e["hash"],
+                "prev": e["prev_hash"],
+                "payload": e["payload"],
+            }
             for e in entries
         ],
     }
@@ -322,7 +338,7 @@ function drawer(c){
       const cls=dec==='DENY'?'deny':(dec==='ALLOW'?'allow':'');
       return `<div class="step ${cls}"><div class="t">${esc(t.type)}${dec?` \\u2014 ${dec}`:''}</div>
       <div class="d">${esc(describe(t))}</div>
-      <div class="hash mono">#${t.seq} ${t.prev}\\u2009\\u2192\\u2009${t.hash}</div></div>`;
+      <div class="hash mono">#${t.seq} ${t.prev.slice(0,12)}\\u2009\\u2192\\u2009${t.hash.slice(0,12)}</div></div>`;
     }).join('');
   } else if(tab==='certificates'){
     body=certs.length?certs.map(t=>`<div style="margin-bottom:16px">
@@ -418,6 +434,10 @@ def build_data(ledger_path: Path, max_cases: int) -> dict:
         # own — so it needs both arms, not just the incremental figure.
         "batch": load_optional(ROOT / "experiments" / "tier2_simulation" / "results.json"),
         "sensitivity": load_optional(ROOT / "experiments" / "sensitivity" / "results_sensitivity.json"),
+        # Where each rule comes from. Embedded rather than fetched, so the
+        # static dashboard can answer "says who?" with no server running —
+        # the live console gets the same registry from /api/provenance.
+        "rule_provenance": registry_json(),
     }
 
 

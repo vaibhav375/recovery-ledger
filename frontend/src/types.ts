@@ -1,6 +1,10 @@
 export type Step = {
   type: string;
   seq: number;
+  case_id: string;
+  timestamp: string;
+  // Full SHA-256, not a display prefix: the chain verifier re-derives these,
+  // so a truncated hash would make the stored trail unverifiable.
   hash: string;
   prev: string;
   payload: Record<string, any>;
@@ -46,4 +50,5 @@ export type Dashboard = {
   baselines: any | null;
   batch: any | null;
   sensitivity: any | null;
+  rule_provenance?: Record<string, import("./live/api").Citation>;
 };

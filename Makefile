@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live
 
 setup:
 	uv venv --python 3.12
@@ -79,6 +79,18 @@ dashboard-serve:
 
 frontend-dev:
 	npm --prefix frontend run dev
+
+# The live console: the same static dashboard, plus a backend that drives the
+# real agent. Start a run and watch the loop write the ledger, engage the kill
+# switch mid-run, fire the red-team suite at the compliance kernel one attack
+# at a time (and switch rules off to prove they were doing the work), re-run a
+# case with one fact of the world changed, or tamper with a ledger entry and
+# watch verification catch it.
+#
+# Standard library only - nothing to install beyond `make setup`. --warm fits
+# the uplift and churn models up front so the first run is not waiting on them.
+live: dashboard
+	PYTHONPATH=src .venv/bin/python3 -m recovery_ledger.live.server --warm
 
 # Sensitivity sweep (spec section 7.3) — is the policy RANKING stable when the
 # simulator's invented constants are swept across defensible ranges?

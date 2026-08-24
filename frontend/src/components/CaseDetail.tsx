@@ -1,27 +1,9 @@
 import { useState } from "react";
 import type { CaseCard } from "../types";
 import { money } from "../format";
+import { describeEntry, shortHash } from "../entries";
 
 type Tab = "timeline" | "certificates" | "raw";
-
-function describe(step: CaseCard["timeline"][number]): string {
-  const p = step.payload ?? {};
-  switch (step.type) {
-    case "decision": return p.rationale ?? "";
-    case "diagnosis": return p.narration ?? "";
-    case "stop": return `reason: ${p.reason}`;
-    case "pause": return `until ${p.resume_at}`;
-    case "reply": return `customer intent: ${p.intent}`;
-    case "action_result":
-      return `${p.executed ? "executed" : "not executed"} ${p.action_type ?? ""}`;
-    case "certificate": {
-      const failed = (p.rule_results ?? []).filter((r: any) => !r.passed).map((r: any) => r.rule_name);
-      return failed.length ? `denied by ${failed.join(", ")}` : "all rules passed";
-    }
-    case "case_ingested": return "case opened";
-    default: return "";
-  }
-}
 
 export default function CaseDetail({ c, onClose }: { c: CaseCard; onClose: () => void }) {
   const [tab, setTab] = useState<Tab>("timeline");
@@ -57,9 +39,9 @@ export default function CaseDetail({ c, onClose }: { c: CaseCard; onClose: () =>
                   <div className="rl-step-title">
                     {s.type}{decision ? ` — ${decision}` : ""}
                   </div>
-                  <div className="rl-step-detail">{describe(s)}</div>
+                  <div className="rl-step-detail">{describeEntry(s)}</div>
                   <div className="rl-step-hash">
-                    #{s.seq} {s.prev}&nbsp;→&nbsp;{s.hash}
+                    #{s.seq} {shortHash(s.prev)}&nbsp;→&nbsp;{shortHash(s.hash)}
                   </div>
                 </li>
               );

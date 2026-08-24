@@ -9,9 +9,37 @@ an LLM client — mechanically enforced by
 temporary `import anthropic` inside `kernel/` was confirmed to fail the
 test, then removed — see `ENGINEERING_LOG.md`, 2026-08-23).
 
-12 rules are implemented so far, all with passing unit tests in
+13 rules are implemented so far, all with passing unit tests in
 `tests/test_kernel_engine.py`, `tests/test_kernel_rules_new.py`, and
 `tests/test_runner.py` (the promise-to-pay window).
+
+## Provenance is machine-readable, and its limits are stated
+
+`src/recovery_ledger/kernel/provenance.py` carries a `Citation` for every rule
+in the default kernel: the instrument, its reference where we could name one,
+the section number **only where it was checked against the instrument itself**,
+one sentence on what the source requires, and one sentence on what this project
+actually encoded — which is not always the same thing.
+
+Two rules are enforced by `tests/test_kernel_provenance.py` rather than left to
+good intentions:
+
+- **No invented clause numbers.** Where the rule was encoded from the spec's
+  summary of a requirement rather than from the instrument, `clause` is `None`
+  and `confidence` is `"spec"`. A missing section number is information; a
+  plausible-looking wrong one is a liability. The tests fail the build if a
+  clause is pinned without a primary source.
+- **Policy is labelled as policy.** The three `POLICY.*` rules are this
+  project's own operating limits, not law. They declare `kind="policy"` and
+  carry no instrument, and a test fails if one ever claims otherwise.
+
+Two further tests keep the registry from drifting: every rule in the default
+kernel must have an entry, and every entry must correspond to a rule that still
+exists.
+
+The registry is embedded in `dashboard/dist/data.json`, so the static dashboard
+can answer "says who?" with no server running, and is also served at
+`/api/provenance` by the live console.
 
 ## RBI recovery-agent norms
 

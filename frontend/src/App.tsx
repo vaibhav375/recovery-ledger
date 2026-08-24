@@ -16,6 +16,7 @@ import Opening from "./sections/Opening";
 import Subtraction from "./sections/Subtraction";
 import Silence from "./sections/Silence";
 import Kernel from "./sections/Kernel";
+import Live from "./sections/Live";
 import Explorer from "./sections/Explorer";
 import CaseDetail from "./components/CaseDetail";
 
@@ -114,6 +115,7 @@ export default function App() {
           totalCases={data.summary.cases}
         />
         <Kernel data={data} />
+        <Live data={data} />
         <Explorer data={data} onSelect={setSelected} />
       </main>
 

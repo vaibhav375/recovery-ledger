@@ -1,4 +1,7 @@
+import { useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import InView from "../motion/InView";
+import { CitationCard } from "../live/Range";
 import type { Dashboard } from "../types";
 
 /** A DENY is the system working, not the system failing.
@@ -14,6 +17,13 @@ export default function Kernel({ data }: { data: Dashboard }) {
   const s = data.summary;
   const rules = [...data.rule_stats].sort((a, b) => b.failed - a.failed);
   const busiest = rules[0];
+  // "Cited to source" is a claim the page has to be able to answer. Opening a
+  // rule shows the instrument, what it actually requires, what this project
+  // encoded, and — where the clause number could not be verified against the
+  // instrument — that it could not. Embedded in data.json, so this works with
+  // no server.
+  const [open, setOpen] = useState<string | null>(null);
+  const provenance = data.rule_provenance ?? {};
 
   return (
     <section className="rl-kernel">
@@ -38,7 +48,7 @@ export default function Kernel({ data }: { data: Dashboard }) {
             </div>
             <div>
               <span className="rl-kernel-num">{data.rule_stats.length}</span>
-              <span className="rl-kernel-lbl">rules, each cited to source</span>
+              <span className="rl-kernel-lbl">rules — open one to see its source</span>
             </div>
             <div>
               <span className="rl-kernel-num is-ok">0</span>
@@ -63,19 +73,44 @@ export default function Kernel({ data }: { data: Dashboard }) {
 
         <InView index={3}>
           <div className="rl-kernel-rules">
-            {rules.map((r) => (
-              <div key={r.rule} className={`rl-rulerow${r.failed ? " is-active" : ""}`}>
-                <code>{r.rule}</code>
-                <span className="rl-rulerow-bar">
-                  <span
-                    style={{ width: `${(r.failed / Math.max(r.evaluated, 1)) * 100}%` }}
-                  />
-                </span>
-                <span className="rl-rulerow-n">
-                  {r.failed ? `${r.failed.toLocaleString("en-IN")} refused` : "—"}
-                </span>
-              </div>
-            ))}
+            {rules.map((r) => {
+              const isOpen = open === r.rule;
+              return (
+                <div key={r.rule}>
+                  <button
+                    type="button"
+                    className={`rl-rulerow${r.failed ? " is-active" : ""}${isOpen ? " is-open" : ""}`}
+                    aria-expanded={isOpen}
+                    onClick={() => setOpen(isOpen ? null : r.rule)}
+                  >
+                    <code>{r.rule}</code>
+                    <span className="rl-rulerow-bar">
+                      <span
+                        style={{ width: `${(r.failed / Math.max(r.evaluated, 1)) * 100}%` }}
+                      />
+                    </span>
+                    <span className="rl-rulerow-n">
+                      {r.failed ? `${r.failed.toLocaleString("en-IN")} refused` : "—"}
+                    </span>
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                        style={{ overflow: "hidden" }}
+                      >
+                        <div className="rl-rulerow-source">
+                          <CitationCard rule={r.rule} citation={provenance[r.rule] ?? null} />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
           </div>
         </InView>
       </div>
