@@ -20,6 +20,18 @@ and all three theme modes work unmodified. The licence is preserved at
 ThreeUI's Three.js/WebGL shader components are not used: this is a compliance
 audit tool and there is nothing here to render in 3D.
 
+## Design system and motion
+
+| Source | Used for |
+|---|---|
+| **[ThreeUI](https://github.com/MengTo/threeui)** (MIT) | `styles.css` design tokens, `theme.ts` (light/dark/system + 5 palettes), the app shell (`topbar`/`app`/`sidebar`/`pane`), browse-grid + filter classes, and the `DotMatrixBackground` WebGL shader template in the hero |
+| **[Realtime Colors](https://www.realtimecolors.com/?colors=050315-fbfbfe-2f27ce-dedcff-433bff&fonts=Inter-Inter)** | The palette — text `#050315`, background `#fbfbfe`, primary `#2f27ce`, secondary `#dedcff`, accent `#433bff` — and Inter. Applied in `src/theme.css` by re-pointing ThreeUI's own tokens, so every ThreeUI class keeps working |
+| **[Motion Primitives](https://motion-primitives.com/)** patterns, on [Motion](https://motion.dev) | `AnimatedNumber` (spring counters on the hero figures), `TextEffect` (per-word blur-and-rise), `InView` (staggered reveals), `AnimatedTabs` (shared-`layoutId` nav pill) |
+| **[Lenis](https://lenis.dev/)** | Smooth scrolling, disabled under `prefers-reduced-motion` |
+
+`three` is lazily imported so its ~500KB chunk never blocks first paint, and is
+skipped entirely for reduced-motion users.
+
 ## Running
 
 ```bash

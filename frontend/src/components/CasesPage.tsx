@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { CaseCard, Dashboard } from "../types";
 import { money } from "../format";
+import InView from "../motion/InView";
 
 export default function CasesPage({
   data, onSelect,
@@ -58,8 +59,9 @@ export default function CasesPage({
       </header>
 
       <div className="browse-grid rl-cases">
-        {rows.map((c) => (
-          <article key={c.case_id} className="browse-item rl-case">
+        {rows.map((c, i) => (
+          <InView key={c.case_id} index={i} className="browse-item rl-case">
+          <article>
             <button className="rl-case-btn" onClick={() => onSelect(c)}>
               <div className="rl-case-id">{c.case_id}</div>
               <div className="rl-case-meta">
@@ -77,6 +79,7 @@ export default function CasesPage({
               </div>
             </button>
           </article>
+          </InView>
         ))}
       </div>
     </main>

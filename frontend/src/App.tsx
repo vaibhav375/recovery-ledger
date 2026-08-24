@@ -13,6 +13,7 @@ import {
   type ThemePalette,
 } from "./vendor/theme";
 
+import { useLenis } from "./motion/useLenis";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import OverviewPage from "./components/OverviewPage";
@@ -46,6 +47,9 @@ export default function App() {
   const [view, setView] = useState<ViewId>("overview");
   const [selected, setSelected] = useState<CaseCard | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Lenis smooth scroll (lenis.dev)
+  useLenis(true);
 
   // Theme state uses ThreeUI's own module: light/dark/system plus five
   // palettes, persisted to localStorage under its keys.

@@ -1,4 +1,6 @@
 import Stat from "./Stat";
+import Hero from "./Hero";
+import InView from "../motion/InView";
 import type { Dashboard } from "../types";
 import { titleise } from "../format";
 
@@ -6,11 +8,8 @@ export default function OverviewPage({ data }: { data: Dashboard }) {
   const s = data.summary;
   const stops = Object.entries(s.stop_reasons).sort((a, b) => b[1] - a[1]);
   return (
-    <main className="browse-page rl-page">
-      <header className="browse-header">
-        <h1>Overview</h1>
-        <p className="lede">{data.source}</p>
-      </header>
+    <main className="rl-page rl-page--hero">
+      <Hero data={data} />
 
       <div className="card rl-note">
         Every action below passed through the deterministic compliance kernel
@@ -38,8 +37,8 @@ export default function OverviewPage({ data }: { data: Dashboard }) {
         <table className="rl-table">
           <thead><tr><th>Reason</th><th>Cases</th></tr></thead>
           <tbody>
-            {stops.map(([k, v]) => (
-              <tr key={k}>
+            {stops.map(([k, v], i) => (
+              <tr key={k} style={{ animationDelay: `${i * 30}ms` }} className="rl-row-in">
                 <td><code>{k}</code></td>
                 <td className="rl-num">{v.toLocaleString()}</td>
               </tr>

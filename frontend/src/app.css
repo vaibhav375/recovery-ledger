@@ -337,3 +337,155 @@ code, pre { font-family: var(--font-mono); }
   .rl-source { display: none; }
   .rl-page { padding: 20px 16px 50px; }
 }
+
+/* ===================================================================== *
+ *  Hero, motion and the indigo palette treatment
+ * ===================================================================== */
+
+.rl-page--hero { padding-top: 0; }
+
+.rl-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--r-xl);
+  margin: 22px 0 30px;
+  padding: 62px 40px 46px;
+  background:
+    radial-gradient(120% 130% at 12% -10%, var(--rl-secondary) 0%, transparent 55%),
+    radial-gradient(90% 120% at 95% 0%, rgba(67, 59, 255, 0.18) 0%, transparent 60%),
+    var(--content-bg);
+  border: 1px solid var(--border);
+  box-shadow: var(--rl-shadow-lg);
+}
+html[data-scheme="dark"] .rl-hero {
+  background:
+    radial-gradient(120% 130% at 12% -10%, rgba(67, 59, 255, 0.30) 0%, transparent 55%),
+    radial-gradient(90% 120% at 95% 0%, rgba(139, 132, 255, 0.18) 0%, transparent 60%),
+    var(--content-bg);
+}
+
+/* ThreeUI's DotMatrixBackground canvas, masked so it fades out behind text */
+.rl-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.9;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
+}
+.rl-hero-bg canvas { width: 100% !important; height: 100% !important; display: block; }
+
+.rl-hero-inner { position: relative; max-width: 780px; }
+
+.rl-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rl-primary);
+  background: var(--tint);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+html[data-scheme="dark"] .rl-eyebrow { color: var(--accent); }
+
+/* Solid colour, deliberately NOT background-clip:text. The gradient version
+ * silently dropped the second word: Motion animates each word span with
+ * transform/filter, which gives it its own stacking context, and the parent's
+ * text-clipped background does not paint through that. Caught by finding the
+ * span present at opacity 1 with a valid bounding box but nothing visible. */
+.rl-hero-title {
+  font-size: clamp(38px, 6.2vw, 66px);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+  margin: 18px 0 0;
+  color: var(--foreground);
+}
+.rl-hero-title .rl-accent-word { color: var(--rl-primary); }
+html[data-scheme="dark"] .rl-hero-title .rl-accent-word { color: var(--accent); }
+
+.rl-hero-lede {
+  margin: 16px 0 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--foreground-muted);
+  max-width: 62ch;
+}
+.rl-hero-lede strong { color: var(--foreground); font-weight: 650; }
+
+.rl-hero-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin-top: 34px;
+  padding-top: 26px;
+  border-top: 1px solid var(--border);
+}
+.rl-hero-figure { display: flex; flex-direction: column; gap: 3px; }
+.rl-hero-num {
+  font-size: 28px;
+  font-weight: 750;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--rl-primary);
+}
+html[data-scheme="dark"] .rl-hero-num { color: var(--accent); }
+.rl-hero-num.is-deny { color: var(--rl-deny); }
+.rl-hero-figure-label {
+  font-size: 11px;
+  color: var(--foreground-muted);
+  letter-spacing: 0.02em;
+}
+
+/* ---- animated nav pill (Motion Primitives pattern) ------------------ */
+.rl-nav-item { position: relative; }
+.rl-nav-item[aria-current="true"] { background: transparent; color: var(--onfill); }
+.rl-tab-pill {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-md);
+  background: var(--fill);
+  z-index: 0;
+}
+.rl-tab-label, .rl-nav-item .rl-nav-flag { position: relative; z-index: 1; }
+
+/* ---- table row entrance --------------------------------------------- */
+@keyframes rl-row-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: none; }
+}
+.rl-row-in { animation: rl-row-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ---- polish -------------------------------------------------------- */
+.rl-stat, .rl-case, .rl-scenario { box-shadow: var(--rl-shadow); }
+.rl-case { transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease; }
+.rl-case:hover {
+  border-color: var(--ring);
+  transform: translateY(-2px);
+  box-shadow: var(--rl-shadow-lg);
+}
+.rl-stat-value { color: var(--foreground); }
+.rl-stat-value.is-ok { color: var(--rl-ok); }
+.rl-stat-value.is-deny { color: var(--rl-deny); }
+.rl-pass { color: var(--rl-ok); }
+.rl-fail { color: var(--rl-deny); }
+.rl-hi { color: var(--rl-primary); }
+html[data-scheme="dark"] .rl-hi { color: var(--accent); }
+.rl-chip.is-ok { color: var(--rl-ok); background: color-mix(in srgb, var(--rl-ok) 12%, transparent); }
+.rl-chip.is-deny { color: var(--rl-deny); background: color-mix(in srgb, var(--rl-deny) 12%, transparent); }
+.rl-note { border-left-color: var(--rl-primary); }
+html[data-scheme="dark"] .rl-note { border-left-color: var(--accent); }
+.rl-note.is-alert { border-left-color: var(--rl-deny); }
+.rl-scenario.is-highlight { border-color: var(--rl-primary); box-shadow: var(--rl-shadow-lg); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+@media (max-width: 860px) {
+  .rl-hero { padding: 40px 22px 32px; margin: 14px 0 22px; }
+}

@@ -1,0 +1,80 @@
+/* Palette from the Realtime Colors configuration supplied for this project:
+ * realtimecolors.com/?colors=050315-fbfbfe-2f27ce-dedcff-433bff&fonts=Inter-Inter
+ *
+ *   text #050315 · background #fbfbfe · primary #2f27ce
+ *   secondary #dedcff · accent #433bff · Inter
+ *
+ * These override ThreeUI's own token values rather than replacing its token
+ * *system* — every ThreeUI component and layout class keeps working, it just
+ * renders in this palette. Dark mode is derived from the same five colours so
+ * the identity holds in both schemes.
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+:root,
+html[data-theme="light"],
+html[data-scheme="light"] {
+  --rl-text: #050315;
+  --rl-bg: #fbfbfe;
+  --rl-primary: #2f27ce;
+  --rl-secondary: #dedcff;
+  --rl-accent: #433bff;
+
+  /* ThreeUI tokens, re-pointed at the palette above */
+  --page: #fbfbfe;
+  --wall: #f6f6fd;
+  --surface: #f1f1fc;
+  --content-bg: #ffffff;
+  --foreground: #050315;
+  --foreground-muted: #5a5872;
+  --accent: #2f27ce;
+  --border: rgba(5, 3, 21, 0.08);
+  --ring: rgba(47, 39, 206, 0.35);
+  --line-3: rgba(5, 3, 21, 0.18);
+  --tint: rgba(47, 39, 206, 0.06);
+  --hover: rgba(47, 39, 206, 0.08);
+  --fill: #2f27ce;
+  --onfill: #fbfbfe;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "Inter", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --rl-ok: #0f9d58;
+  --rl-deny: #d7263d;
+  --rl-shadow: 0 1px 2px rgba(5, 3, 21, 0.04), 0 8px 24px -12px rgba(5, 3, 21, 0.14);
+  --rl-shadow-lg: 0 2px 6px rgba(5, 3, 21, 0.05), 0 24px 60px -24px rgba(47, 39, 206, 0.28);
+  color-scheme: light;
+}
+
+html[data-theme="dark"],
+html[data-scheme="dark"] {
+  --page: #050315;
+  --wall: #0a0722;
+  --surface: #110d2e;
+  --content-bg: #0e0a28;
+  --foreground: #fbfbfe;
+  --foreground-muted: #9d9ac4;
+  --accent: #8b84ff;
+  --border: rgba(222, 220, 255, 0.10);
+  --ring: rgba(139, 132, 255, 0.45);
+  --line-3: rgba(222, 220, 255, 0.22);
+  --tint: rgba(139, 132, 255, 0.10);
+  --hover: rgba(139, 132, 255, 0.14);
+  --fill: #433bff;
+  --onfill: #fbfbfe;
+
+  --rl-ok: #34d399;
+  --rl-deny: #ff6b7f;
+  --rl-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  --rl-shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.5), 0 24px 60px -24px rgba(67, 59, 255, 0.5);
+  color-scheme: dark;
+}
+
+/* Body font weight/rendering tuned for Inter specifically. */
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.011em;
+}
