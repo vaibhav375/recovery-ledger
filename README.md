@@ -173,7 +173,18 @@ running.
 - [ ] Negotiation + Section 43B(h) clock
 - [ ] Fleet-level degradation detection
 
-- [ ] Dashboard / audit-trail browser
+- [x] **B4 — browsable audit trail.** `make dashboard` renders the
+      hash-chained ledger as a **self-contained HTML file** — no npm, no
+      build step, no network; it opens by double-click. Browse cases, search
+      and filter by outcome, open any case for its full decision trace with
+      tabs for timeline / certificates / raw JSON, and see every kernel rule
+      evaluated per action. UX architecture is modelled on
+      [ThreeUI](https://github.com/MengTo/threeui) (app shell, browse grid,
+      detail tabs, theming); its React/Vite/WebGL layer is deliberately not
+      carried over — a build step would break the clean-clone property, and
+      decorative 3D on a compliance tool would undercut the very thing this
+      view exists to demonstrate. Verified in a real browser (Playwright):
+      all views, search, drawer tabs and theme toggle work, zero JS errors.
 - [ ] Video + submission
 
 ## Running this repo
@@ -193,6 +204,7 @@ make baselines         # runs all 5 spec-required baselines + a matched-volume
                        # random-targeting control + both EV variants against the
                        # same eval batch — verified working, deterministic
 make sensitivity       # 5-parameter ranking-stability sweep — verified working
+make dashboard         # renders the audit trail to dashboard/index.html
 make redteam          # 21 named attacks + hostile policy + 5,000-state fuzz —
                        # verified working, 100% block rate, mutation-tested
 ```

@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard
 
 setup:
 	uv venv --python 3.12
@@ -32,6 +32,18 @@ eval:
 baselines:
 	PYTHONPATH=src:experiments/tier2_simulation .venv/bin/python3 \
 		experiments/tier2_simulation/run_baselines.py --n-train 5000 --n-eval 2000
+
+# Browsable audit trail (bar requirement B4). Self-contained HTML — no npm, no
+# build step, no network. Uses the rich batch ledger when `make eval` has been
+# run, otherwise falls back to the demo ledger.
+dashboard:
+	@if [ -f experiments/tier2_simulation/batch_ledger.json ]; then \
+		PYTHONPATH=src .venv/bin/python3 dashboard/build_dashboard.py \
+			--ledger experiments/tier2_simulation/batch_ledger.json --max-cases 80; \
+	else \
+		$(MAKE) demo >/dev/null && PYTHONPATH=src .venv/bin/python3 dashboard/build_dashboard.py; \
+	fi
+	@echo "Open dashboard/index.html in any browser."
 
 # Sensitivity sweep (spec section 7.3) — is the policy RANKING stable when the
 # simulator's invented constants are swept across defensible ranges?
