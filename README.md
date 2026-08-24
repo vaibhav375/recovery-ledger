@@ -5,8 +5,11 @@ per 1,000 cases (95% CI ₹133,924–₹432,362).** The decisive test: against a
 control contacting a comparable number of cases *at random*, the agent
 recovers **2.85x more incremental revenue with non-overlapping confidence
 intervals** — so the targeting model, not merely contact volume, is doing the
-work. It also edges blind mass-contact on recovery using 48% fewer contacts,
-at 2x better cost per incremental rupee. Policy dominance under stated
+work. Against blind mass-contact it is **statistically indistinguishable on
+total recovery** (overlapping CIs — and the sign of the difference flips
+with the sample, so "beats" would be an overclaim) while using **48% fewer
+contacts** at 2x better cost per incremental rupee. The contact efficiency
+is the robust claim; a higher headline total is not. Policy dominance under stated
 assumptions, in simulation — not a real-world claim. **Four revisions to
 these numbers** (three from real bugs, one from a methodology fix) are
 documented in
@@ -20,9 +23,57 @@ reports **incremental** rupees recovered against a randomised no-contact holdout
 with every outbound action gated by a deterministic, machine-checkable compliance
 kernel that emits a signed certificate per action.
 
-Full design rationale, novelty claims, and the two-tier validation methodology are
-in [`RAZORPAY_BUILDATHON_TRACK3_SPEC.md`](RAZORPAY_BUILDATHON_TRACK3_SPEC.md).
-Build history and honest failures are in [`ENGINEERING_LOG.md`](ENGINEERING_LOG.md).
+| Document | What's in it |
+|---|---|
+| [`RESULTS.md`](RESULTS.md) | **Every measured number, with the command that reproduces it** |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Component contracts, data flow, and the reasoning behind each design decision |
+| [`COMPLIANCE.md`](COMPLIANCE.md) | All 12 kernel rules, each cited to source, plus two ambiguities flagged rather than silently resolved |
+| [`ENGINEERING_LOG.md`](ENGINEERING_LOG.md) | Dated build history — including the wrong turns, withdrawn numbers, and bugs found in my own work |
+| [`RAZORPAY_BUILDATHON_TRACK3_SPEC.md`](RAZORPAY_BUILDATHON_TRACK3_SPEC.md) | The original spec this was built against |
+
+## Where AI is used — and where it is deliberately not
+
+This table is the answer to the "AI judgment" criterion ("the right tool in
+the right place, **and where you chose not to use one**"). The bottom three
+rows are the ones that matter.
+
+| Use | LLM? | Why |
+|---|---|---|
+| Persona simulation / synthetic replies | ✅ | Language variety is exactly what LLMs are for |
+| Inbound reply-intent classification | ✅ | Free text → structured intent |
+| Message drafting (tone, language, Hinglish) | ✅ | Natural-language generation, template-constrained |
+| Negotiation dialogue | ✅ | Bounded by a solver and the kernel |
+| Root-cause narration | ✅ | Explanation, not decision |
+| **Treatment-effect estimation** | ❌ | Needs calibrated probabilities and confidence intervals. An LLM cannot give you a Qini curve. Classical ML, validated on real RCT data first. |
+| **Compliance decisions** | ❌ | **Must be deterministic and auditable.** Same input, same verdict, forever. "The model usually gets it right" is not a defence you can present to a regulator. |
+| **Money-affecting final actions** | ❌ | Gated by the kernel and an explicit policy, never by generated text |
+
+The constraint is enforced mechanically, not by discipline:
+`tests/test_kernel_no_llm_imports.py` fails the build if anything under
+`kernel/` imports an LLM client — and it has been mutation-tested to confirm
+it actually catches a violation rather than passing vacuously.
+
+## What is novel here — and what is not
+
+**Not novel, said plainly.** Dunning and recovery agents as a category.
+Uplift modelling as a technique. LLM-generated recovery messaging. Hinglish
+voice bots. Butter Payments, Churnkey, Churn Buster, Recurly and Stripe
+Revenue Recovery all exist and are good. The maturity of the category is
+evidence the problem is real; it is not something to claim credit for.
+
+**What is claimed, with honest build status:**
+
+| | Claim | Status |
+|---|---|---|
+| **N1** | **Incremental-first accounting.** Recovery vendors overwhelmingly report *gross* recovered revenue. This reports incremental ₹ against a randomised no-contact holdout, with confidence intervals. The holdout here recovers 15.47% unaided — that is the number gross reporting quietly takes credit for. | ✅ Built, measured |
+| **N2** | **Negative-uplift targeting ("do-not-disturbs").** Customers whose payment probability *falls* when contacted. Nobody in dunning models the downside of contact. | ⚠️ Modelled and measured, but the agent's do-not-disturb contact rate is 20.1% — level with untargeted policies, not better. Reported as the top open problem, not as a win. |
+| **N3** | **A deterministic, machine-checkable India-regulatory compliance kernel** emitting a per-action certificate — TCCCPR/DLT, RBI recovery-agent norms, RBI e-mandate 2026, DPDPA. | ✅ Built: 12 rules, 100% red-team block rate, mutation-tested |
+| **N4** | **Contact as a budget-constrained sequential decision problem**, not one-shot classification. | ⚠️ Partial: greedy EV under an explicit budget, plus a finite-horizon lookahead variant. Not a full constrained-MDP solver, and the spec explicitly permits the simplification — but it is a simplification, and the lookahead currently adds nothing measurable. |
+| **N5** | **Two-tier validation** — causal machinery proven on real randomised public data *before* transfer to the simulator. Directly defeats "your synthetic number is circular". | ✅ Built (Criteo + Hillstrom) |
+| **N6** | **Contact-free recovery** — detecting issuer degradation and suppressing retries into a dead issuer. | ❌ **Not built.** Listed here because it is in the design, not because it exists. |
+
+Two of six are partial and one is not built at all. That is stated here
+rather than left for a reader to discover.
 
 ## Three framings that shape every decision in this repo
 
@@ -62,9 +113,10 @@ running.
       annoyance threshold, dispute propensity), a response model with
       negative responses (opt-out/dispute risk that rises with
       over-contacting), retry economics loosely anchored to spec section
-      3.2's published benchmarks. Marginal calibration is loose, not
-      rigorous, and there's no sensitivity sweep yet — both flagged
-      honestly in `experiments/tier2_simulation/REPORT.md`.
+      3.2's published benchmarks. Marginal calibration is loose rather than
+      rigorous — flagged honestly in `experiments/tier2_simulation/REPORT.md`
+      — but every invented constant is now injectable and swept (see the
+      sensitivity sweep below).
 - [x] Compliance kernel — deny-by-default engine, per-action certificates,
       hash-chained into the ledger, no-LLM-import test that fails the build
       (verified: mutation-tested, not just passing vacuously). 11 rules

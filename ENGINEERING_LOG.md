@@ -869,3 +869,54 @@ bug fix, and has now turned into the sweep's strongest supporting evidence.
 Same phenomenon, three different readings, each honest at the time.
 
 128/128 tests passing. `make sensitivity` wired.
+
+## 2026-08-24 (cont. 8) — Caught myself overclaiming, then closed the documentation gaps
+
+Asked to check for bugs or dropped results before starting anything new.
+The health check itself was clean — 128 tests, `make eval` reproducing
+₹288,729, red-team at 100%/0 violations, demo working. But cross-reading
+two experiments against each other turned up something worse than a bug: a
+claim I had been making that the data does not support.
+
+**The overclaim.** The sensitivity sweep at default parameters showed
+`blast=603,976` ahead of `ev=507,119`, while `make baselines` showed the EV
+policy ahead (340,988 vs 330,108). Those should agree, so I chased it.
+Turned out not to be a bug at all: the ranking simply **flips with the eval
+sample**. At n_eval=1500 mass-contact leads 603,976 to 536,990; at
+n_eval=2000 the EV policy leads 681,976 to 660,216. Same parameters, same
+code, opposite ordering.
+
+The confidence intervals had already been saying this — 340,988
+(274,088–408,856) against 330,108 (249,085–421,457) overlap heavily — and I
+had written "the agent edges blind mass-contact" anyway, reading a point
+estimate as a result. Corrected in README and REPORT.md, with the flip
+evidence recorded so the correction is checkable rather than just asserted.
+
+The robust claims survive and are unchanged: 2.85x against matched-volume
+random targeting with non-overlapping CIs, 48% fewer contacts, 2x
+per-contact efficiency, and C1 holding at 25/25 sweep settings. The
+not-robust claim was only ever the least interesting one — a bigger headline
+total. Worth noting the pattern though: the overclaim crept in precisely
+where I *wanted* a clean "we beat them" line.
+
+**Then the documentation gaps.** Audited what spec section 12 requires
+against what exists: `ARCHITECTURE.md` and `RESULTS.md` were both missing
+outright, the section 8.5 LLM/no-LLM table was absent from the README
+despite the spec saying to include it verbatim because it *is* the answer to
+the "AI judgment" criterion, and the novelty claims were nowhere in the
+README despite being a Definition-of-Done item.
+
+Wrote all four. Two things I did deliberately rather than by default:
+
+- **`RESULTS.md` numbers were extracted programmatically** from the results
+  JSON rather than retyped, because hand-copying figures across documents is
+  exactly how a repo ends up with a number nobody can reproduce.
+- **The novelty table carries honest build status.** N1, N3, N5 are built
+  and measured. N2 is modelled and measured but the agent's do-not-disturb
+  rate (20.1%) is merely *level* with untargeted policies, so it is marked
+  as the top open problem rather than a win. N4 is partial — greedy EV plus
+  a lookahead that currently adds nothing measurable, not a constrained-MDP
+  solver. **N6 is not built at all** and is marked ❌. Two of six partial and
+  one absent, said in the README rather than left for a reader to find.
+
+128/128 tests still passing.

@@ -1,8 +1,9 @@
 # Tier 2 batch experiment — B1 headline result
 
 **Every number below was produced by `run_batch.py` / `run_baselines.py` in
-this directory, run on 2026-08-24.** Two earlier headline figures have been
-withdrawn — see "Revision history" below before citing anything here. Reproduce with `make eval`
+this directory, run on 2026-08-24.** The headline has been revised four
+times — three real bugs and one methodology fix — see "Revision history"
+below before citing anything here. Reproduce with `make eval`
 (or the command below) — seeds are fixed throughout; re-running gives
 identical output (verified: ran it twice, diffed, byte-identical).
 
@@ -23,9 +24,9 @@ under *this simulation's assumptions*.
 
 ## Revision history — read this before the numbers
 
-This report has been revised twice, both times because a check turned up a
-real defect rather than because the numbers were merely re-tuned. Both
-withdrawn figures are recorded here rather than quietly replaced.
+This report has been revised four times, each because a check turned up a
+real defect rather than because the numbers were re-tuned to look better.
+Every withdrawn figure is recorded here rather than quietly replaced.
 
 **2026-08-23, ₹996,519 — WITHDRAWN, was an artifact.** The first run
 reported a suspiciously clean result: only 1.52% of contacts going to
@@ -190,10 +191,20 @@ Chart: `experiments/tier2_simulation/baselines_comparison.png`.
 
 ### What this shows
 
-- **Against blind mass-contact**: the EV policy edges it on recovery
-  (340,988 vs 330,108 — overlapping CIs, so treat as a tie) using **48%
-  fewer contacts**, at 2x the incremental rupees per contact and 2x better
-  cost per incremental rupee.
+- **Against blind mass-contact**: a **tie on total recovery** (340,988 vs
+  330,108, CIs overlapping heavily) achieved with **48% fewer contacts**, at
+  2x the incremental rupees per contact and 2x better cost per incremental
+  rupee.
+
+  Do not read the 340,988 > 330,108 ordering as a result. It is within
+  noise, and it was checked rather than assumed: re-running the identical
+  configuration at a different eval batch size flips the sign (at n_eval=1500
+  mass-contact leads 603,976 to 536,990; at n_eval=2000 the EV policy leads
+  681,976 to 660,216). An earlier version of this report said the EV policy
+  "edges" mass-contact — that was an overclaim the confidence intervals had
+  already ruled out, corrected here rather than left standing. **The robust
+  claims against mass-contact are contact volume and per-contact efficiency,
+  not total recovered rupees.**
 - **Against matched-volume random targeting**: 2.85x the incremental
   recovery, CIs non-overlapping. The targeting is real.
 - **`razorpay_current`'s CI includes zero** — a single automated retry then
