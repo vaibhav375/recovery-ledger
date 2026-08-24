@@ -64,6 +64,7 @@ from recovery_ledger.kernel.rules.tcccpr import (
 )
 from recovery_ledger.kernel.rules.timing import ContactHoursRule
 from recovery_ledger.ledger.ledger import Ledger
+from recovery_ledger.policy.churn import ChurnRiskModel
 from recovery_ledger.policy.decision import DoNothingPolicy, LookaheadEVDecisionPolicy
 from recovery_ledger.policy.features import cases_to_feature_matrix
 from recovery_ledger.policy.uplift.learners import TLearnerModel
@@ -83,6 +84,35 @@ def build_kernel() -> KernelEngine:
         PreDebitNotificationRule(), ConsentRecordExistsRule(), ToneIntensityCeilingRule(),
         PromiseToPayWindowRule(),
     ])
+
+
+def train_models(n_train: int, seed: int) -> tuple[TLearnerModel, ChurnRiskModel]:
+    """Fit BOTH causal models on the same randomised assignment: the effect of
+    contact on payment, and the effect of contact on churn. Same data, same
+    learner class, two different outcomes — the churn model costs nothing
+    extra to identify and gives the policy an independent signal for spotting
+    do-not-disturbs."""
+    from recovery_ledger.listener.listener import ReplyIntent
+
+    cases = generate_cases(n_train, seed=seed, now=NOW)
+    traits = generate_population(cases, seed=seed)
+    env = SimulationEnvironment(traits, seed=seed)
+    rng = np.random.default_rng(seed)
+    treatment = rng.integers(0, 2, size=n_train)
+
+    paid = np.zeros(n_train)
+    churned = np.zeros(n_train)
+    for i, case in enumerate(cases):
+        action = ActionType.NUDGE if treatment[i] == 1 else ActionType.WAIT
+        result = env.step(case, action, attempt_index=0)
+        paid[i] = float(result.paid)
+        churned[i] = float(result.reply == ReplyIntent.OPT_OUT)
+
+    X = cases_to_feature_matrix(cases)
+    uplift = TLearnerModel(random_state=seed)
+    uplift.fit(X, treatment, paid)
+    churn = ChurnRiskModel().fit(X, treatment, churned, random_state=seed)
+    return uplift, churn
 
 
 def train_uplift_model(n_train: int, seed: int) -> TLearnerModel:
@@ -117,7 +147,7 @@ def _bootstrap_ci(treated_values: np.ndarray, control_values: np.ndarray, *, n_b
     return point, float(lo), float(hi)
 
 
-def run_eval(n_eval: int, uplift_model: TLearnerModel, *, seed: int) -> dict:
+def run_eval(n_eval: int, uplift_model: TLearnerModel, *, seed: int, churn_model=None) -> dict:
     cases = generate_cases(n_eval, seed=seed, now=NOW)
     traits = generate_population(cases, seed=seed)
 
@@ -133,7 +163,7 @@ def run_eval(n_eval: int, uplift_model: TLearnerModel, *, seed: int) -> dict:
     detector, diagnoser, executor = CaseDetector(), CaseDiagnoser(), SimulatedExecutor()
 
     treatment_agent = RecoveryAgent(
-        detector=detector, diagnoser=diagnoser, policy=LookaheadEVDecisionPolicy(uplift_model=uplift_model),
+        detector=detector, diagnoser=diagnoser, policy=LookaheadEVDecisionPolicy(uplift_model=uplift_model, churn_model=churn_model),
         kernel=kernel, executor=executor, listener=listener, ledger=ledger, clock=lambda: NOW,
     )
     holdout_agent = RecoveryAgent(
@@ -210,11 +240,11 @@ def main() -> None:
     parser.add_argument("--n-eval", type=int, default=1000)
     args = parser.parse_args()
 
-    print(f"Training uplift model on {args.n_train} randomised-contact cases...")
-    model = train_uplift_model(args.n_train, seed=SEED)
+    print(f"Training uplift + churn models on {args.n_train} randomised-contact cases...")
+    model, churn_model = train_models(args.n_train, seed=SEED)
 
     print(f"Running eval batch: {args.n_eval} cases split into treatment/holdout arms...")
-    results, ledger = run_eval(args.n_eval, model, seed=SEED + 1000)
+    results, ledger = run_eval(args.n_eval, model, seed=SEED + 1000, churn_model=churn_model)
 
     print(json.dumps(results, indent=2))
 

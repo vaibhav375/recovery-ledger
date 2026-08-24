@@ -47,7 +47,7 @@ from recovery_ledger.policy.decision import (
 )
 from recovery_ledger.sim.environment import EnvironmentListener, SimulationEnvironment, generate_population, persuadability
 from recovery_ledger.sim.generator import generate_cases
-from run_batch import NOW, SEED, build_kernel, train_uplift_model
+from run_batch import NOW, SEED, build_kernel, train_models
 
 HERE = Path(__file__).parent
 
@@ -129,8 +129,8 @@ def main() -> None:
     parser.add_argument("--n-eval", type=int, default=2000)
     args = parser.parse_args()
 
-    print(f"Training uplift model on {args.n_train} randomised-contact cases...")
-    uplift_model = train_uplift_model(args.n_train, seed=SEED)
+    print(f"Training uplift + churn models on {args.n_train} randomised-contact cases...")
+    uplift_model, churn_model = train_models(args.n_train, seed=SEED)
 
     eval_seed = SEED + 2000  # disjoint from run_batch.py's own eval seed (SEED+1000)
     cases = generate_cases(args.n_eval, seed=eval_seed, now=NOW)
@@ -146,8 +146,11 @@ def main() -> None:
         # the efficiency claim falsifiable rather than rhetorical — see
         # REPORT.md, "Does the targeting actually work?".
         "random_targeting": RandomTargetingPolicy(contact_rate=0.45, seed=7),
-        "ev_policy_greedy": EVDecisionPolicy(uplift_model=uplift_model),
-        "ev_policy_lookahead": LookaheadEVDecisionPolicy(uplift_model=uplift_model),
+        # lambda_churn=0 keeps the pre-churn-term policy in the comparison, so
+        # the effect of the term is visible rather than asserted.
+        "ev_policy_no_churn": EVDecisionPolicy(uplift_model=uplift_model, churn_model=None),
+        "ev_policy_greedy": EVDecisionPolicy(uplift_model=uplift_model, churn_model=churn_model),
+        "ev_policy_lookahead": LookaheadEVDecisionPolicy(uplift_model=uplift_model, churn_model=churn_model),
     }
 
     print(f"Running {len(policies)} policies against the same {args.n_eval}-case batch...")

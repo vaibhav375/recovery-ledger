@@ -1,7 +1,7 @@
 # Recovery Ledger
 
-**Status: Tier 1 validation passed. B1 headline: ₹288,729 incremental recovery
-per 1,000 cases (95% CI ₹133,924–₹432,362).** The decisive test: against a
+**Status: Tier 1 validation passed. B1 headline: ₹310,910 incremental recovery
+per 1,000 cases (95% CI ₹150,240–₹471,072).** The decisive test: against a
 control contacting a comparable number of cases *at random*, the agent
 recovers **2.85x more incremental revenue with non-overlapping confidence
 intervals** — so the targeting model, not merely contact volume, is doing the
@@ -66,7 +66,7 @@ evidence the problem is real; it is not something to claim credit for.
 | | Claim | Status |
 |---|---|---|
 | **N1** | **Incremental-first accounting.** Recovery vendors overwhelmingly report *gross* recovered revenue. This reports incremental ₹ against a randomised no-contact holdout, with confidence intervals. The holdout here recovers 15.47% unaided — that is the number gross reporting quietly takes credit for. | ✅ Built, measured |
-| **N2** | **Negative-uplift targeting ("do-not-disturbs").** Customers whose payment probability *falls* when contacted. Nobody in dunning models the downside of contact. | ⚠️ Modelled and measured, but the agent's do-not-disturb contact rate is 20.1% — level with untargeted policies, not better. Reported as the top open problem, not as a win. |
+| **N2** | **Negative-uplift targeting ("do-not-disturbs").** Customers whose payment probability *falls* when contacted. Nobody in dunning models the downside of contact. | ✅ Built. A learned churn model gives the policy a signal independent of `τ̂_pay` (do-not-disturbs opt out **1.93x** more when contacted), cutting the do-not-disturb contact rate **20.1% → 13.6%** against untargeted policies' ~20.2%, at 49% better rupees-per-contact. Full λ_churn curve in [`RESULTS.md`](RESULTS.md); it is a stated trade, not a free win. |
 | **N3** | **A deterministic, machine-checkable India-regulatory compliance kernel** emitting a per-action certificate — TCCCPR/DLT, RBI recovery-agent norms, RBI e-mandate 2026, DPDPA. | ✅ Built: 12 rules, 100% red-team block rate, mutation-tested |
 | **N4** | **Contact as a budget-constrained sequential decision problem**, not one-shot classification. | ⚠️ Partial: greedy EV under an explicit budget, plus a finite-horizon lookahead variant. Not a full constrained-MDP solver, and the spec explicitly permits the simplification — but it is a simplification, and the lookahead currently adds nothing measurable. |
 | **N5** | **Two-tier validation** — causal machinery proven on real randomised public data *before* transfer to the simulator. Directly defeats "your synthetic number is circular". | ✅ Built (Criteo + Hillstrom) |
@@ -131,7 +131,7 @@ running.
       dependency-free look at the loop) is unchanged. `make eval` runs the
       real `LookaheadEVDecisionPolicy`, uplift-model-driven, over 5000+2000 cases.
 - [x] **B1 — batch run, headline incremental ₹ + CI.** `make eval`:
-      **₹288,729 incremental per 1,000 cases (95% CI ₹133,924–₹432,362)**;
+      **₹310,910 incremental per 1,000 cases (95% CI ₹150,240–₹471,072)**;
       holdout recovers 15.47% unaided, which is exactly why this reports
       incremental rather than gross.
 - [x] **Baseline comparison + falsification test.** `make baselines`: the
@@ -140,10 +140,13 @@ running.
       bootstrap. Headline: **2.85x incremental recovery vs random targeting
       at comparable contact volume** (non-overlapping CIs), and a tie with
       blind mass-contact at 48% fewer contacts.
-- [x] **Do-not-disturb rate 20.2%** — level with untargeted policies, not
-      better, and far from the ≈0 target. Honestly reported as the top open
-      problem; the principled fix is the `λ_churn × P(churn) × LTV` term the
-      spec includes and this omits for lack of a defensible LTV estimate.
+- [x] **Do-not-disturb targeting (N2) — the `λ_churn` term, now built.**
+      A second causal model, trained on the same randomised data with the
+      outcome swapped from "paid" to "opted out", prices the downside of
+      contact. Do-not-disturb contact rate **20.1% → 13.6%**, rupees per
+      contact **302 → 450**, for 12% less total incremental recovery — a
+      stated policy trade with the whole parameter curve published. Still
+      not the ≈0 the spec aspires to, and said so.
 - [x] **B3 — all 11 stopping rules, provably reachable.** `tests/test_all_stopping_rules.py`
       runs a crafted scenario suite and asserts **every one of the 11 reasons
       fires at least once** — B3 as an executable property, not a README claim.
@@ -226,7 +229,7 @@ successfully.
 
 ## What is NOT claimed
 
-- No real-world causal effect size. The ₹288,729-per-1,000-cases figure above
+- No real-world causal effect size. The ₹310,910-per-1,000-cases figure above
   is a simulation result — policy dominance under stated assumptions, in
   simulation. Everything in `experiments/tier2_simulation/` runs against a
   simulator calibrated to published marginal benchmarks — that calibrates

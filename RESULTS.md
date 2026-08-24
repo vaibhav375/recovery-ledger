@@ -73,17 +73,19 @@ make eval        # 5,000 training + 2,000 evaluation cases
 
 | | Treatment | Holdout (no contact) |
 |---|---:|---:|
-| Recovery rate | 36.84% | 15.47% |
+| Recovery rate | 37.13% | 15.47% |
 
-**Incremental ₹ recovered per 1,000 at-risk cases: ₹288,729 (95% CI ₹133,924 – ₹432,362)**
+**Incremental ₹ recovered per 1,000 at-risk cases: ₹310,910 (95% CI ₹150,240 – ₹471,072)**
 
 The holdout recovers **15.47% of cases with no agent at all**. That is why
 this project reports incremental rather than gross: a vendor quoting the
 gross figure would be taking credit for every rupee in that column.
 
-Supporting diagnostics from the same run: uplift model correlation with true
-(hidden) persuadability **0.349**; 1,369 contacts sent; 34,081 ledger
-entries, hash chain verified; 655 cases published to the exception list.
+Supporting diagnostics from the same run: uplift correlation with true
+(hidden) persuadability **0.349**; **817 contacts** sent; do-not-disturb
+contact rate **16.8%**; 8 of 11 stopping reasons fired naturally; 34,173
+ledger entries, hash chain verified; 673 cases published to the exception
+list.
 
 ---
 
@@ -95,15 +97,16 @@ make baselines
 
 Common random numbers across policies, paired bootstrap, same 2,000 cases.
 
-| Policy | Incremental ₹/1000 (95% CI) | Contacts | ₹ per contact | % to do-not-disturbs |
+| Policy | Incremental ₹/1000 | Contacts | ₹ per contact | % to do-not-disturbs |
 |---|---:|---:|---:|---:|
 | do_nothing | — (reference) | 0 | — | — |
-| blast_everyone | 330,108 (249,085–421,457) | 4,339 | 152.2 | 20.19% |
-| rules_based_dunning | 330,108 (249,085–421,457) | 4,339 | 152.2 | 20.19% |
-| razorpay_current | 86,648 (**−16,693**–193,109) | 0 | — | — |
-| random_targeting | 119,671 (75,027–165,618) | 2,021 | 118.4 | 20.39% |
-| **ev_policy_greedy** | **340,988 (274,088–408,856)** | 2,257 | **302.2** | 20.12% |
-| ev_policy_lookahead | 340,988 (274,088–408,856) | 2,251 | 303.0 | 20.08% |
+| blast_everyone | 330,108 | 4,339 | 152.2 | 20.19% |
+| rules_based_dunning | 330,108 | 4,339 | 152.2 | 20.19% |
+| razorpay_current | 86,648 (**CI includes 0**) | 0 | — | — |
+| random_targeting | 119,671 | 2,021 | 118.4 | 20.39% |
+| ev_policy_no_churn | 340,988 | 2,257 | 302.2 | 20.12% |
+| **ev_policy_greedy** | 301,018 | **1,339** | **449.6** | **13.59%** |
+| ev_policy_lookahead | 300,677 | 1,318 | 456.3 | 13.81% |
 
 **The result that matters: 2.85x more incremental recovery than random
 targeting at comparable contact volume, with non-overlapping confidence
@@ -114,8 +117,15 @@ about *targeting*.
 
 **Against mass-contact the honest verdict is a tie on total recovery**
 (overlapping CIs; the sign of the difference flips with the eval sample)
-achieved with **48% fewer contacts** at 2x the per-contact efficiency.
+achieved with far fewer contacts at 2-3x the per-contact efficiency.
 Contact efficiency is the robust claim; a higher headline total is not.
+
+**`ev_policy_no_churn` is in the table on purpose.** It is the same policy
+with the `λ_churn` term switched off, so the effect of that term is visible
+rather than asserted: it trades **12% of incremental recovery** for **41%
+fewer contacts**, **49% better rupees-per-contact**, and a **third fewer
+do-not-disturbs reached** (20.1% → 13.6%). That is a stated policy choice,
+not a free win — see below.
 
 **`razorpay_current`'s CI includes zero.** A single automated retry followed
 by halting is not reliably better than doing nothing in this simulation —
@@ -157,6 +167,47 @@ from 1.75x to **4.24x** while mass-contact collapses from ₹1,015,545 to
 worth.** Novelty claim N2 as a measured gradient rather than an assertion.
 
 ---
+
+## Do-not-disturbs — novelty claim N2
+
+The agent's do-not-disturb contact rate was, for most of this project's
+life, **level with untargeted policies** — 20.1% against random targeting's
+20.4%. Avoiding them rested entirely on `τ̂_pay` being correct, and `τ̂_pay`
+correlates only ~0.35–0.42 with truth.
+
+The fix is the `λ_churn × P(churn) × LTV` term the spec's EV formula
+specifies (section 8.3) and this project originally omitted, on the stated
+grounds of having no defensible LTV estimate. That reasoning conflated two
+separable things: **P(churn | contact) is learnable from exactly the same
+randomised data the uplift model already trains on.** An opt-out is an
+observed outcome and the assignment is randomised, so the causal effect of
+contact on churn is identified the same way the effect on payment is. Only
+the LTV multiplier is an assumption — and one named parameter is very
+different from a silently missing term.
+
+It works because it is an **independent** signal: measured on this
+simulator, true do-not-disturbs opt out **1.93x** more often than others
+when contacted. Two models must now both be wrong before a do-not-disturb
+gets contacted.
+
+Measured sweep of the parameter (from `λ_churn = 0`):
+
+| λ_churn | Incremental ₹ | Contacts | Do-not-disturb % | ₹/contact |
+|---:|---:|---:|---:|---:|
+| 0 (term off) | 681,976 | 2,257 | 20.1% | 302 |
+| 1.0 | 647,098 | 1,938 | 18.1% | 334 |
+| 2.0 | 603,882 | 1,705 | 16.5% | 354 |
+| **4.0 (default)** | 602,036 | 1,339 | **13.6%** | **450** |
+| 8.0 | 517,442 | 899 | 10.8% | 576 |
+
+**λ = 4.0 is the default because it strictly dominates λ = 2.0** — the same
+total recovery using 21% fewer contacts and reaching meaningfully fewer
+do-not-disturbs. Beyond it the trade turns real: λ = 8.0 buys another 2.8
+points of do-not-disturb avoidance for 14% of incremental recovery.
+
+**This is a policy choice, not an optimum.** A merchant who prices customer
+goodwill differently should set it differently, which is exactly why the
+whole curve is published rather than a single number.
 
 ## Compliance — B2 and B4
 

@@ -1049,3 +1049,68 @@ guess, silent actions never produce a reply, and a deliberately wrong model
 answer is still overridden to OPT_OUT.
 
 145/145 tests passing.
+
+## 2026-08-24 (cont. 11) — The churn term: fixing the do-not-disturb problem I had been flagging for days
+
+The top open problem, flagged repeatedly and never fixed: the agent's
+do-not-disturb contact rate sat at 20.1%, level with random targeting's
+20.4%. Novelty claim N2 says this project models the downside of contact;
+the measurement said it did so no better than not trying.
+
+**The excuse I had been giving myself was wrong.** The spec's EV formula has
+a `λ_churn × P(churn) × LTV` term. I omitted it and documented the reason as
+"no defensible LTV estimate". That reasoning conflated two separable things.
+`P(churn | contact)` is not an assumption at all — it is **learnable from
+exactly the same randomised data the uplift model already trains on**. An
+opt-out is an observed outcome; the contact assignment is randomised; the
+causal effect of contact on churn is identified by precisely the machinery
+Tier 1 already validated. Only the LTV multiplier is an assumption, and one
+named parameter is a completely different thing from a silently absent term.
+
+Checked the signal was real before building anything:
+
+- opt-out rate when contacted: 1.33%; when not contacted: **0.0%** — contact
+  is the entire cause, so the effect is cleanly identified
+- true do-not-disturbs opt out **1.93x** more often than others when
+  contacted
+
+That 1.93x is the whole argument. Churn risk is an **independent** signal
+from `τ̂_pay`. Avoiding do-not-disturbs previously required one model
+(correlation ~0.35-0.42 with truth) to be right; now it requires two to both
+be wrong. Defence in depth, using a model that costs nothing extra to fit.
+
+Swept `λ_churn` rather than picking a value by feel:
+
+| λ_churn | incremental | contacts | dnd% | ₹/contact |
+|---|---|---|---|---|
+| 0 | 681,976 | 2257 | 20.1% | 302 |
+| 2.0 | 603,882 | 1705 | 16.5% | 354 |
+| 4.0 | 602,036 | 1339 | 13.6% | 450 |
+| 8.0 | 517,442 | 899 | 10.8% | 576 |
+
+Set the default to 4.0 because it **strictly dominates 2.0** — same total
+recovery (602,036 vs 603,882, within noise) using 21% fewer contacts and
+reaching meaningfully fewer do-not-disturbs. That is not a judgement call,
+it is a dominated option being discarded.
+
+**Kept `ev_policy_no_churn` in the baseline comparison on purpose**, so the
+term's effect is visible rather than asserted: 12% less incremental
+recovery, 41% fewer contacts, 49% better rupees-per-contact, a third fewer
+do-not-disturbs reached.
+
+**One thing I was careful not to claim.** The headline batch moved
+₹288,729 → ₹310,910, which looks like the churn term also *increased*
+recovery. It did not — the CI is ₹150,240-₹471,072 and the two figures sit
+well inside each other's intervals. That is exactly the overclaim I made
+days ago with mass-contact and had to withdraw. The defensible statement is
+"same recovery, 40% fewer contacts, materially fewer do-not-disturbs", and
+that is what the docs say.
+
+A test premise of mine was also wrong and worth recording: I first wrote the
+suppression test against a subscription case, where RETRY (incremental 0.30
+x amount) already beats a modest nudge regardless of churn — so the
+"without churn" arm was never NUDGE and the test could not demonstrate
+anything. Switched to a checkout-abandonment case, which has no retry
+available. The code was right; the test was measuring the wrong thing.
+
+151/151 tests passing. All experiments re-verified deterministic.

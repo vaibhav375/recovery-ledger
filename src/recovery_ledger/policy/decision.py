@@ -22,6 +22,7 @@ from recovery_ledger.events.schemas import (
     FailedSubscriptionCase,
     RecoveryCase,
 )
+from recovery_ledger.policy.churn import ChurnRiskModel, estimated_ltv
 from recovery_ledger.policy.features import case_to_features
 from recovery_ledger.policy.uplift.learners import UpliftModel
 
@@ -209,6 +210,38 @@ class EVDecisionPolicy:
     # limit"). Set deliberately high so it fires on genuinely large cases
     # rather than routinely.
     autonomy_limit_rupees: float = 25_000.0
+    # The spec's lambda_churn term (section 8.3), previously omitted. The
+    # model estimates the INCREMENTAL opt-out probability caused by
+    # contacting; multiplied by the relationship value at stake, it prices
+    # the downside of contact that a payment-only objective cannot see.
+    #
+    # This is defence in depth for novelty claim N2: avoiding
+    # do-not-disturbs previously rested entirely on tau_hat being right, and
+    # tau_hat correlates only ~0.35-0.42 with truth. Churn risk is an
+    # independent signal (measured: true do-not-disturbs opt out 1.93x more
+    # often when contacted), so two models must now both be wrong before a
+    # do-not-disturb is contacted.
+    #
+    # Defaults to None, so behaviour is unchanged unless a caller opts in.
+    churn_model: ChurnRiskModel | None = None
+    # Chosen from a measured sweep, not picked by feel. Against lambda_churn=0
+    # this cuts do-not-disturb contacts 20.1% -> 13.6% and raises incremental
+    # rupees per contact 302 -> 450, for a 12% reduction in total incremental
+    # recovery. It also strictly dominates lambda_churn=2.0, which reached the
+    # same total recovery using 21% MORE contacts. Full curve in
+    # experiments/tier2_simulation/REPORT.md.
+    #
+    # This is a stated policy choice, not an optimum: a merchant who prices
+    # customer goodwill differently should set it differently, which is why it
+    # is a parameter and the whole curve is published rather than one number.
+    lambda_churn: float = 4.0
+
+    def _churn_cost(self, case: RecoveryCase, features) -> float:
+        """Expected value destroyed by contacting this customer."""
+        if self.churn_model is None:
+            return 0.0
+        p_churn = float(self.churn_model.predict_incremental_churn(features)[0])
+        return self.lambda_churn * p_churn * estimated_ltv(case)
 
     def _best_ev(self, case: RecoveryCase, tau_hat: float, *, attempt_index: int) -> float:
         """Best expected value available at a given attempt index. Used both
@@ -219,6 +252,7 @@ class EVDecisionPolicy:
             tau_hat * case.amount_at_risk
             - CHANNEL_COST[channel]
             - self.lambda_annoyance * attempt_index
+            - self._churn_cost(case, case_to_features(case).reshape(1, -1))
         )
         ev_retry = (
             _retry_incremental_prob(case) * case.amount_at_risk
@@ -251,6 +285,7 @@ class EVDecisionPolicy:
             tau_hat * case.amount_at_risk
             - CHANNEL_COST[channel]
             - self.lambda_annoyance * attempts_so_far
+            - self._churn_cost(case, features)
         )
 
         retry_applicable = isinstance(case, (FailedPaymentCase, FailedSubscriptionCase))
@@ -362,6 +397,14 @@ class LookaheadEVDecisionPolicy:
     max_attempts: int = 3
     base_resolution_prob: float = 0.05
     autonomy_limit_rupees: float = 25_000.0
+    churn_model: ChurnRiskModel | None = None
+    lambda_churn: float = 4.0
+
+    def _churn_cost(self, case: RecoveryCase, features) -> float:
+        if self.churn_model is None:
+            return 0.0
+        p_churn = float(self.churn_model.predict_incremental_churn(features)[0])
+        return self.lambda_churn * p_churn * estimated_ltv(case)
 
     def _immediate_and_resolve(
         self, case: RecoveryCase, tau_hat: float, attempt_index: int
@@ -372,6 +415,7 @@ class LookaheadEVDecisionPolicy:
             tau_hat * case.amount_at_risk
             - CHANNEL_COST[channel]
             - self.lambda_annoyance * attempt_index
+            - self._churn_cost(case, case_to_features(case).reshape(1, -1))
         )
         nudge_resolve = float(min(max(self.base_resolution_prob + tau_hat, 0.0), 0.95))
 

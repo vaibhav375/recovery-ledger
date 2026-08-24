@@ -84,7 +84,7 @@
       "incremental_rupees_per_contact": 118.42716368266098
     },
     {
-      "policy": "ev_policy_greedy",
+      "policy": "ev_policy_no_churn",
       "gross_recovered": 1570179.9901669696,
       "recovery_rate": 0.3645,
       "contacts_sent": 2257,
@@ -100,20 +100,36 @@
       "incremental_rupees_per_contact": 302.1604891415271
     },
     {
-      "policy": "ev_policy_lookahead",
-      "gross_recovered": 1570179.9901669696,
-      "recovery_rate": 0.3645,
-      "contacts_sent": 2251,
-      "contacts_sent_to_do_not_disturbs": 452,
-      "pct_contacts_to_do_not_disturbs": 0.20079964460239894,
-      "approx_channel_cost": 727.3,
+      "policy": "ev_policy_greedy",
+      "gross_recovered": 1490239.7652211252,
+      "recovery_rate": 0.3445,
+      "contacts_sent": 1339,
+      "contacts_sent_to_do_not_disturbs": 182,
+      "pct_contacts_to_do_not_disturbs": 0.13592233009708737,
+      "approx_channel_cost": 432.3,
       "incremental_per_1000_cases": {
-        "point": 340988.1119962134,
-        "ci_low": 274087.93505199195,
-        "ci_high": 408856.1640400568
+        "point": 301017.9995232912,
+        "ci_low": 248462.3367885828,
+        "ci_high": 352036.5619908355
       },
-      "cost_per_incremental_rupee": 0.002132918932986369,
-      "incremental_rupees_per_contact": 302.96589248886124
+      "cost_per_incremental_rupee": 0.0014361267455255643,
+      "incremental_rupees_per_contact": 449.616130729337
+    },
+    {
+      "policy": "ev_policy_lookahead",
+      "gross_recovered": 1489557.6128422022,
+      "recovery_rate": 0.344,
+      "contacts_sent": 1318,
+      "contacts_sent_to_do_not_disturbs": 182,
+      "pct_contacts_to_do_not_disturbs": 0.13808801213960548,
+      "approx_channel_cost": 426.6,
+      "incremental_per_1000_cases": {
+        "point": 300676.9233338296,
+        "ci_low": 247788.71131439635,
+        "ci_high": 351636.6388790799
+      },
+      "cost_per_incremental_rupee": 0.0014187986070562622,
+      "incremental_rupees_per_contact": 456.26240263100095
     }
   ]
 }
