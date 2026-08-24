@@ -22,3 +22,7 @@ experiments/tier2_simulation/batch_ledger.json
 *.key
 
 .DS_Store
+
+# frontend build artefacts
+frontend/node_modules/
+dashboard/dist/

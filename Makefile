@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev
 
 setup:
 	uv venv --python 3.12
@@ -51,14 +51,35 @@ listener-eval:
 # Browsable audit trail (bar requirement B4). Self-contained HTML — no npm, no
 # build step, no network. Uses the rich batch ledger when `make eval` has been
 # run, otherwise falls back to the demo ledger.
-dashboard:
+dashboard: frontend-build
 	@if [ -f experiments/tier2_simulation/batch_ledger.json ]; then \
 		PYTHONPATH=src .venv/bin/python3 dashboard/build_dashboard.py \
 			--ledger experiments/tier2_simulation/batch_ledger.json --max-cases 80; \
 	else \
 		$(MAKE) demo >/dev/null && PYTHONPATH=src .venv/bin/python3 dashboard/build_dashboard.py; \
 	fi
-	@echo "Open dashboard/index.html in any browser."
+	@echo ""
+	@echo "React app : dashboard/dist/index.html   (make dashboard-serve)"
+	@echo "Fallback  : dashboard/index.html        (single file, opens directly)"
+
+# Compiles the React + Vite front end into dashboard/dist. Skipped with a clear
+# message if node is unavailable, so the Python-only path still works.
+frontend-build:
+	@if command -v npm >/dev/null 2>&1; then \
+		[ -d frontend/node_modules ] || npm --prefix frontend install --silent; \
+		npm --prefix frontend run build --silent; \
+	else \
+		echo "npm not found - skipping the React build, using the single-file fallback"; \
+	fi
+
+# The React build fetches data.json, which browsers block over file://, so it
+# needs a static server rather than a double-click.
+dashboard-serve:
+	@echo "Serving http://localhost:5174 - Ctrl+C to stop"
+	@cd dashboard/dist && ../../.venv/bin/python3 -m http.server 5174
+
+frontend-dev:
+	npm --prefix frontend run dev
 
 # Sensitivity sweep (spec section 7.3) — is the policy RANKING stable when the
 # simulator's invented constants are swept across defensible ranges?

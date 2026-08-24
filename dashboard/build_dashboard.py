@@ -397,6 +397,25 @@ def rule_stats(entries: list[dict]) -> list[dict]:
     ]
 
 
+def build_data(ledger_path: Path, max_cases: int) -> dict:
+    """The dashboard's data payload, consumed by the React app at
+    `dashboard/dist/data.json`. Kept separate from HTML generation so the
+    front end can be rebuilt independently of the data, and vice versa."""
+    entries = load(ledger_path)
+    grouped = group_by_case(entries)
+    case_ids = list(grouped)[:max_cases]
+    return {
+        "source": f"{ledger_path.name} — {len(entries):,} entries, {len(grouped)} cases",
+        "summary": summarise(entries, grouped),
+        "cases": [case_card(cid, grouped[cid]) for cid in case_ids],
+        "rule_stats": rule_stats(entries),
+        "fleet": load_optional(ROOT / "experiments" / "fleet" / "results_fleet.json"),
+        "negotiation": load_optional(ROOT / "experiments" / "negotiation" / "results_negotiation.json"),
+        "listener": load_optional(ROOT / "experiments" / "listener_eval" / "results_listener_gold.json"),
+        "baselines": load_optional(ROOT / "experiments" / "tier2_simulation" / "results_baselines.json"),
+    }
+
+
 def build(ledger_path: Path, out_path: Path, max_cases: int) -> Path:
     entries = load(ledger_path)
     grouped = group_by_case(entries)
@@ -440,10 +459,21 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--ledger", default=str(ROOT / "demo_ledger.json"))
     ap.add_argument("--out", default=str(HERE / "index.html"))
+    ap.add_argument("--data-out", default=str(HERE / "dist" / "data.json"),
+                    help="JSON payload consumed by the React front end")
     ap.add_argument("--max-cases", type=int, default=200)
     a = ap.parse_args()
+
+    data = build_data(Path(a.ledger), a.max_cases)
+    data_path = Path(a.data_out)
+    if data_path.parent.exists():
+        data_path.write_text(json.dumps(data))
+        print(f"Wrote {data_path}  ({data_path.stat().st_size/1024:.0f} KB) for the React app")
+    else:
+        print(f"Skipped {data_path} — run `npm --prefix frontend run build` first")
+
     p = build(Path(a.ledger), Path(a.out), a.max_cases)
-    print(f"Wrote {p}  ({p.stat().st_size/1024:.0f} KB, self-contained, no build step)")
+    print(f"Wrote {p}  ({p.stat().st_size/1024:.0f} KB, dependency-free fallback)")
 
 
 if __name__ == "__main__":
