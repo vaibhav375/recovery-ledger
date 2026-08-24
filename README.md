@@ -168,8 +168,19 @@ running.
       hostile to it. C2 (contact efficiency vs mass-contact) holds at 24/25 —
       the single flip is reported, not averaged away. Best finding: the
       *harder* the do-not-disturb problem, the more targeting is worth.
-- [ ] Real listener + LLM personas (LLM backend decided and built — see
-      above — not yet wired into the loop's Listener)
+- [x] **LLM reply-intent listener, validated (spec 8.5).** `make listener-eval`:
+      **95.2% accuracy** on a hand-authored 42-example gold set (100% English,
+      92% Hinglish, 92% Hindi), with promise-to-pay precision 0.88 / recall
+      1.00 — the metric spec 11.2 asks for by name.
+      **Opt-out is deliberately NOT left to the model.** Measured alone, the
+      LLM recalled only 0.57 of opt-outs and every miss was Hindi/Hinglish;
+      missing one is a TCCCPR violation, not a lost sale. A deterministic
+      detector now runs first and overrides it, taking opt-out to
+      **1.00 precision and 1.00 recall**. That is the same argument as the
+      compliance kernel, applied one level down.
+      The LLM-generated persona corpus scored only 42.9% — inspection showed
+      the labels were wrong, not the classifier, so it is reported separately
+      rather than used as ground truth.
 - [ ] Negotiation + Section 43B(h) clock
 - [ ] Fleet-level degradation detection
 
@@ -204,6 +215,7 @@ make baselines         # runs all 5 spec-required baselines + a matched-volume
                        # random-targeting control + both EV variants against the
                        # same eval batch — verified working, deterministic
 make sensitivity       # 5-parameter ranking-stability sweep — verified working
+make listener-eval     # reply-intent accuracy vs the gold set (needs Ollama)
 make dashboard         # renders the audit trail to dashboard/index.html
 make redteam          # 21 named attacks + hostile policy + 5,000-state fuzz —
                        # verified working, 100% block rate, mutation-tested

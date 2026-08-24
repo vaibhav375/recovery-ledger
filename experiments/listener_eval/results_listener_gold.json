@@ -1,0 +1,81 @@
+{
+  "n": 42,
+  "accuracy": 0.9524,
+  "accuracy_by_language": {
+    "en": 1.0,
+    "hinglish": 0.9167,
+    "hi": 0.9167
+  },
+  "per_intent": {
+    "paid": {
+      "precision": 0.875,
+      "recall": 1.0,
+      "tp": 7,
+      "fp": 1,
+      "fn": 0
+    },
+    "promise_to_pay": {
+      "precision": 0.875,
+      "recall": 1.0,
+      "tp": 7,
+      "fp": 1,
+      "fn": 0
+    },
+    "dispute": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "tp": 7,
+      "fp": 0,
+      "fn": 0
+    },
+    "opt_out": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "tp": 7,
+      "fp": 0,
+      "fn": 0
+    },
+    "wrong_person": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "tp": 7,
+      "fp": 0,
+      "fn": 0
+    },
+    "negotiate": {
+      "precision": 1.0,
+      "recall": 0.7143,
+      "tp": 5,
+      "fp": 0,
+      "fn": 2
+    }
+  },
+  "top_confusions": [
+    {
+      "true": "negotiate",
+      "predicted": "promise_to_pay",
+      "n": 1
+    },
+    {
+      "true": "negotiate",
+      "predicted": "paid",
+      "n": 1
+    }
+  ],
+  "disagreements": [
+    {
+      "text": "aadha abhi de dun aur aadha agle mahine, chalega kya",
+      "true": "negotiate",
+      "predicted": "promise_to_pay",
+      "language": "hinglish"
+    },
+    {
+      "text": "क्या मैं इसे किस्तों में चुका सकता हूँ",
+      "true": "negotiate",
+      "predicted": "paid",
+      "language": "hi"
+    }
+  ],
+  "model": "qwen2.5:3b",
+  "set": "gold"
+}

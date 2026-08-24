@@ -1,0 +1,457 @@
+[
+ {
+  "text": "Sorry missed it first time pls check again",
+  "intent": "paid",
+  "language": "en"
+ },
+ {
+  "text": "Already paid last week, ignore this msg",
+  "intent": "paid",
+  "language": "en"
+ },
+ {
+  "text": "I've already settled this, please update my record",
+  "intent": "paid",
+  "language": "en"
+ },
+ {
+  "text": "Waste of time with all these chase msgs",
+  "intent": "paid",
+  "language": "en"
+ },
+ {
+  "text": "Had paid earlier, dont ping me now",
+  "intent": "paid",
+  "language": "en"
+ },
+ {
+  "text": "Check your records, I've paid for this already",
+  "intent": "paid",
+  "language": "en"
+ },
+ {
+  "text": "मैं तो पिछले हफ्ट में भुगतान कर दिया।",
+  "intent": "paid",
+  "language": "hi"
+ },
+ {
+  "text": "अब जाँच करना खुदकी सामान्य है, वहाँ खोज रखूंगा।",
+  "intent": "paid",
+  "language": "hi"
+ },
+ {
+  "text": "मैने पहले मत भेजना इसे बड़ा दिलचस्प कर दिया है।",
+  "intent": "paid",
+  "language": "hi"
+ },
+ {
+  "text": "यहाँ मुझे अभी समय नहीं मिल पा रहा है, तब आगे बढ़ो।",
+  "intent": "paid",
+  "language": "hi"
+ },
+ {
+  "text": "तुम्हें जायजा देर करके भाग जाऊंगा, मुझे चिंता हो।",
+  "intent": "paid",
+  "language": "hi"
+ },
+ {
+  "text": "Maine yeh pay kar diya hoga aapko, kyon kaafi hota laga rahe ho",
+  "intent": "paid",
+  "language": "hinglish"
+ },
+ {
+  "text": "Aur message mat bhijo mujhse, baat karo phir se",
+  "intent": "paid",
+  "language": "hinglish"
+ },
+ {
+  "text": "Apni sahi details check kar do aap, maine wahi cheche",
+  "intent": "paid",
+  "language": "hinglish"
+ },
+ {
+  "text": "Chala pehle milega phir uske baad yeh resolve hoga na",
+  "intent": "paid",
+  "language": "hinglish"
+ },
+ {
+  "text": "Main to ye time nahi lena chataa, aur dialog ke liye bacha banta ḇhaū",
+  "intent": "paid",
+  "language": "hinglish"
+ },
+ {
+  "text": "Aur phir se contact karne ka pasunch dijiye mujhe aapko",
+  "intent": "paid",
+  "language": "hinglish"
+ },
+ {
+  "text": "Sure can wait till payday",
+  "intent": "promise_to_pay",
+  "language": "en"
+ },
+ {
+  "text": "No worries pay next payday pls",
+  "intent": "promise_to_pay",
+  "language": "en"
+ },
+ {
+  "text": "Got it will settle on payday",
+  "intent": "promise_to_pay",
+  "language": "en"
+ },
+ {
+  "text": "Waiting for payday to clear this",
+  "intent": "promise_to_pay",
+  "language": "en"
+ },
+ {
+  "text": "Thanks will take care of it soon",
+  "intent": "promise_to_pay",
+  "language": "en"
+ },
+ {
+  "text": "Keep waiting payday is coming",
+  "intent": "promise_to_pay",
+  "language": "en"
+ },
+ {
+  "text": "मैं सही तरीके में परिवर्तन करके करूपा करता हूँ।",
+  "intent": "promise_to_pay",
+  "language": "hi"
+ },
+ {
+  "text": "ये लगातार ठीक रहेगा, मुझे संदhorn.",
+  "intent": "promise_to_pay",
+  "language": "hi"
+ },
+ {
+  "text": "मैं नहीं खर्च करूंगा, यह किसी प्रकार की विशेषता है।",
+  "intent": "promise_to_pay",
+  "language": "hi"
+ },
+ {
+  "text": "ये दिन सोचने के बजए हो जाएंगे।",
+  "intent": "promise_to_pay",
+  "language": "hi"
+ },
+ {
+  "text": "मुझे महीने के अंत तक पास रहना पड़ेगा।",
+  "intent": "promise_to_pay",
+  "language": "hi"
+ },
+ {
+  "text": "Ab aapko bhi dhanyala karo main pay karunga phir se",
+  "intent": "promise_to_pay",
+  "language": "hinglish"
+ },
+ {
+  "text": "Thik hai ye samay mil jaaye nahi to next payday pe",
+  "intent": "promise_to_pay",
+  "language": "hinglish"
+ },
+ {
+  "text": "Main jaldi check karein phir aapka record",
+  "intent": "promise_to_pay",
+  "language": "hinglish"
+ },
+ {
+  "text": "Aur phir apne baare mein update kiyege sir",
+  "intent": "promise_to_pay",
+  "language": "hinglish"
+ },
+ {
+  "text": "Bhai sab safe hi karna hoga agle din main payenge",
+  "intent": "promise_to_pay",
+  "language": "hinglish"
+ },
+ {
+  "text": "Abhi also bhi message send karke aapko dhanyala, nahi?",
+  "intent": "promise_to_pay",
+  "language": "hinglish"
+ },
+ {
+  "text": "please check my bank statement it shows payment already made",
+  "intent": "dispute",
+  "language": "en"
+ },
+ {
+  "text": "dont bother me now i want to verify first",
+  "intent": "dispute",
+  "language": "en"
+ },
+ {
+  "text": "can you resend the invoice details please",
+  "intent": "dispute",
+  "language": "en"
+ },
+ {
+  "text": "i trust your system but this seems off somehow",
+  "intent": "dispute",
+  "language": "en"
+ },
+ {
+  "text": "can we look into this again in a week?",
+  "intent": "dispute",
+  "language": "en"
+ },
+ {
+  "text": "looking into it but just need time to confirm",
+  "intent": "dispute",
+  "language": "en"
+ },
+ {
+  "text": "मैं कभी भुगतान पिछले ही कर दिया था",
+  "intent": "dispute",
+  "language": "hi"
+ },
+ {
+  "text": "अब आज भी मै अनुसोहन कर रहा हूँ",
+  "intent": "dispute",
+  "language": "hi"
+ },
+ {
+  "text": "क्या इक वेळ लग सकता है?",
+  "intent": "dispute",
+  "language": "hi"
+ },
+ {
+  "text": "मानक सिद्धि प्रदान करे",
+  "intent": "dispute",
+  "language": "hi"
+ },
+ {
+  "text": "अगर एक तरफ आप कुछ गलती करते हैं",
+  "intent": "dispute",
+  "language": "hi"
+ },
+ {
+  "text": "बार-बार मुझे भुगतान लें",
+  "intent": "dispute",
+  "language": "hi"
+ },
+ {
+  "text": "Abhi maine bhi check kiya hai ab tak aapko kya ho rha hai?",
+  "intent": "dispute",
+  "language": "hinglish"
+ },
+ {
+  "text": "Plz stop msgin me bout dis.",
+  "intent": "opt_out",
+  "language": "en"
+ },
+ {
+  "text": "Its been paid already remember.",
+  "intent": "opt_out",
+  "language": "en"
+ },
+ {
+  "text": "No need to contact me again.",
+  "intent": "opt_out",
+  "language": "en"
+ },
+ {
+  "text": "Not bothered by this issue anymore.",
+  "intent": "opt_out",
+  "language": "en"
+ },
+ {
+  "text": "Can't repeat payment for same service.",
+  "intent": "opt_out",
+  "language": "en"
+ },
+ {
+  "text": "Thanks but you can ignore this.",
+  "intent": "opt_out",
+  "language": "en"
+ },
+ {
+  "text": "कृपया जाँच करें तब से मुझे यहाँ निकल पड़ता है।",
+  "intent": "opt_out",
+  "language": "hi"
+ },
+ {
+  "text": "अगर वापसी नहीं चल रही तो बताओ, अब छोड़ें।",
+  "intent": "opt_out",
+  "language": "hi"
+ },
+ {
+  "text": "मेरे पास मिलने का समय नहीं है, फिर भी पूछें नहीं।",
+  "intent": "opt_out",
+  "language": "hi"
+ },
+ {
+  "text": "कृपया इस समस्या को मुफ्त रखें।",
+  "intent": "opt_out",
+  "language": "hi"
+ },
+ {
+  "text": "हाल ही मेरे बच्चे के दिलाह के लिए विनती है, अब जल्दी खता रकें।",
+  "intent": "opt_out",
+  "language": "hi"
+ },
+ {
+  "text": "Abhi tak bhut kuch nahi aata hai yaar, wait lenge jaldi record check kar denge.",
+  "intent": "opt_out",
+  "language": "hinglish"
+ },
+ {
+  "text": "Apne contact number ko bhi update karna chahte ho?",
+  "intent": "opt_out",
+  "language": "hinglish"
+ },
+ {
+  "text": "Main apka fir se message nahi bhulunga sirf record check kar lenge.",
+  "intent": "opt_out",
+  "language": "hinglish"
+ },
+ {
+  "text": "Bhai ye time bata diya tha, month end tak padega kya maine samjha diya.",
+  "intent": "opt_out",
+  "language": "hinglish"
+ },
+ {
+  "text": "Abhi tak mujhe clear reply yaad nahi aata please jaldi update kary.",
+  "intent": "opt_out",
+  "language": "hinglish"
+ },
+ {
+  "text": "Mujhe bahtin message mat bhejo yeh record check ke liye baaki zameen hai.",
+  "intent": "opt_out",
+  "language": "hinglish"
+ },
+ {
+  "text": "Sorry missed ur msg first time pls resend it to right number",
+  "intent": "wrong_person",
+  "language": "en"
+ },
+ {
+  "text": "This is wrong num i don't know who r u refering to",
+  "intent": "wrong_person",
+  "language": "en"
+ },
+ {
+  "text": "मैं तो उनके सामने था, मुझे भत्ता करनी पड़ी",
+  "intent": "wrong_person",
+  "language": "hi"
+ },
+ {
+  "text": "अब नहीं, मुझे किसका है यह बताइंगे",
+  "intent": "wrong_person",
+  "language": "hi"
+ },
+ {
+  "text": "क्योंकि अगर में थे तो भुगतान किया होगा",
+  "intent": "wrong_person",
+  "language": "hi"
+ },
+ {
+  "text": "मैं से दूसरा फैला, किसने बात की हो?",
+  "intent": "wrong_person",
+  "language": "hi"
+ },
+ {
+  "text": "अब अच्छी तरफ जाकर पिछले भुगतान के लिए जांच करें",
+  "intent": "wrong_person",
+  "language": "hi"
+ },
+ {
+  "text": "कैद में तक पहुंचना होगा, इही से मुक्ति प्राप्त करें",
+  "intent": "wrong_person",
+  "language": "hi"
+ },
+ {
+  "text": "Bhai aapka num barabar hai jissse mujh se bhi nahi mil sakta. Main apna pay kar liya hoga kya?",
+  "intent": "wrong_person",
+  "language": "hinglish"
+ },
+ {
+  "text": "Sure can do.",
+  "intent": "negotiate",
+  "language": "en"
+ },
+ {
+  "text": "Less amount next month works for me.",
+  "intent": "negotiate",
+  "language": "en"
+ },
+ {
+  "text": "I need this till end of the month please.",
+  "intent": "negotiate",
+  "language": "en"
+ },
+ {
+  "text": "Can arrange in installments if possible.",
+  "intent": "negotiate",
+  "language": "en"
+ },
+ {
+  "text": "More time is appreciated for now.",
+  "intent": "negotiate",
+  "language": "en"
+ },
+ {
+  "text": "Please allow till next billing cycle.",
+  "intent": "negotiate",
+  "language": "en"
+ },
+ {
+  "text": "बिल पूरा करने की मदत से अनुसरण कर दो",
+  "intent": "negotiate",
+  "language": "hi"
+ },
+ {
+  "text": "मैं आगे बारे में जानकारी प्राप्त करने के लिए फॉक हुआ हूँ",
+  "intent": "negotiate",
+  "language": "hi"
+ },
+ {
+  "text": "विभा जी को से संपर्क कर ली, मैं बताऊंगा",
+  "intent": "negotiate",
+  "language": "hi"
+ },
+ {
+  "text": "क्या मैंने तब भुगतान किया है?",
+  "intent": "negotiate",
+  "language": "hi"
+ },
+ {
+  "text": "मैं पूलर जी से संपर्क करके सोच रहा हूँ",
+  "intent": "negotiate",
+  "language": "hi"
+ },
+ {
+  "text": "इसके बजट में समय लगे, मुझे अनुरोध আমি ভোটামেশা শেষ পর্যন্ত ফেয়ারি করবে",
+  "intent": "negotiate",
+  "language": "hi"
+ },
+ {
+  "text": "Yes bhai aapko kitne amount required hota hai? Aur kaise pad sakta hoon?",
+  "intent": "negotiate",
+  "language": "hinglish"
+ },
+ {
+  "text": "Abhi time nahi mil raha hai for complete payment, hum apna offer pad sakte hain.",
+  "intent": "negotiate",
+  "language": "hinglish"
+ },
+ {
+  "text": "Aur installation options pe bataye jao please",
+  "intent": "negotiate",
+  "language": "hinglish"
+ },
+ {
+  "text": "Kya main ek month ke liye partial payment kar sakta hoon?",
+  "intent": "negotiate",
+  "language": "hinglish"
+ },
+ {
+  "text": "Apne upi id ko de do bhai, mujhe add krna pdega to quick response kar do.",
+  "intent": "negotiate",
+  "language": "hinglish"
+ },
+ {
+  "text": "Abhi tak update nahi aaya hai yeh amount padega na? Mujhe time milegi.",
+  "intent": "negotiate",
+  "language": "hinglish"
+ }
+]

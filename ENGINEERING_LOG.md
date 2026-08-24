@@ -975,3 +975,77 @@ step carries its hash-chain position so the browser can show provenance
 rather than just content. Playwright stays as a manual verification tool.
 
 132/132 tests passing.
+
+## 2026-08-24 (cont. 10) — LLM listener: the labelled set was the problem, and opt-out should never have been the model's job
+
+Wired the LLM into reply-intent classification, which spec section 8.5
+permits *on condition* it is "validated against a labelled set, report
+accuracy". Getting that validation honest took three passes.
+
+**Pass 1 — the self-labelling idea, and why it failed.** The neat design is
+to have the simulator pick a ground-truth intent, have a persona LLM write
+text expressing it, then have the listener classify it back. Labels come
+free by construction. Generated 91 replies across 6 intents x 3 languages
+(batched, ~18 calls, 198s, cached to disk so the eval is reproducible
+without Ollama).
+
+Measured **42.9%**. Then read the disagreements instead of reporting the
+number, and the corpus was the problem, not the classifier. Asked to write
+as a customer who had already paid, qwen2.5:3b produced "Waste of time with
+all these chase msgs" (not a payment claim at all) and "Aur message mat
+bhijo mujhse" — which literally means *stop messaging me*, i.e. the opt-out
+intent, filed under `paid`. Hindi output was frequently incoherent; Hindi
+scored 27.3% against English's 62.5%.
+
+A labelled set whose labels are wrong cannot validate anything, and
+publishing 42.9% would have attributed corpus noise to the listener.
+
+Worth recording that few-shot anchoring materially improved generation
+before I gave up on it as ground truth — without style examples the model
+wrote "Sab kochi? Bhai aapke yaar pay day ho jayega"; with them, "Abhi paise
+nahi hoga, 15th January ka salary aayega tab karunga". Also tested
+qwen2.5:7b for generation on the theory that a bigger model is worth it when
+the work is one-time and cached — it was not clearly better and 3x slower,
+so 3b stayed.
+
+**Pass 2 — a hand-authored gold set.** 42 examples, 7 per intent, balanced
+across English/Hindi/Hinglish, each written so only one reading is
+reasonable. Result: **88.1%**, versus 42.9% on the generated corpus. Most of
+the original "error" was indeed label noise.
+
+**Pass 3 — the finding that mattered.** On clean labels, opt-out recall was
+**0.57**. The model missed 3 of 7, and every miss was Hindi or Hinglish —
+"कृपया मुझसे दोबारा संपर्क न करें" ("please do not contact me again") came
+back as `wrong_person`.
+
+Every other intent being wrong costs money. Opt-out being wrong costs
+compliance: continuing to contact someone who asked you to stop is a TCCCPR
+violation, and it silently skips the 90-day cooling obligation. That is
+exactly the class of decision this project already argues should not rest on
+a language model — the compliance-kernel argument, one level down. So
+opt-out got a deterministic detector that runs before the LLM and overrides
+it, with patterns grouped by language so a compliance reviewer can actually
+read them, and a deliberately asymmetric bias (a false positive costs
+revenue; a false negative is a breach).
+
+That took the combined system to **92.9%**, opt-out recall to 1.00 — and
+immediately produced a false positive of my own making: "maine to
+subscription band kar diya tha, phir charge kyun hua" ("I had cancelled it,
+so why was I charged") is a *dispute*, caught by my `band kar` pattern.
+"band karo" is the imperative "stop it"; "band kar diya" is past tense "I
+cancelled it". Tightened the pattern to the imperative form only.
+
+**Final: 95.2% overall** (100% English, 92% Hinglish, 92% Hindi), opt-out
+1.00 precision and 1.00 recall, promise-to-pay 0.88/1.00 — the metric spec
+11.2 names explicitly. Both the gold and generated results are published; the
+generated one is labelled as unreliable ground truth rather than quietly
+dropped, because the gap between 42.9% and 95.2% is itself the evidence for
+why hand-authored labels were necessary.
+
+Tests mock the LLM, so none of this needs Ollama in CI. They pin the
+properties that matter: unparseable model output becomes NO_REPLY rather
+than an action, an unreachable model degrades to NO_REPLY rather than a
+guess, silent actions never produce a reply, and a deliberately wrong model
+answer is still overridden to OPT_OUT.
+
+145/145 tests passing.

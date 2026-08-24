@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval
 
 setup:
 	uv venv --python 3.12
@@ -32,6 +32,11 @@ eval:
 baselines:
 	PYTHONPATH=src:experiments/tier2_simulation .venv/bin/python3 \
 		experiments/tier2_simulation/run_baselines.py --n-train 5000 --n-eval 2000
+
+# Reply-intent classification accuracy vs a hand-authored labelled set
+# (spec section 8.5 requires this validation). Needs a local Ollama.
+listener-eval:
+	PYTHONPATH=src .venv/bin/python3 experiments/listener_eval/run_eval.py --set gold
 
 # Browsable audit trail (bar requirement B4). Self-contained HTML — no npm, no
 # build step, no network. Uses the rich batch ledger when `make eval` has been

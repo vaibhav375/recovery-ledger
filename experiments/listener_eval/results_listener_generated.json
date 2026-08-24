@@ -1,0 +1,412 @@
+{
+  "n": 91,
+  "accuracy": 0.4396,
+  "accuracy_by_language": {
+    "en": 0.625,
+    "hi": 0.2727,
+    "hinglish": 0.4231
+  },
+  "per_intent": {
+    "paid": {
+      "precision": 0.4286,
+      "recall": 0.3529,
+      "tp": 6,
+      "fp": 8,
+      "fn": 11
+    },
+    "negotiate": {
+      "precision": 0.7273,
+      "recall": 0.4444,
+      "tp": 8,
+      "fp": 3,
+      "fn": 10
+    },
+    "opt_out": {
+      "precision": 0.75,
+      "recall": 0.3529,
+      "tp": 6,
+      "fp": 2,
+      "fn": 11
+    },
+    "dispute": {
+      "precision": 0.2727,
+      "recall": 0.2308,
+      "tp": 3,
+      "fp": 8,
+      "fn": 10
+    },
+    "promise_to_pay": {
+      "precision": 0.3939,
+      "recall": 0.7647,
+      "tp": 13,
+      "fp": 20,
+      "fn": 4
+    },
+    "no_reply": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "tp": 0,
+      "fp": 6,
+      "fn": 0
+    },
+    "wrong_person": {
+      "precision": 0.5,
+      "recall": 0.4444,
+      "tp": 4,
+      "fp": 4,
+      "fn": 5
+    }
+  },
+  "top_confusions": [
+    {
+      "true": "opt_out",
+      "predicted": "promise_to_pay",
+      "n": 6
+    },
+    {
+      "true": "dispute",
+      "predicted": "promise_to_pay",
+      "n": 5
+    },
+    {
+      "true": "negotiate",
+      "predicted": "promise_to_pay",
+      "n": 5
+    },
+    {
+      "true": "paid",
+      "predicted": "promise_to_pay",
+      "n": 3
+    },
+    {
+      "true": "paid",
+      "predicted": "negotiate",
+      "n": 2
+    },
+    {
+      "true": "paid",
+      "predicted": "opt_out",
+      "n": 2
+    },
+    {
+      "true": "paid",
+      "predicted": "dispute",
+      "n": 2
+    },
+    {
+      "true": "promise_to_pay",
+      "predicted": "dispute",
+      "n": 2
+    }
+  ],
+  "disagreements": [
+    {
+      "text": "Sorry missed it first time pls check again",
+      "true": "paid",
+      "predicted": "negotiate",
+      "language": "en"
+    },
+    {
+      "text": "Waste of time with all these chase msgs",
+      "true": "paid",
+      "predicted": "opt_out",
+      "language": "en"
+    },
+    {
+      "text": "अब जाँच करना खुदकी सामान्य है, वहाँ खोज रखूंगा।",
+      "true": "paid",
+      "predicted": "dispute",
+      "language": "hi"
+    },
+    {
+      "text": "मैने पहले मत भेजना इसे बड़ा दिलचस्प कर दिया है।",
+      "true": "paid",
+      "predicted": "dispute",
+      "language": "hi"
+    },
+    {
+      "text": "यहाँ मुझे अभी समय नहीं मिल पा रहा है, तब आगे बढ़ो।",
+      "true": "paid",
+      "predicted": "promise_to_pay",
+      "language": "hi"
+    },
+    {
+      "text": "तुम्हें जायजा देर करके भाग जाऊंगा, मुझे चिंता हो।",
+      "true": "paid",
+      "predicted": "promise_to_pay",
+      "language": "hi"
+    },
+    {
+      "text": "Aur message mat bhijo mujhse, baat karo phir se",
+      "true": "paid",
+      "predicted": "opt_out",
+      "language": "hinglish"
+    },
+    {
+      "text": "Apni sahi details check kar do aap, maine wahi cheche",
+      "true": "paid",
+      "predicted": "no_reply",
+      "language": "hinglish"
+    },
+    {
+      "text": "Chala pehle milega phir uske baad yeh resolve hoga na",
+      "true": "paid",
+      "predicted": "promise_to_pay",
+      "language": "hinglish"
+    },
+    {
+      "text": "Main to ye time nahi lena chataa, aur dialog ke liye bacha banta ḇhaū",
+      "true": "paid",
+      "predicted": "negotiate",
+      "language": "hinglish"
+    },
+    {
+      "text": "Aur phir se contact karne ka pasunch dijiye mujhe aapko",
+      "true": "paid",
+      "predicted": "wrong_person",
+      "language": "hinglish"
+    },
+    {
+      "text": "Thanks will take care of it soon",
+      "true": "promise_to_pay",
+      "predicted": "paid",
+      "language": "en"
+    },
+    {
+      "text": "ये लगातार ठीक रहेगा, मुझे संदhorn.",
+      "true": "promise_to_pay",
+      "predicted": "dispute",
+      "language": "hi"
+    },
+    {
+      "text": "मैं नहीं खर्च करूंगा, यह किसी प्रकार की विशेषता है।",
+      "true": "promise_to_pay",
+      "predicted": "dispute",
+      "language": "hi"
+    },
+    {
+      "text": "Main jaldi check karein phir aapka record",
+      "true": "promise_to_pay",
+      "predicted": "no_reply",
+      "language": "hinglish"
+    },
+    {
+      "text": "please check my bank statement it shows payment already made",
+      "true": "dispute",
+      "predicted": "paid",
+      "language": "en"
+    },
+    {
+      "text": "dont bother me now i want to verify first",
+      "true": "dispute",
+      "predicted": "no_reply",
+      "language": "en"
+    },
+    {
+      "text": "can we look into this again in a week?",
+      "true": "dispute",
+      "predicted": "promise_to_pay",
+      "language": "en"
+    },
+    {
+      "text": "looking into it but just need time to confirm",
+      "true": "dispute",
+      "predicted": "promise_to_pay",
+      "language": "en"
+    },
+    {
+      "text": "मैं कभी भुगतान पिछले ही कर दिया था",
+      "true": "dispute",
+      "predicted": "paid",
+      "language": "hi"
+    },
+    {
+      "text": "अब आज भी मै अनुसोहन कर रहा हूँ",
+      "true": "dispute",
+      "predicted": "promise_to_pay",
+      "language": "hi"
+    },
+    {
+      "text": "क्या इक वेळ लग सकता है?",
+      "true": "dispute",
+      "predicted": "promise_to_pay",
+      "language": "hi"
+    },
+    {
+      "text": "मानक सिद्धि प्रदान करे",
+      "true": "dispute",
+      "predicted": "promise_to_pay",
+      "language": "hi"
+    },
+    {
+      "text": "अगर एक तरफ आप कुछ गलती करते हैं",
+      "true": "dispute",
+      "predicted": "wrong_person",
+      "language": "hi"
+    },
+    {
+      "text": "Abhi maine bhi check kiya hai ab tak aapko kya ho rha hai?",
+      "true": "dispute",
+      "predicted": "no_reply",
+      "language": "hinglish"
+    },
+    {
+      "text": "Its been paid already remember.",
+      "true": "opt_out",
+      "predicted": "paid",
+      "language": "en"
+    },
+    {
+      "text": "Can't repeat payment for same service.",
+      "true": "opt_out",
+      "predicted": "negotiate",
+      "language": "en"
+    },
+    {
+      "text": "कृपया जाँच करें तब से मुझे यहाँ निकल पड़ता है।",
+      "true": "opt_out",
+      "predicted": "paid",
+      "language": "hi"
+    },
+    {
+      "text": "मेरे पास मिलने का समय नहीं है, फिर भी पूछें नहीं।",
+      "true": "opt_out",
+      "predicted": "promise_to_pay",
+      "language": "hi"
+    },
+    {
+      "text": "कृपया इस समस्या को मुफ्त रखें।",
+      "true": "opt_out",
+      "predicted": "dispute",
+      "language": "hi"
+    },
+    {
+      "text": "हाल ही मेरे बच्चे के दिलाह के लिए विनती है, अब जल्दी खता रकें।",
+      "true": "opt_out",
+      "predicted": "promise_to_pay",
+      "language": "hi"
+    },
+    {
+      "text": "Abhi tak bhut kuch nahi aata hai yaar, wait lenge jaldi record check kar denge.",
+      "true": "opt_out",
+      "predicted": "promise_to_pay",
+      "language": "hinglish"
+    },
+    {
+      "text": "Apne contact number ko bhi update karna chahte ho?",
+      "true": "opt_out",
+      "predicted": "wrong_person",
+      "language": "hinglish"
+    },
+    {
+      "text": "Main apka fir se message nahi bhulunga sirf record check kar lenge.",
+      "true": "opt_out",
+      "predicted": "promise_to_pay",
+      "language": "hinglish"
+    },
+    {
+      "text": "Bhai ye time bata diya tha, month end tak padega kya maine samjha diya.",
+      "true": "opt_out",
+      "predicted": "promise_to_pay",
+      "language": "hinglish"
+    },
+    {
+      "text": "Abhi tak mujhe clear reply yaad nahi aata please jaldi update kary.",
+      "true": "opt_out",
+      "predicted": "promise_to_pay",
+      "language": "hinglish"
+    },
+    {
+      "text": "मैं तो उनके सामने था, मुझे भत्ता करनी पड़ी",
+      "true": "wrong_person",
+      "predicted": "dispute",
+      "language": "hi"
+    },
+    {
+      "text": "क्योंकि अगर में थे तो भुगतान किया होगा",
+      "true": "wrong_person",
+      "predicted": "paid",
+      "language": "hi"
+    },
+    {
+      "text": "अब अच्छी तरफ जाकर पिछले भुगतान के लिए जांच करें",
+      "true": "wrong_person",
+      "predicted": "no_reply",
+      "language": "hi"
+    },
+    {
+      "text": "कैद में तक पहुंचना होगा, इही से मुक्ति प्राप्त करें",
+      "true": "wrong_person",
+      "predicted": "promise_to_pay",
+      "language": "hi"
+    },
+    {
+      "text": "Bhai aapka num barabar hai jissse mujh se bhi nahi mil sakta. Main apna pay kar liya hoga kya?",
+      "true": "wrong_person",
+      "predicted": "dispute",
+      "language": "hinglish"
+    },
+    {
+      "text": "I need this till end of the month please.",
+      "true": "negotiate",
+      "predicted": "promise_to_pay",
+      "language": "en"
+    },
+    {
+      "text": "More time is appreciated for now.",
+      "true": "negotiate",
+      "predicted": "promise_to_pay",
+      "language": "en"
+    },
+    {
+      "text": "Please allow till next billing cycle.",
+      "true": "negotiate",
+      "predicted": "promise_to_pay",
+      "language": "en"
+    },
+    {
+      "text": "बिल पूरा करने की मदत से अनुसरण कर दो",
+      "true": "negotiate",
+      "predicted": "paid",
+      "language": "hi"
+    },
+    {
+      "text": "मैं आगे बारे में जानकारी प्राप्त करने के लिए फॉक हुआ हूँ",
+      "true": "negotiate",
+      "predicted": "dispute",
+      "language": "hi"
+    },
+    {
+      "text": "विभा जी को से संपर्क कर ली, मैं बताऊंगा",
+      "true": "negotiate",
+      "predicted": "wrong_person",
+      "language": "hi"
+    },
+    {
+      "text": "क्या मैंने तब भुगतान किया है?",
+      "true": "negotiate",
+      "predicted": "paid",
+      "language": "hi"
+    },
+    {
+      "text": "इसके बजट में समय लगे, मुझे अनुरोध আমি ভোটামেশা শেষ পর্যন্ত ফেয়ারি করবে",
+      "true": "negotiate",
+      "predicted": "promise_to_pay",
+      "language": "hi"
+    },
+    {
+      "text": "Apne upi id ko de do bhai, mujhe add krna pdega to quick response kar do.",
+      "true": "negotiate",
+      "predicted": "no_reply",
+      "language": "hinglish"
+    },
+    {
+      "text": "Abhi tak update nahi aaya hai yeh amount padega na? Mujhe time milegi.",
+      "true": "negotiate",
+      "predicted": "promise_to_pay",
+      "language": "hinglish"
+    }
+  ],
+  "model": "qwen2.5:3b",
+  "set": "generated"
+}
