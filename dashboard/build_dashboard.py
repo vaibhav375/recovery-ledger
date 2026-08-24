@@ -30,6 +30,16 @@ def load(path: Path) -> list[dict]:
     return json.loads(path.read_text())
 
 
+def load_optional(path: Path):
+    """Experiment results are embedded when present. A missing file means that
+    experiment has not been run in this checkout — the view then says so
+    rather than rendering an empty shell that looks broken."""
+    try:
+        return json.loads(path.read_text())
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+
+
 def group_by_case(entries: list[dict]) -> dict[str, list[dict]]:
     cases: dict[str, list[dict]] = defaultdict(list)
     for e in entries:
@@ -216,6 +226,93 @@ function compliance(){
   </tbody></table>`;
 }
 
+const missing=(what,cmd)=>`<h1>${what}</h1><div class="sub">Not present in this build</div>
+  <div class="note">Run <span class="mono">${cmd}</span> and rebuild the dashboard
+  (<span class="mono">make dashboard</span>) to populate this view.</div>`;
+
+function fleet(){
+  const f=D.fleet;
+  if(!f) return missing('Fleet health','make fleet');
+  const b=f.blind, a=f.fleet_aware;
+  const ok=f.detection_correct;
+  return `<h1>Fleet health \u2014 contact-free recovery</h1>
+  <div class="sub">Detecting a broken payment rail and declining to retry into it. Nobody is messaged to produce this value.</div>
+  <div class="note">The detector is never told which issuer is down. It sees only the observed
+  attempt stream and compares each slice against <em>its own</em> baseline, so a structurally
+  weak issuer is not flagged merely for being weak \u2014 only for getting worse.</div>
+  <div class="grid">
+    ${stat('Outage (ground truth)', esc(f.ground_truth_outage.join(', ')))}
+    ${stat('Detected', esc(f.detected.join(', ')||'none'), ok?'exact match':'MISMATCH')}
+    ${stat('Futile retries avoided', f.futile_retries_avoided, 'into a dead rail')}
+    ${stat('Gross \u20b9 recovered', '+'+Math.round(f.gross_recovery_change).toLocaleString('en-IN'))}
+  </div>
+  ${f.attribution?`<div class="note" style="border-left-color:var(--deny)"><b>Root-cause attribution:</b> ${esc(f.attribution)}</div>`:''}
+  <h1 style="margin-top:26px">Blind vs fleet-aware</h1>
+  <div class="sub">Same cases, same outage, same policy \u2014 only the detector differs</div>
+  <table><thead><tr><th></th><th>blind</th><th>fleet-aware</th></tr></thead><tbody>
+    ${row('Retries into the degraded issuer',b.retries_into_degraded_issuer,a.retries_into_degraded_issuer,true)}
+    ${row('Total retries',b.retries,a.retries)}
+    ${row('Contacts sent',b.contacts,a.contacts)}
+    ${row('\u20b9 recovered on outage-hit cases',money(b.recovered_on_degraded_issuer),money(a.recovered_on_degraded_issuer),true)}
+    ${row('\u20b9 recovered overall',money(b.gross_recovered),money(a.gross_recovered))}
+  </tbody></table>`;
+}
+const row=(k,x,y,hi)=>`<tr><td>${k}</td><td class="mono">${x}</td>
+  <td class="mono" ${hi?'style="font-weight:650;color:var(--accent)"':''}>${y}</td></tr>`;
+
+function negotiation(){
+  const n=D.negotiation;
+  if(!n) return missing('Negotiation','make negotiate');
+  return `<h1>Negotiation \u2014 Section 43B(h)</h1>
+  <div class="sub">The 45-day MSME clock, an NPV solver, and a kernel-enforced concession envelope</div>
+  <div class="note">Under Section 43B(h) a buyer who does not pay an MSME supplier within 45 days
+  cannot claim the expense in that financial year \u2014 the deduction is <b>deferred to the year of
+  actual payment, not forfeited</b>. That precision matters: the overstated version is wrong and a
+  CFO would know it. It also inverts the negotiation, because settling early is in the
+  <em>buyer's</em> interest.</div>
+  ${n.map(sc=>{
+    const denied=sc.kernel_decision==='DENY';
+    const lever=(sc.solver_rationale||'').includes('Leverage, not margin');
+    return `<div class="stat" style="margin-bottom:12px${lever?';border-color:var(--accent)':''}">
+      <div class="id" style="font-weight:620">${esc(sc.scenario)}</div>
+      <div class="meta">${money(sc.amount)} \u00b7 43B(h): ${esc(sc['43bh_urgency'])}${
+        sc['43bh_days_left']!==null?` \u00b7 ${sc['43bh_days_left']}d`:''}</div>
+      <div style="margin-top:9px;font-size:12.5px"><b>Solver:</b> ${esc(sc.offer_type)}
+        ${sc.discount_pct?` (${(sc.discount_pct*100).toFixed(2)}%)`:''}</div>
+      <div class="d" style="color:var(--muted);font-size:11.5px;margin-top:2px">${esc(sc.solver_rationale)}</div>
+      <div style="margin-top:8px;font-size:12.5px"><b>Kernel:</b>
+        <span class="${denied?'fail':'pass'}">${sc.kernel_decision}</span>
+        ${denied?` \u2190 ${esc((sc.kernel_denied_rules||[]).join(', '))}`:''}</div>
+      <div style="margin-top:8px;font-size:12.5px"><b>Message:</b> ${
+        sc.message_suppressed_by_kernel
+          ? '<span class="fail">not drafted \u2014 kernel denied the action</span>'
+          : esc(sc.message)}</div>
+      ${lever?'<span class="chip ok" style="margin-top:9px">leverage, not margin</span>':''}
+    </div>`;}).join('')}`;
+}
+
+function listener(){
+  const l=D.listener;
+  if(!l) return missing('Listener','make listener-eval');
+  const pi=l.per_intent||{};
+  const langs=Object.entries(l.accuracy_by_language||{});
+  return `<h1>Listener \u2014 reply-intent classification</h1>
+  <div class="sub">${l.n} hand-labelled replies \u00b7 model ${esc(l.model||'')}</div>
+  <div class="note"><b>Opt-out is deliberately not left to the model.</b> Measured alone the LLM
+  recalled only 0.57 of opt-outs and every miss was Hindi or Hinglish. Missing one is a TCCCPR
+  violation, not a lost sale, so a deterministic detector runs first and overrides it.</div>
+  <div class="grid">
+    ${stat('Overall accuracy',(l.accuracy*100).toFixed(1)+'%')}
+    ${langs.map(([k,v])=>stat(k,(v*100).toFixed(0)+'%')).join('')}
+  </div>
+  <h1 style="margin-top:26px">Per intent</h1>
+  <table><thead><tr><th>Intent</th><th>Precision</th><th>Recall</th></tr></thead><tbody>
+  ${Object.entries(pi).map(([k,m])=>`<tr><td class="mono">${esc(k)}</td>
+    <td>${m.precision.toFixed(2)}</td>
+    <td class="${m.recall===1?'pass':''}">${m.recall.toFixed(2)}</td></tr>`).join('')}
+  </tbody></table>`;
+}
+
 function drawer(c){
   const certs=c.timeline.filter(t=>t.type==='certificate');
   let body;
@@ -258,7 +355,8 @@ function describe(t){
 }
 
 function render(){
-  $('#main').innerHTML = view==='overview'?overview():view==='cases'?cases():compliance();
+  const views={overview,cases,compliance,fleet,negotiation,listener};
+  $('#main').innerHTML=(views[view]||overview)();
   $$('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.view===view));
   if(view==='cases'){
     $('#q').oninput=e=>{q=e.target.value;const p=e.target.selectionStart;render();
@@ -308,6 +406,10 @@ def build(ledger_path: Path, out_path: Path, max_cases: int) -> Path:
         "summary": summarise(entries, grouped),
         "cases": [case_card(cid, grouped[cid]) for cid in case_ids],
         "rule_stats": rule_stats(entries),
+        "fleet": load_optional(ROOT / "experiments" / "fleet" / "results_fleet.json"),
+        "negotiation": load_optional(ROOT / "experiments" / "negotiation" / "results_negotiation.json"),
+        "listener": load_optional(ROOT / "experiments" / "listener_eval" / "results_listener_gold.json"),
+        "baselines": load_optional(ROOT / "experiments" / "tier2_simulation" / "results_baselines.json"),
     }
     doc = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -319,6 +421,9 @@ def build(ledger_path: Path, out_path: Path, max_cases: int) -> Path:
       <button data-view="overview" aria-current="true">Overview</button>
       <button data-view="cases">Cases</button>
       <button data-view="compliance">Compliance kernel</button>
+      <button data-view="fleet">Fleet health</button>
+      <button data-view="negotiation">Negotiation</button>
+      <button data-view="listener">Listener</button>
     </nav>
     <div style="margin-top:20px"><button class="themebtn" id="theme">Toggle theme</button></div>
   </aside>
