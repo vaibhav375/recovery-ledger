@@ -209,10 +209,16 @@ class SimulationEnvironment:
     def __init__(
         self, traits_by_case: dict[str, LatentTraits], *, seed: int,
         params: ResponseParams = DEFAULT_PARAMS,
+        fleet_health=None, now=None,
     ):
         self._traits = traits_by_case
         self._params = params
         self._seed = seed
+        # Ground truth for issuer outages (novelty claim N6). The policy never
+        # sees this — it only sees what its detector infers from observed
+        # attempts, exactly as a real system would.
+        self._fleet_health = fleet_health
+        self._now = now
         self._rngs: dict[str, np.random.Generator] = {}
         self._contacts: dict[str, int] = {}
 
@@ -237,7 +243,17 @@ class SimulationEnvironment:
             return StepResult(reply=ReplyIntent.PAID if paid else ReplyIntent.NO_REPLY, paid=paid)
 
         if action_type == ActionType.RETRY:
-            paid = bool(rng.random() < _retry_success_prob(case, p))
+            success_prob = _retry_success_prob(case, p)
+            # A retry into an issuer that is currently down cannot succeed,
+            # however good the case looks otherwise. This is what makes
+            # suppressing such retries a genuine recovery lever rather than a
+            # marginal optimisation: the attempt is not low-value, it is
+            # worthless, and it still consumes the case's budget.
+            if self._fleet_health is not None and self._now is not None:
+                issuer = getattr(case, "issuer", None)
+                if self._fleet_health.is_out(issuer, self._now):
+                    success_prob = 0.0
+            paid = bool(rng.random() < success_prob)
             return StepResult(reply=ReplyIntent.PAID if paid else ReplyIntent.NO_REPLY, paid=paid)
 
         # customer-contact actions (NUDGE / NEGOTIATE / ESCALATE_HUMAN)

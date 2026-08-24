@@ -1114,3 +1114,62 @@ anything. Switched to a checkout-abandonment case, which has no retry
 available. The code was right; the test was measuring the wrong thing.
 
 151/151 tests passing. All experiments re-verified deterministic.
+
+## 2026-08-24 (cont. 12) — N6, contact-free recovery, and a detector floor I had set wrong
+
+Built the last unbuilt novelty claim. N6 inverts what the rest of the
+project does: instead of deciding whether to contact a customer, it notices
+the payment rail is broken and declines to retry into it. Nobody is messaged
+to produce that value.
+
+Method is a two-proportion z-test per slice, recent window against that
+slice's own baseline. Chose it over CUSUM or a Bayesian change-point model
+deliberately — an operator or regulator can check a z-test by hand, and the
+extra sensitivity would not change what the agent does. Each slice is
+compared against itself, so a structurally weak issuer is not flagged for
+being weak, only for getting worse. Attribution then names the dimension
+that explains the drop, because an issuer outage also drags down every
+method and region it serves and listing all three tells an operator nothing.
+
+Wired it so a degraded issuer makes retry's incremental value exactly zero.
+That is the actual lever: a retry into a dead rail is not low-value, it is
+*worthless*, and it still consumes the case's attempt budget.
+
+**Then the detector got a false positive, and chasing it was the useful
+part.** First run flagged SBI alongside the genuinely-out HDFC. Rather than
+shrug at one bad call, measured it: over 40 independent outages, precision
+0.98 / recall 1.00. Real, small, and costly in an asymmetric way — a false
+positive suppresses retries into a *working* issuer and destroys recovery,
+whereas a missed detection only forgoes an optimisation.
+
+First fix was wrong. I added a minimum effect-size gate on the reasoning
+that statistical significance is not operational significance. Re-measured:
+precision went 0.98 → 0.968, i.e. **no improvement**. That was the clue —
+the false alarms were not marginal dips being over-read, they were genuinely
+large apparent drops. So the problem had to be sample size.
+
+Swept observation volume, and it was unambiguous:
+
+| recent attempts | 24 | 60 | 150 | 360 | 900 |
+|---|---|---|---|---|---|
+| precision | 0.968 | 1.000 | 1.000 | 1.000 | 1.000 |
+| recall | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 |
+
+The method was never the problem. My `MIN_RECENT_ATTEMPTS = 20` floor was
+simply set too low — 24 observations is not enough to call a proportion.
+Raised it to 60, which makes the detector **decline to judge a thinly
+observed slice rather than judge it badly**. Fail-safe in the direction that
+matters, and the tradeoff is now measured rather than assumed.
+
+Worth recording the sequence: I guessed a fix, measured it, found it did
+nothing, and used *that* to locate the real cause. Adding the effect-size
+gate on a hunch and declaring victory would have left a detector that still
+misfires on exactly the low-volume slices where misfiring is most likely.
+
+Result with the floor corrected and a realistic observation volume:
+detection CORRECT, futile retries into the dead issuer **351 → 0**, gross
+recovery **+₹41,264 — all of it on the outage-hit cases**, for 81 extra
+contacts. Stated the caveat plainly in RESULTS.md: the *detection* is
+contact-free, and it reallocates effort rather than eliminating it.
+
+160/160 tests passing.

@@ -70,10 +70,11 @@ evidence the problem is real; it is not something to claim credit for.
 | **N3** | **A deterministic, machine-checkable India-regulatory compliance kernel** emitting a per-action certificate — TCCCPR/DLT, RBI recovery-agent norms, RBI e-mandate 2026, DPDPA. | ✅ Built: 12 rules, 100% red-team block rate, mutation-tested |
 | **N4** | **Contact as a budget-constrained sequential decision problem**, not one-shot classification. | ⚠️ Partial: greedy EV under an explicit budget, plus a finite-horizon lookahead variant. Not a full constrained-MDP solver, and the spec explicitly permits the simplification — but it is a simplification, and the lookahead currently adds nothing measurable. |
 | **N5** | **Two-tier validation** — causal machinery proven on real randomised public data *before* transfer to the simulator. Directly defeats "your synthetic number is circular". | ✅ Built (Criteo + Hillstrom) |
-| **N6** | **Contact-free recovery** — detecting issuer degradation and suppressing retries into a dead issuer. | ❌ **Not built.** Listed here because it is in the design, not because it exists. |
+| **N6** | **Contact-free recovery** — detecting issuer degradation and suppressing retries into a dead issuer. Inverts the assumption that recovery means outreach. | ✅ Built. Change-point detection per issuer/method/region with root-cause attribution; **precision 1.00 / recall 1.00** against ground truth at realistic observation volume. Cuts futile retries into a dead rail **351 → 0** and recovers **+₹41,264**, all on outage-hit cases. |
 
-Two of six are partial and one is not built at all. That is stated here
-rather than left for a reader to discover.
+Four of six are built and measured; N4 remains a stated simplification the
+spec explicitly permits. That status is kept current here rather than left
+for a reader to discover — N2 and N6 both read ⚠️/❌ until the work landed.
 
 ## Three framings that shape every decision in this repo
 
@@ -185,7 +186,13 @@ running.
       the labels were wrong, not the classifier, so it is reported separately
       rather than used as ground truth.
 - [ ] Negotiation + Section 43B(h) clock
-- [ ] Fleet-level degradation detection
+- [x] **N6 — contact-free recovery.** `make fleet`: issuer/method/region
+      change-point detection with root-cause attribution, precision 1.00 /
+      recall 1.00 against ground truth. Futile retries into a degraded issuer
+      **351 → 0**, **+₹41,264** recovered without messaging anyone extra to
+      find it. Also caught and fixed a real defect in my own detector — the
+      minimum-observations floor was set too low, producing false positives
+      that a volume sweep showed were pure small-sample noise.
 
 - [x] **B4 — browsable audit trail.** `make dashboard` renders the
       hash-chained ledger as a **self-contained HTML file** — no npm, no
@@ -218,6 +225,7 @@ make baselines         # runs all 5 spec-required baselines + a matched-volume
                        # random-targeting control + both EV variants against the
                        # same eval batch — verified working, deterministic
 make sensitivity       # 5-parameter ranking-stability sweep — verified working
+make fleet             # contact-free recovery: issuer degradation detection
 make listener-eval     # reply-intent accuracy vs the gold set (needs Ollama)
 make dashboard         # renders the audit trail to dashboard/index.html
 make redteam          # 21 named attacks + hostile policy + 5,000-state fuzz —

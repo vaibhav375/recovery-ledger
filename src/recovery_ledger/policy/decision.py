@@ -22,6 +22,7 @@ from recovery_ledger.events.schemas import (
     FailedSubscriptionCase,
     RecoveryCase,
 )
+from recovery_ledger.detector.fleet import DegradedIssuerRegistry
 from recovery_ledger.policy.churn import ChurnRiskModel, estimated_ltv
 from recovery_ledger.policy.features import case_to_features
 from recovery_ledger.policy.uplift.learners import UpliftModel
@@ -113,10 +114,20 @@ def _retry_success_prob(case: RecoveryCase) -> float:
     return RETRY_SUCCESS_PROB_GENERIC
 
 
-def _retry_incremental_prob(case: RecoveryCase) -> float:
+def _retry_incremental_prob(
+    case: RecoveryCase, degraded: DegradedIssuerRegistry | None = None
+) -> float:
     """INCREMENTAL lift from retrying, versus letting the case sit. This is
     the quantity comparable to the uplift model's tau_hat, and the one the
-    EV formula must use."""
+    EV formula must use.
+
+    If the case's issuer is currently degraded (spec 8.4, novelty claim N6),
+    a retry cannot succeed and its incremental value is zero. This is the
+    contact-free recovery lever: the agent stops throwing the case's limited
+    attempt budget into a rail that is down, without messaging anyone.
+    """
+    if degraded is not None and isinstance(case, FailedPaymentCase) and degraded.is_degraded(case.issuer):
+        return 0.0
     return max(_retry_success_prob(case) - BASE_RESOLUTION_PROB, 0.0)
 
 
@@ -223,6 +234,10 @@ class EVDecisionPolicy:
     # do-not-disturb is contacted.
     #
     # Defaults to None, so behaviour is unchanged unless a caller opts in.
+    # Fleet-level degradation (novelty claim N6). When set, retries into an
+    # issuer currently detected as degraded are valued at zero, so the agent
+    # stops burning attempts on a dead rail. Costs no customer contact at all.
+    degraded_issuers: DegradedIssuerRegistry | None = None
     churn_model: ChurnRiskModel | None = None
     # Chosen from a measured sweep, not picked by feel. Against lambda_churn=0
     # this cuts do-not-disturb contacts 20.1% -> 13.6% and raises incremental
@@ -255,7 +270,7 @@ class EVDecisionPolicy:
             - self._churn_cost(case, case_to_features(case).reshape(1, -1))
         )
         ev_retry = (
-            _retry_incremental_prob(case) * case.amount_at_risk
+            _retry_incremental_prob(case, self.degraded_issuers) * case.amount_at_risk
             if isinstance(case, (FailedPaymentCase, FailedSubscriptionCase))
             else float("-inf")
         )
@@ -289,7 +304,10 @@ class EVDecisionPolicy:
         )
 
         retry_applicable = isinstance(case, (FailedPaymentCase, FailedSubscriptionCase))
-        ev_retry = _retry_incremental_prob(case) * case.amount_at_risk if retry_applicable else float("-inf")
+        ev_retry = (
+            _retry_incremental_prob(case, self.degraded_issuers) * case.amount_at_risk
+            if retry_applicable else float("-inf")
+        )
 
         ev_wait = 0.0  # the reference point every other action must beat
 

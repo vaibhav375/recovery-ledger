@@ -31,6 +31,13 @@ from recovery_ledger.events.schemas import (
 )
 
 FAILURE_CODES = ["insufficient_funds", "gateway_timeout", "expired_card", "wrong_pin", "issuer_decline"]
+
+# Named issuers so fleet-level degradation (spec 8.4 / novelty claim N6) has
+# a real slice dimension to detect on. Shares are uneven on purpose: an
+# outage at a large issuer is a materially different event from one at a
+# small issuer, and a detector that cannot tell them apart is not useful.
+ISSUERS = ["HDFC", "ICICI", "SBI", "AXIS", "KOTAK"]
+ISSUER_SHARE = [0.30, 0.25, 0.22, 0.13, 0.10]
 HARD_DECLINE_CODES = {"expired_card"}
 PAYMENT_METHODS = ["upi", "card", "netbanking"]
 
@@ -69,6 +76,7 @@ def generate_cases(n: int, *, seed: int, now: datetime) -> list[RecoveryCase]:
                 case_id=case_id, customer=customer, amount_at_risk=amount, detected_at=detected_at,
                 failure_code=code, is_hard_decline=code in HARD_DECLINE_CODES,
                 payment_method=str(rng.choice(PAYMENT_METHODS)),
+                issuer=str(rng.choice(ISSUERS, p=ISSUER_SHARE)),
             ))
         elif loss_type == LossType.CHECKOUT_ABANDONMENT:
             cases.append(CheckoutAbandonmentCase(

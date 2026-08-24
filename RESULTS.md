@@ -209,6 +209,60 @@ points of do-not-disturb avoidance for 14% of incremental recovery.
 goodwill differently should set it differently, which is exactly why the
 whole curve is published rather than a single number.
 
+## Contact-free recovery — novelty claim N6
+
+```
+make fleet
+```
+
+Every other lever here decides whether to *contact* someone. This one
+recovers revenue by noticing the payment rail is broken and declining to
+retry into it. **No customer is messaged to produce this value.**
+
+A two-proportion z-test compares each slice's recent success rate against
+its own baseline, so a structurally weak issuer is not flagged merely for
+being weak — only for getting *worse*. Attribution then names the dimension
+that explains it, because an issuer outage also drags down the aggregate for
+every method and region it serves, and an operator needs the root cause
+rather than all three.
+
+The detector never sees which issuer is actually out. It has only the
+observed attempt stream.
+
+| | blind | fleet-aware |
+|---|---:|---:|
+| Retries into the degraded issuer | 351 | **0** |
+| Gross ₹ recovered | 1,348,020 | 1,389,285 |
+| ₹ recovered on outage-hit cases | 20,349 | **61,613** |
+| Contacts | 852 | 933 |
+
+**+₹41,264 recovered, all of it on the outage-hit cases**, by stopping 351
+futile retries. The cost is 81 extra contacts — the agent switches strategy
+on cases where retrying became worthless, which is the honest caveat: the
+*detection* is contact-free, and it reallocates effort rather than
+eliminating it.
+
+### The detector's own accuracy, and a floor that was set wrong
+
+Measured against ground truth over 60 independent outages, sweeping how much
+of the attempt stream the detector gets to see:
+
+| Recent attempts observed | 24 | 60 | 150 | 360 | 900 |
+|---|---:|---:|---:|---:|---:|
+| Precision | 0.968 | **1.000** | 1.000 | 1.000 | 1.000 |
+| Recall | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 |
+
+The first version of this detector had a minimum-observations floor of 20
+and produced false positives. Adding a minimum effect-size gate barely
+helped, which was the clue: the false alarms were not small dips but
+genuinely large *apparent* drops from small-sample noise. The floor was
+simply too low. At 60+ observations precision is perfect and stays perfect.
+
+The floor is now 60, which makes the detector **decline to judge a thinly
+observed slice rather than judge it badly**. That is the correct direction:
+a false positive suppresses retries into a *working* issuer and destroys
+recovery outright, while a missed detection merely forgoes an optimisation.
+
 ## Compliance — B2 and B4
 
 ```

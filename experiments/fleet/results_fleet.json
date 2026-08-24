@@ -1,0 +1,31 @@
+{
+  "ground_truth_outage": [
+    "HDFC"
+  ],
+  "detected": [
+    "HDFC"
+  ],
+  "detection_correct": true,
+  "attribution": "issuer 'HDFC' success rate fell from 90.4% to 12.0% (78.4 points) across 150 recent attempts (z=28.6). Retries into it are unlikely to succeed until it recovers.",
+  "blind": {
+    "arm": "blind",
+    "gross_recovered": 1348020.2857473749,
+    "retries": 2228,
+    "retries_into_degraded_issuer": 351,
+    "contacts": 852,
+    "cases_on_degraded_issuer": 157,
+    "recovered_on_degraded_issuer": 20348.593402829414
+  },
+  "fleet_aware": {
+    "arm": "fleet_aware",
+    "gross_recovered": 1389284.650384744,
+    "retries": 1877,
+    "retries_into_degraded_issuer": 0,
+    "contacts": 933,
+    "cases_on_degraded_issuer": 157,
+    "recovered_on_degraded_issuer": 61612.95804019838
+  },
+  "futile_retries_avoided": 351,
+  "gross_recovery_change": 41264.36463736906,
+  "recovery_change_on_outage_cases": 41264.36463736896
+}
