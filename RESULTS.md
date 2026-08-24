@@ -263,6 +263,73 @@ observed slice rather than judge it badly**. That is the correct direction:
 a false positive suppresses retries into a *working* issuer and destroys
 recovery outright, while a missed detection merely forgoes an optimisation.
 
+## Negotiation and Section 43B(h)
+
+```
+make negotiate
+```
+
+For B2B receivables the agent negotiates rather than merely chases. The
+division of labour is the design:
+
+| | Decides |
+|---|---|
+| **Section 43B(h) clock** | what leverage exists |
+| **NPV solver** | what may be conceded, and whether to bother |
+| **Compliance kernel** | whether that concession is permitted at all |
+| **LLM** | the sentence — using only supplied figures |
+
+**The India-specific lever.** Under Section 43B(h) (Finance Act 2023), a
+buyer who does not pay an MSME supplier within the MSMED Act's 45-day window
+cannot claim that expense as a deduction *in the year it was incurred*.
+Precision matters here: the deduction is **deferred to the year of actual
+payment, not forfeited**. The loose version — "you lose the deduction" — is
+wrong, and a CFO would know it instantly.
+
+That inverts the negotiation. A normal dunning agent asks a buyer to do
+something that costs them money. This one points at something in the
+buyer's *own* interest.
+
+The solver's most interesting behaviour follows directly:
+
+> **No discount offered:** 13 days remain in the counterparty's 45-day MSME
+> window, so settling early is already in their interest under Section
+> 43B(h). **Leverage, not margin.**
+
+Breakeven discounts are computed, not guessed — `d = 1 − (1+r)^(−days/365)`,
+so at 18% cost of capital a 90-day delay justifies at most 4.00%, and the
+merchant's envelope then clips it further.
+
+**The envelope is enforced by the kernel, not by the solver.** On the happy
+path the rule never fires, because the solver already respects the bounds —
+which is exactly why it belongs in the kernel. Conceding margin is a
+money-affecting action, and this project's position is that such actions are
+permitted by a deterministic gate rather than by the good behaviour of
+whatever proposed them. On the ₹900,000 scenario the kernel returns **DENY**
+and no message is drafted at all.
+
+### Where the LLM was measured and then removed
+
+Negotiation drafting defaults to a **deterministic template**, and that is a
+finding rather than caution. With numeric grounding passing, qwen2.5:3b
+still produced drafts that were legally wrong:
+
+- *"Settling now will allow you to **claim** a deferral cost of Rs 10,200"* —
+  inverted; settling *avoids* it
+- *"the MSME payment window closed **45 days** ago"* — it had closed 35 days
+  ago; the model conflated the window's length with elapsed time. **Both
+  figures were legitimately supplied, so the grounding check could not catch
+  it**
+- *"the associated **penalty** under Section 43B(h)"* — there is no penalty
+
+Numeric grounding checks numbers, not meaning. A fluent, confident, wrong
+statement about a counterparty's tax position is worse than a plain correct
+one, and would destroy the credibility the whole 43B(h) argument rests on.
+So the template is the default and the LLM is opt-in for contexts where a
+human reviews the wording — the same judgement as the compliance kernel,
+reached the same way: by measuring where a model is trustworthy rather than
+assuming it either way.
+
 ## Compliance — B2 and B4
 
 ```

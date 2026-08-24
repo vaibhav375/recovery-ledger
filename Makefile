@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate
 
 setup:
 	uv venv --python 3.12
@@ -32,6 +32,11 @@ eval:
 baselines:
 	PYTHONPATH=src:experiments/tier2_simulation .venv/bin/python3 \
 		experiments/tier2_simulation/run_baselines.py --n-train 5000 --n-eval 2000
+
+# Negotiation showpiece: Section 43B(h) clock + NPV solver + kernel envelope
+# + grounded LLM drafting (spec 9.4).
+negotiate:
+	PYTHONPATH=src .venv/bin/python3 experiments/negotiation/run_negotiation.py
 
 # Contact-free recovery: fleet-level issuer degradation (spec 8.4, claim N6).
 fleet:

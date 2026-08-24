@@ -22,6 +22,7 @@ from recovery_ledger.kernel.rules.dpdp import ConsentRecordExistsRule
 from recovery_ledger.kernel.rules.emandate_2026 import PreDebitNotificationRule
 from recovery_ledger.kernel.rules.escalation import ToneIntensityCeilingRule
 from recovery_ledger.kernel.rules.opt_out import OptOutRule
+from recovery_ledger.kernel.rules.negotiation import NegotiationEnvelopeRule
 from recovery_ledger.kernel.rules.promise import PromiseToPayWindowRule
 from recovery_ledger.kernel.rules.tcccpr import (
     ConsentValidityRule,
@@ -47,7 +48,7 @@ def build_default_agent(ledger: Ledger, *, clock) -> RecoveryAgent:
             DLTRegistrationRule(), HeaderClassMatchRule(), ConsentValidityRule(),
             OptOutOptionPresentRule(), NumberSeriesRule(),
             PreDebitNotificationRule(), ConsentRecordExistsRule(), ToneIntensityCeilingRule(),
-        PromiseToPayWindowRule(),
+        PromiseToPayWindowRule(), NegotiationEnvelopeRule(),
         ]),
         executor=SimulatedExecutor(),
         listener=Listener(),

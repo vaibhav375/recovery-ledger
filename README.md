@@ -69,6 +69,7 @@ evidence the problem is real; it is not something to claim credit for.
 | **N2** | **Negative-uplift targeting ("do-not-disturbs").** Customers whose payment probability *falls* when contacted. Nobody in dunning models the downside of contact. | ✅ Built. A learned churn model gives the policy a signal independent of `τ̂_pay` (do-not-disturbs opt out **1.93x** more when contacted), cutting the do-not-disturb contact rate **20.1% → 13.6%** against untargeted policies' ~20.2%, at 49% better rupees-per-contact. Full λ_churn curve in [`RESULTS.md`](RESULTS.md); it is a stated trade, not a free win. |
 | **N3** | **A deterministic, machine-checkable India-regulatory compliance kernel** emitting a per-action certificate — TCCCPR/DLT, RBI recovery-agent norms, RBI e-mandate 2026, DPDPA. | ✅ Built: 12 rules, 100% red-team block rate, mutation-tested |
 | **N4** | **Contact as a budget-constrained sequential decision problem**, not one-shot classification. | ⚠️ Partial: greedy EV under an explicit budget, plus a finite-horizon lookahead variant. Not a full constrained-MDP solver, and the spec explicitly permits the simplification — but it is a simplification, and the lookahead currently adds nothing measurable. |
+| **Bonus** | **Bounded-authority negotiation with the Section 43B(h) tax clock** (spec 9.4). Invokes the counterparty's *own* tax incentive rather than only chasing. | ✅ Built. NPV solver, kernel-enforced concession envelope, and a measured decision to keep an LLM *out* of the drafting. |
 | **N5** | **Two-tier validation** — causal machinery proven on real randomised public data *before* transfer to the simulator. Directly defeats "your synthetic number is circular". | ✅ Built (Criteo + Hillstrom) |
 | **N6** | **Contact-free recovery** — detecting issuer degradation and suppressing retries into a dead issuer. Inverts the assumption that recovery means outreach. | ✅ Built. Change-point detection per issuer/method/region with root-cause attribution; **precision 1.00 / recall 1.00** against ground truth at realistic observation volume. Cuts futile retries into a dead rail **351 → 0** and recovers **+₹41,264**, all on outage-hit cases. |
 
@@ -185,7 +186,14 @@ running.
       The LLM-generated persona corpus scored only 42.9% — inspection showed
       the labels were wrong, not the classifier, so it is reported separately
       rather than used as ground truth.
-- [ ] Negotiation + Section 43B(h) clock
+- [x] **Negotiation + Section 43B(h) clock.** `make negotiate`: a 45-day MSME
+      clock, an NPV solver computing breakeven discounts, a merchant policy
+      envelope **enforced by the compliance kernel** (₹9L case → DENY, no
+      message drafted), and grounded message drafting. The showpiece
+      behaviour: inside the counterparty's own 43B(h) window the solver
+      offers **no discount at all** — "leverage, not margin". Drafting
+      defaults to a deterministic template because measured LLM drafts made
+      legally inaccurate 43B(h) claims that numeric grounding cannot detect.
 - [x] **N6 — contact-free recovery.** `make fleet`: issuer/method/region
       change-point detection with root-cause attribution, precision 1.00 /
       recall 1.00 against ground truth. Futile retries into a degraded issuer
@@ -225,6 +233,7 @@ make baselines         # runs all 5 spec-required baselines + a matched-volume
                        # random-targeting control + both EV variants against the
                        # same eval batch — verified working, deterministic
 make sensitivity       # 5-parameter ranking-stability sweep — verified working
+make negotiate         # Section 43B(h) negotiation showpiece
 make fleet             # contact-free recovery: issuer degradation detection
 make listener-eval     # reply-intent accuracy vs the gold set (needs Ollama)
 make dashboard         # renders the audit trail to dashboard/index.html

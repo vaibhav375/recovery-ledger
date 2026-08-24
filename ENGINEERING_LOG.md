@@ -1173,3 +1173,72 @@ contacts. Stated the caveat plainly in RESULTS.md: the *detection* is
 contact-free, and it reallocates effort rather than eliminating it.
 
 160/160 tests passing.
+
+## 2026-08-24 (cont. 13) — Negotiation, Section 43B(h), and taking the LLM back out again
+
+Built the showpiece from spec 9.4: the 45-day MSME clock, an NPV solver, a
+kernel-enforced concession envelope, and message drafting.
+
+**Getting the tax law right mattered more than the code.** The seductive
+framing is "pay within 45 days or you lose the deduction". That is wrong.
+Section 43B(h) *defers* the deduction to the year of actual payment; it does
+not destroy it. The buyer's real cost is the time value of that deferral
+plus MSMED Act interest exposure, which for a Rs 340,000 invoice is roughly
+Rs 10,200, not Rs 85,000. Any CFO would catch the exaggerated version
+instantly and stop taking the agent seriously — so the code computes and
+states the deferral cost, and a test asserts the phrase "lose the deduction"
+never appears.
+
+**The solver's best behaviour was one I did not plan for.** Inside the
+counterparty's own 43B(h) window, it declines to discount at all: they
+already have a tax reason to settle, so conceding margin buys something
+available for free. "Leverage, not margin" is a better line than anything I
+would have written deliberately, and it falls out of the economics.
+
+Breakeven discounts are computed rather than guessed:
+`d = 1 - (1+r)^(-days/365)`. At 18% cost of capital a 90-day delay justifies
+at most 4.00%.
+
+**Put the envelope in the kernel even though the solver already respects
+it.** On the happy path the rule never fires, which is exactly the argument
+for its location: conceding margin is a money-affecting action, and this
+project's whole position is that those are permitted by a deterministic gate
+rather than by the good behaviour of whatever proposed them. It holds if the
+solver has a bug, gets swapped, or an LLM names a number of its own.
+
+**Two defects I found in my own work by reading output rather than trusting
+it:**
+
+1. The demo drafted and displayed a message for a case the kernel had
+   DENIED. Nothing would have sent it, but it read as though the agent
+   would. Fixed so a denial suppresses drafting entirely.
+2. My numeric grounding check rejected *every* LLM draft. Reading the
+   rejected drafts showed why: the allow-list omitted the 43B(h) deferral
+   cost, which the prompt itself supplies. The model was right and my
+   checker was wrong — and had I shipped it, the LLM path would never have
+   run and the feature would have been template-only theatre wearing a
+   grounding check as decoration.
+
+**Then, having fixed grounding so the LLM path worked, I took it back out.**
+With numeric grounding passing, qwen2.5:3b still wrote:
+
+- "Settling now will allow you to *claim* a deferral cost of Rs 10,200" —
+  inverted; settling avoids it
+- "the MSME payment window closed 45 days ago" — it closed 35 days ago; the
+  model conflated the window's length with elapsed time. Both 45 and 35 were
+  legitimately supplied figures, so grounding could not catch it
+- "the associated *penalty* under Section 43B(h)" — there is no penalty
+
+Numeric grounding checks numbers, not meaning. A negotiation message is a
+financial communication to a counterparty; a fluent, confident, wrong claim
+about their tax position is worse than a plain correct one and would destroy
+the credibility the entire 43B(h) argument depends on. So the deterministic
+template is now the default, with the LLM opt-in for contexts where a human
+reviews wording.
+
+That is the third "where we deliberately did not use an LLM" decision in
+this project, and the second one discovered by measurement rather than
+assumed up front — the first being opt-out detection. Both were places I had
+initially assumed a model would be fine.
+
+183/183 tests passing.

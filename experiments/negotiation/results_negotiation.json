@@ -1,0 +1,60 @@
+[
+  {
+    "scenario": "Leverage instead of margin",
+    "amount": 340000.0,
+    "43bh_urgency": "elevated",
+    "43bh_days_left": 13,
+    "offer_type": "none",
+    "discount_pct": 0.0,
+    "solver_rationale": "No discount offered: 13 days remain in the counterparty's 45-day MSME window, so settling early is already in their interest under Section 43B(h). Leverage, not margin.",
+    "kernel_decision": "ALLOW",
+    "kernel_denied_rules": [],
+    "message": "Invoice for Rs 340,000 is outstanding. 13 days remain in the 45-day MSME payment window; settling within it keeps this expense deductible for you in the current financial year under Section 43B(h).",
+    "message_from_llm": false,
+    "message_suppressed_by_kernel": false
+  },
+  {
+    "scenario": "Window breached, economics justify a discount",
+    "amount": 180000.0,
+    "43bh_urgency": "breached",
+    "43bh_days_left": -35,
+    "offer_type": "early_payment_discount",
+    "discount_pct": 0.04,
+    "solver_rationale": "4.00% early-payment discount. Breakeven at 5.30% for a 120-day delay at 18% cost of capital; envelope caps at 4%.",
+    "kernel_decision": "ALLOW",
+    "kernel_denied_rules": [],
+    "message": "Invoice for Rs 180,000 is outstanding. The 45-day MSME window closed 35 days ago, so under Section 43B(h) this deduction now moves to the year of actual payment. We can offer a 4.0% early-payment discount if settled now.",
+    "message_from_llm": false,
+    "message_suppressed_by_kernel": false
+  },
+  {
+    "scenario": "Above the agent's autonomy limit",
+    "amount": 900000.0,
+    "43bh_urgency": "breached",
+    "43bh_days_left": -5,
+    "offer_type": "none",
+    "discount_pct": 0.0,
+    "solver_rationale": "Rs 900,000 exceeds the Rs 500,000 autonomy limit; a human must handle this negotiation.",
+    "kernel_decision": "DENY",
+    "kernel_denied_rules": [
+      "POLICY.NEGOTIATION_ENVELOPE"
+    ],
+    "message": null,
+    "message_from_llm": false,
+    "message_suppressed_by_kernel": true
+  },
+  {
+    "scenario": "Non-MSME counterparty",
+    "amount": 250000.0,
+    "43bh_urgency": "not_applicable",
+    "43bh_days_left": null,
+    "offer_type": "early_payment_discount",
+    "discount_pct": 0.03999019338707621,
+    "solver_rationale": "4.00% early-payment discount. Breakeven at 4.00% for a 90-day delay at 18% cost of capital; envelope caps at 4%.",
+    "kernel_decision": "ALLOW",
+    "kernel_denied_rules": [],
+    "message": "Invoice for Rs 250,000 is outstanding. We can offer a 4.0% early-payment discount if settled now.",
+    "message_from_llm": false,
+    "message_suppressed_by_kernel": false
+  }
+]

@@ -77,6 +77,12 @@ class RuleContext:
     # Set when the customer has promised payment by a date; contact is
     # inadmissible until then (spec section 10, rule 6).
     promise_to_pay_until: datetime | None = None
+    # What the agent proposes to concede in a negotiation, if anything.
+    # Present so the kernel can bound the agent's authority to give away
+    # margin the same way it bounds its authority to contact (spec 9.4).
+    offer_discount_pct: float = 0.0
+    offer_extension_days: int = 0
+    offer_instalments: int = 1
     sender_number_series: Literal["140", "160", "other"] = "160"
     tone_intensity: int = 0  # 0 (neutral) .. 3 (firm) — see rules/escalation.py
 
