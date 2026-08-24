@@ -19,3 +19,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+--------------------------------------------------------------------------
+Recovery Ledger uses ThreeUI's design-token system and stylesheet, vendored
+into src/vendor/ (threeui-styles.css, theme.ts) under the MIT terms above.
+
+The npm package itself is no longer a runtime dependency. Its shader
+backgrounds render inside a sandboxed iframe whose srcdoc loads Tailwind from
+cdn.tailwindcss.com at runtime, which this dashboard cannot accept: it is
+meant to run offline from a static dist/, and an iframe cannot be tinted,
+blended, or driven by the page's own data. src/components/FleetField.tsx is a
+three.js scene written for this project in its place.

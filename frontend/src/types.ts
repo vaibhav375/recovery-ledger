@@ -44,4 +44,6 @@ export type Dashboard = {
   negotiation: any[] | null;
   listener: any | null;
   baselines: any | null;
+  batch: any | null;
+  sensitivity: any | null;
 };

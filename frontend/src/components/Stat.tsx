@@ -7,9 +7,9 @@ export default function Stat({
   tone?: "ok" | "deny";
 }) {
   return (
-    <div className="card rl-stat">
-      <div className="rl-stat-label">{label}</div>
+    <div className="rl-stat">
       <div className={`rl-stat-value${tone ? ` is-${tone}` : ""}`}>{value}</div>
+      <div className="rl-stat-label">{label}</div>
       {note && <div className="rl-stat-note">{note}</div>}
     </div>
   );

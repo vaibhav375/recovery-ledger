@@ -413,6 +413,11 @@ def build_data(ledger_path: Path, max_cases: int) -> dict:
         "negotiation": load_optional(ROOT / "experiments" / "negotiation" / "results_negotiation.json"),
         "listener": load_optional(ROOT / "experiments" / "listener_eval" / "results_listener_gold.json"),
         "baselines": load_optional(ROOT / "experiments" / "tier2_simulation" / "results_baselines.json"),
+        # The B1 headline. The front end's opening argument is a subtraction —
+        # gross recovered minus what the no-contact holdout recovered on its
+        # own — so it needs both arms, not just the incremental figure.
+        "batch": load_optional(ROOT / "experiments" / "tier2_simulation" / "results.json"),
+        "sensitivity": load_optional(ROOT / "experiments" / "sensitivity" / "results_sensitivity.json"),
     }
 
 

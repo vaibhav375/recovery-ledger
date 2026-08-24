@@ -3,9 +3,6 @@ import { loadDashboard } from "./data";
 import type { CaseCard, Dashboard } from "./types";
 import {
   applyAppearance,
-  nextThemePalette,
-  readStoredPalette,
-  readStoredTheme,
   DARK_PALETTE_STORAGE_KEY,
   LIGHT_PALETTE_STORAGE_KEY,
   THEME_STORAGE_KEY,
@@ -14,137 +11,120 @@ import {
 } from "./vendor/theme";
 
 import { useLenis } from "./motion/useLenis";
-import Sidebar from "./components/Sidebar";
-import Topbar from "./components/Topbar";
-import OverviewPage from "./components/OverviewPage";
-import CasesPage from "./components/CasesPage";
+import Scene from "./components/Scene";
+import Opening from "./sections/Opening";
+import Subtraction from "./sections/Subtraction";
+import Silence from "./sections/Silence";
+import Kernel from "./sections/Kernel";
+import Explorer from "./sections/Explorer";
 import CaseDetail from "./components/CaseDetail";
-import CompliancePage from "./components/CompliancePage";
-import FleetPage from "./components/FleetPage";
-import NegotiationPage from "./components/NegotiationPage";
-import ListenerPage from "./components/ListenerPage";
-
-export type ViewId =
-  | "overview"
-  | "cases"
-  | "compliance"
-  | "fleet"
-  | "negotiation"
-  | "listener";
-
-export const VIEWS: { id: ViewId; label: string }[] = [
-  { id: "overview", label: "Overview" },
-  { id: "cases", label: "Cases" },
-  { id: "compliance", label: "Compliance kernel" },
-  { id: "fleet", label: "Fleet health" },
-  { id: "negotiation", label: "Negotiation" },
-  { id: "listener", label: "Listener" },
-];
 
 export default function App() {
   const [data, setData] = useState<Dashboard | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<ViewId>("overview");
   const [selected, setSelected] = useState<CaseCard | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Lenis smooth scroll (lenis.dev)
   useLenis(true);
 
-  // Theme state uses ThreeUI's own module: light/dark/system plus five
-  // palettes, persisted to localStorage under its keys.
-  const [mode, setMode] = useState<ThemeMode>(() => readStoredTheme());
-  const [lightPalette, setLightPalette] = useState<ThemePalette>(() =>
-    readStoredPalette(LIGHT_PALETTE_STORAGE_KEY),
-  );
-  const [darkPalette, setDarkPalette] = useState<ThemePalette>(() =>
-    readStoredPalette(DARK_PALETTE_STORAGE_KEY),
-  );
-
+  // Fixed to the dark ground. The palette's #050315 is the page, and the
+  // ambient WebGL field only reads correctly against it — a light variant
+  // would be a different design, not a toggle.
   useEffect(() => {
-    applyAppearance(mode, lightPalette, darkPalette);
+    applyAppearance("dark" as ThemeMode, "mono" as ThemePalette, "mono" as ThemePalette);
     try {
-      localStorage.setItem(THEME_STORAGE_KEY, mode);
-      localStorage.setItem(LIGHT_PALETTE_STORAGE_KEY, lightPalette);
-      localStorage.setItem(DARK_PALETTE_STORAGE_KEY, darkPalette);
+      localStorage.setItem(THEME_STORAGE_KEY, "dark");
+      localStorage.setItem(LIGHT_PALETTE_STORAGE_KEY, "mono");
+      localStorage.setItem(DARK_PALETTE_STORAGE_KEY, "mono");
     } catch {
-      /* private browsing — appearance still applies for this session */
+      /* private browsing */
     }
-  }, [mode, lightPalette, darkPalette]);
+  }, []);
 
   useEffect(() => {
     loadDashboard().then(setData).catch((e) => setError(String(e)));
   }, []);
 
-  const scheme = mode === "system" ? "light" : mode;
-  const cyclePalette = () => {
-    if (scheme === "dark") setDarkPalette(nextThemePalette(darkPalette));
-    else setLightPalette(nextThemePalette(lightPalette));
-  };
+  const figures = useMemo(() => {
+    if (!data) return null;
+    const b = data.batch;
+    const dnd = data.summary.stop_reasons?.do_not_disturb ?? 0;
+    const promises = data.cases.reduce(
+      (n, c) => n + c.timeline.filter((t) => t.type === "pause").length,
+      0,
+    );
+    return {
+      gross: b?.gross_treatment_recovered ?? 0,
+      holdout: b?.gross_holdout_recovered ?? 0,
+      holdoutRate: b?.holdout_recovery_rate ?? 0,
+      incremental: b?.incremental_per_1000_cases?.point ?? 0,
+      ciLow: b?.incremental_per_1000_cases?.ci_low ?? 0,
+      ciHigh: b?.incremental_per_1000_cases?.ci_high ?? 0,
+      contacts: b?.contacts_sent ?? 0,
+      dnd,
+      promises,
+      futile: data.fleet?.futile_retries_avoided ?? 0,
+    };
+  }, [data]);
 
-  const body = useMemo(() => {
-    if (error) {
-      return (
-        <div className="rl-empty">
-          <h1>Could not load the audit trail</h1>
-          <p className="lede">{error}</p>
-          <p className="lede">
-            Generate it with <code>make dashboard</code>, which writes{" "}
-            <code>dashboard/dist/data.json</code>.
-          </p>
-        </div>
-      );
-    }
-    if (!data) return <div className="rl-empty"><p className="lede">Loading…</p></div>;
+  if (error) {
+    return (
+      <main className="rl-boot">
+        <h1>No audit trail found</h1>
+        <p>
+          Generate it with <code>make dashboard</code>, which writes{" "}
+          <code>dashboard/dist/data.json</code>.
+        </p>
+        <p className="rl-boot-err">{error}</p>
+      </main>
+    );
+  }
 
-    switch (view) {
-      case "cases":
-        return <CasesPage data={data} onSelect={setSelected} />;
-      case "compliance":
-        return <CompliancePage data={data} />;
-      case "fleet":
-        return <FleetPage data={data} />;
-      case "negotiation":
-        return <NegotiationPage data={data} />;
-      case "listener":
-        return <ListenerPage data={data} />;
-      default:
-        return <OverviewPage data={data} />;
-    }
-  }, [data, error, view]);
+  if (!data || !figures) {
+    return (
+      <main className="rl-boot">
+        <span className="rl-boot-pulse" />
+      </main>
+    );
+  }
 
   return (
     <>
-      <Topbar
-        mode={mode}
-        onCycleMode={() =>
-          setMode(mode === "dark" ? "light" : mode === "light" ? "system" : "dark")
-        }
-        onCyclePalette={cyclePalette}
-        onOpenNav={() => setSidebarOpen(true)}
-        source={data?.source ?? ""}
-      />
-      <div className="app">
-        <Sidebar
-          view={view}
-          onSelect={(v) => {
-            setView(v);
-            setSidebarOpen(false);
-          }}
-          open={sidebarOpen}
-          data={data}
+      <Scene litFraction={figures.holdoutRate} />
+
+      <header className="rl-topline">
+        <span className="rl-wordmark">Recovery Ledger</span>
+        <span className="rl-topline-meta">{data.source}</span>
+      </header>
+
+      <main>
+        <Opening holdoutRate={figures.holdoutRate} />
+        <Subtraction
+          gross={figures.gross}
+          holdout={figures.holdout}
+          incrementalPer1000={figures.incremental}
+          ciLow={figures.ciLow}
+          ciHigh={figures.ciHigh}
+          holdoutRate={figures.holdoutRate}
         />
-        {sidebarOpen && (
-          <button
-            className="mobile-nav-scrim"
-            aria-label="Close navigation"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-        <div className="pane">
-          <div className="pane-scroll scroll-area">{body}</div>
-        </div>
-      </div>
+        <Silence
+          dndCases={figures.dnd}
+          promiseWindows={figures.promises}
+          futileRetries={figures.futile}
+          contactsSent={figures.contacts}
+          totalCases={data.summary.cases}
+        />
+        <Kernel data={data} />
+        <Explorer data={data} onSelect={setSelected} />
+      </main>
+
+      <footer className="rl-footer">
+        <span>Razorpay AI Buildathon · Track 03</span>
+        <span>
+          Every number here was produced by code in this repository and is
+          reproducible.
+        </span>
+      </footer>
+
       {selected && <CaseDetail c={selected} onClose={() => setSelected(null)} />}
     </>
   );
