@@ -509,3 +509,49 @@ html[data-scheme="dark"] .rl-note { border-left-color: var(--accent); }
   mask-image: radial-gradient(120% 100% at 20% 0%, #000 0%, transparent 70%);
 }
 html[data-scheme="dark"] .rl-hero::before { opacity: 0.5; }
+
+/* ===================================================================== *
+ *  Scroll ownership
+ * ===================================================================== */
+
+/* ThreeUI's shell scrolls an INNER container: `.pane { overflow: hidden }`
+ * clips, `.pane-scroll { height: 100% }` fills a fixed-height `.app`, and
+ * `.scroll-area { overflow-y: auto }` does the scrolling. That suits its
+ * catalogue, where the sidebar and content scroll independently.
+ *
+ * This dashboard scrolls the DOCUMENT instead, for two reasons: long report
+ * pages read better with the browser's own scrollbar and keyboard handling,
+ * and Lenis (lenis.dev) drives window scroll, so an inner scroller would
+ * leave it controlling nothing.
+ *
+ * Overriding all three is required — leaving `.pane { overflow: hidden }` in
+ * place silently CLIPS everything below the fold, which looks exactly like a
+ * page that will not scroll. */
+.app { height: auto; min-height: calc(100vh - 46px); }
+.pane { overflow: visible; margin: 0; border-radius: 0; }
+.pane-scroll { height: auto; padding: 0; overflow: visible; }
+.pane-scroll.scroll-area { overflow: visible; }
+
+/* ThreeUI pins `html, body, #root { height: 100% }` and hides body overflow,
+ * because its shell is a fixed-viewport app that never scrolls the document.
+ * With that in place the page cannot grow past the viewport at all — measured
+ * scrollHeight stayed exactly equal to innerHeight on every view, so there was
+ * simply nothing to scroll. Releasing the height cap is the actual fix;
+ * changing `.pane`'s overflow alone was necessary but not sufficient. */
+html, body, #root {
+  height: auto;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+body { scrollbar-width: auto; }
+body::-webkit-scrollbar { display: initial; width: 12px; }
+body::-webkit-scrollbar-thumb {
+  background: var(--line-3);
+  border-radius: 999px;
+  border: 3px solid var(--page);
+}
+body::-webkit-scrollbar-track { background: var(--page); }
+
+/* Breathing room at the end of long pages. */
+.rl-page { padding-bottom: 80px; }
