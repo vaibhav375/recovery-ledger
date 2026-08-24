@@ -30,7 +30,23 @@ audit tool and there is nothing here to render in 3D.
 | **[Lenis](https://lenis.dev/)** | Smooth scrolling, disabled under `prefers-reduced-motion` |
 
 `three` is lazily imported so its ~500KB chunk never blocks first paint, and is
-skipped entirely for reduced-motion users.
+not requested at all when it cannot be used.
+
+**The WebGL background is an enhancement, never a dependency.** ThreeUI's
+shader components construct a `THREE.WebGLRenderer` during render, and that
+constructor *throws* when no context is available — an uncaught error during
+React render unmounts the whole tree, so on a machine with hardware
+acceleration disabled or a blocklisted GPU a decorative background was able to
+blank the entire dashboard. Two guards now:
+
+- `supportsWebGL()` runs before the dynamic import, so three.js is never even
+  downloaded when it cannot run;
+- `SafeCanvas`, an error boundary, catches a context lost *after* creation
+  (driver reset, long-backgrounded tab) and renders nothing.
+
+A CSS dot-grid sits underneath either way, so the hero is fully designed with
+no canvas at all. Verified in both conditions — Chromium with
+`--disable-webgl --disable-gpu`, and with WebGL available.
 
 ## Running
 

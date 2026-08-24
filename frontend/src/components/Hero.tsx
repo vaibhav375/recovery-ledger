@@ -1,4 +1,6 @@
 import { Suspense, lazy } from "react";
+import SafeCanvas from "./SafeCanvas";
+import { prefersReducedMotion, supportsWebGL } from "../motion/webgl";
 import AnimatedNumber from "../motion/AnimatedNumber";
 import TextEffect from "../motion/TextEffect";
 import InView from "../motion/InView";
@@ -15,9 +17,10 @@ const DotMatrixBackground = lazy(() =>
 
 export default function Hero({ data }: { data: Dashboard }) {
   const s = data.summary;
-  const reduced =
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Only attempt the WebGL background when the browser can actually provide a
+  // context AND the user has not asked for reduced motion. Without the first
+  // check, THREE's renderer throws during render and unmounts the app.
+  const showCanvas = supportsWebGL() && !prefersReducedMotion();
 
   const figures = [
     { label: "Cases worked", value: s.cases },
@@ -29,7 +32,8 @@ export default function Hero({ data }: { data: Dashboard }) {
   return (
     <section className="rl-hero">
       <div className="rl-hero-bg" aria-hidden="true">
-        {!reduced && (
+        {showCanvas && (
+          <SafeCanvas>
           <Suspense fallback={null}>
             <DotMatrixBackground
               speed={0.5}
@@ -40,6 +44,7 @@ export default function Hero({ data }: { data: Dashboard }) {
               mouseAmount={0.05}
             />
           </Suspense>
+          </SafeCanvas>
         )}
       </div>
 

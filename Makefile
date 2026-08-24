@@ -75,8 +75,7 @@ frontend-build:
 # The React build fetches data.json, which browsers block over file://, so it
 # needs a static server rather than a double-click.
 dashboard-serve:
-	@echo "Serving http://localhost:5174 - Ctrl+C to stop"
-	@cd dashboard/dist && ../../.venv/bin/python3 -m http.server 5174
+	@.venv/bin/python3 dashboard/serve.py
 
 frontend-dev:
 	npm --prefix frontend run dev

@@ -489,3 +489,23 @@ html[data-scheme="dark"] .rl-note { border-left-color: var(--accent); }
 @media (max-width: 860px) {
   .rl-hero { padding: 40px 22px 32px; margin: 14px 0 22px; }
 }
+
+/* Static fallback texture behind the hero.
+ *
+ * This is always present, underneath the WebGL canvas rather than instead of
+ * it — so the hero is fully designed on machines with no WebGL (hardware
+ * acceleration disabled, blocklisted GPU, reduced-motion), and the shader is
+ * an enhancement rather than a dependency. A dot grid echoes ThreeUI's
+ * DotMatrixBackground so the two treatments read as the same design. */
+.rl-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image: radial-gradient(circle at center, var(--line-3) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: 0.35;
+  -webkit-mask-image: radial-gradient(120% 100% at 20% 0%, #000 0%, transparent 70%);
+  mask-image: radial-gradient(120% 100% at 20% 0%, #000 0%, transparent 70%);
+}
+html[data-scheme="dark"] .rl-hero::before { opacity: 0.5; }
