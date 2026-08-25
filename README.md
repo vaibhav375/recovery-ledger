@@ -1,7 +1,7 @@
 # Recovery Ledger
 
-**Status: Tier 1 validation passed. B1 headline: ₹310,910 incremental recovery
-per 1,000 cases (95% CI ₹150,240–₹471,072).** The decisive test: against a
+**Status: Tier 1 validation passed. B1 headline: ₹272,281 incremental recovery
+per 1,000 cases (95% CI ₹103,930–₹433,387).** The decisive test: against a
 control contacting a comparable number of cases *at random*, the agent
 recovers **2.85x more incremental revenue with non-overlapping confidence
 intervals** — so the targeting model, not merely contact volume, is doing the
@@ -133,7 +133,7 @@ running.
       dependency-free look at the loop) is unchanged. `make eval` runs the
       real `LookaheadEVDecisionPolicy`, uplift-model-driven, over 5000+2000 cases.
 - [x] **B1 — batch run, headline incremental ₹ + CI.** `make eval`:
-      **₹310,910 incremental per 1,000 cases (95% CI ₹150,240–₹471,072)**;
+      **₹272,281 incremental per 1,000 cases (95% CI ₹103,930–₹433,387)**;
       holdout recovers 15.47% unaided, which is exactly why this reports
       incremental rather than gross.
 - [x] **Baseline comparison + falsification test.** `make baselines`: the
@@ -183,7 +183,7 @@ running.
       detector now runs first and overrides it, taking opt-out to
       **1.00 precision and 1.00 recall**. That is the same argument as the
       compliance kernel, applied one level down.
-      The LLM-generated persona corpus scored only 42.9% — inspection showed
+      The LLM-generated persona corpus scored only 44.0% — inspection showed
       the labels were wrong, not the classifier, so it is reported separately
       rather than used as ground truth.
 - [x] **Negotiation + Section 43B(h) clock.** `make negotiate`: a 45-day MSME
@@ -293,7 +293,7 @@ successfully.
 
 ## What is NOT claimed
 
-- No real-world causal effect size. The ₹310,910-per-1,000-cases figure above
+- No real-world causal effect size. The ₹272,281-per-1,000-cases figure above
   is a simulation result — policy dominance under stated assumptions, in
   simulation. Everything in `experiments/tier2_simulation/` runs against a
   simulator calibrated to published marginal benchmarks — that calibrates

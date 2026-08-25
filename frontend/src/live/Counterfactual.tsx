@@ -30,7 +30,7 @@ export default function Counterfactual() {
     setBusy(true);
     setResult(null);
     try {
-      setResult(await runCounterfactual(key, 20260823, "auto"));
+      setResult(await runCounterfactual(key, 0, "auto"));
     } finally {
       setBusy(false);
     }

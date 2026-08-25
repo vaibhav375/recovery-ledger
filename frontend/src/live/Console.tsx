@@ -102,7 +102,7 @@ export default function Console() {
     setKilled(false);
     setRunning(true);
     try {
-      const { run_id } = await startRun(20260823, nCases, paceMs);
+      const { run_id } = await startRun(0, nCases, paceMs);
       setRunId(run_id);
       closeRef.current = streamRun(run_id, onEvent, () => setRunning(false));
     } catch (err) {

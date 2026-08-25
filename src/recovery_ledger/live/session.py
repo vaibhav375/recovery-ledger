@@ -76,7 +76,16 @@ from recovery_ledger.sim.generator import generate_cases
 # reproducible from the seed alone.
 NOW = datetime(2026, 8, 23, 12, 0, tzinfo=timezone.utc)
 DEFAULT_SEED = 20260823
-TRAIN_N = 3000
+# Matches `make eval`'s --n-train, so the console's models are the models the
+# published results describe rather than a cheaper approximation of them.
+TRAIN_N = 5000
+
+# Cases the agent actually works are drawn from a seed disjoint from the one
+# the models were fitted on — the same separation experiments/tier2_simulation
+# uses (SEED for training, SEED + 1000 for evaluation). Sharing a seed would
+# have the console demonstrating the agent on its own training distribution.
+EVAL_SEED = DEFAULT_SEED + 1000
+EVAL_N = 2000
 
 
 def build_kernel() -> KernelEngine:
@@ -100,8 +109,10 @@ class TrainedModels:
     n_train: int
     train_seconds: float
     # Correlation between predicted CATE and the simulator's hidden
-    # persuadability trait. Reported because a live console that shows
-    # tau_hat driving decisions has to be honest about how good tau_hat is.
+    # persuadability trait, measured on HELD-OUT cases (EVAL_SEED), never on
+    # the training cases. A live console that shows tau_hat driving decisions
+    # has to be honest about how good tau_hat is, and a train-set correlation
+    # would flatter it. This is the same quantity RESULTS.md reports.
     uplift_correlation: float
 
 
@@ -138,9 +149,16 @@ def get_models(seed: int = DEFAULT_SEED, n_train: int = TRAIN_N) -> TrainedModel
         uplift.fit(X, treatment, paid)
         churn = ChurnRiskModel().fit(X, treatment, churned, random_state=seed)
 
-        tau_hat = uplift.predict_cate(X)
-        tau_true = np.array([persuadability(traits[c.case_id]) for c in cases])
-        corr = float(np.corrcoef(tau_hat, tau_true)[0, 1])
+        # Held-out, and computed exactly the way run_batch.py computes the
+        # figure in RESULTS.md: a fresh EVAL_N draw on EVAL_SEED, the model's
+        # predicted CATE against the simulator's hidden persuadability trait.
+        eval_cases = generate_cases(EVAL_N, seed=EVAL_SEED, now=NOW)
+        eval_traits = generate_population(eval_cases, seed=EVAL_SEED)
+        X_eval = cases_to_feature_matrix(eval_cases)
+        corr = float(np.corrcoef(
+            uplift.predict_cate(X_eval),
+            np.array([persuadability(eval_traits[c.case_id]) for c in eval_cases]),
+        )[0, 1])
 
         _MODELS = TrainedModels(
             uplift=uplift, churn=churn, seed=seed, n_train=n_train,

@@ -73,19 +73,27 @@ make eval        # 5,000 training + 2,000 evaluation cases
 
 | | Treatment | Holdout (no contact) |
 |---|---:|---:|
-| Recovery rate | 37.13% | 15.47% |
+| Cases | 1,037 | 963 |
+| Recovery rate | 33.46% | 15.47% |
+| Gross ₹ recovered | ₹819,080 | ₹498,424 |
 
-**Incremental ₹ recovered per 1,000 at-risk cases: ₹310,910 (95% CI ₹150,240 – ₹471,072)**
+**Incremental ₹ recovered per 1,000 at-risk cases: ₹272,281 (95% CI ₹103,930 – ₹433,387)**
 
 The holdout recovers **15.47% of cases with no agent at all**. That is why
 this project reports incremental rather than gross: a vendor quoting the
 gross figure would be taking credit for every rupee in that column.
 
 Supporting diagnostics from the same run: uplift correlation with true
-(hidden) persuadability **0.349**; **817 contacts** sent; do-not-disturb
-contact rate **16.8%**; 8 of 11 stopping reasons fired naturally; 34,173
-ledger entries, hash chain verified; 673 cases published to the exception
+(hidden) persuadability **0.347**; **467 contacts** sent; do-not-disturb
+contact rate **10.1%**; 8 of 11 stopping reasons fired naturally; 34,304
+ledger entries, hash chain verified; 690 cases published to the exception
 list.
+
+Every figure in this section is read straight out of
+`experiments/tier2_simulation/results.json`, and
+`tests/test_results_doc_matches_artifacts.py` fails the build if this document
+and that artifact ever disagree again — which they had, silently, for several
+commits.
 
 ---
 
@@ -192,7 +200,7 @@ gets contacted.
 
 Measured sweep of the parameter (from `λ_churn = 0`):
 
-| λ_churn | Incremental ₹ | Contacts | Do-not-disturb % | ₹/contact |
+| λ_churn | Incremental ₹ (2,000-case batch) | Contacts | Do-not-disturb % | ₹/contact |
 |---:|---:|---:|---:|---:|
 | 0 (term off) | 681,976 | 2,257 | 20.1% | 302 |
 | 1.0 | 647,098 | 1,938 | 18.1% | 334 |
@@ -262,6 +270,43 @@ The floor is now 60, which makes the detector **decline to judge a thinly
 observed slice rather than judge it badly**. That is the correct direction:
 a false positive suppresses retries into a *working* issuer and destroys
 recovery outright, while a missed detection merely forgoes an optimisation.
+
+## Reply-intent listener — spec section 8.5
+
+```
+make listener-eval    # needs a local Ollama running qwen2.5:3b
+```
+
+Free-text customer replies, in English, Hindi and Hinglish, classified into
+the structured intent the agent loop acts on.
+
+| | Gold set (hand-authored) | LLM-generated personas |
+|---|---:|---:|
+| Examples | 42 | 91 |
+| Accuracy | **95.2%** | 44.0% |
+| English | 100% | 62.5% |
+| Hinglish | 92% | 42.3% |
+| Hindi | 92% | 27.3% |
+
+`promise_to_pay` — the metric spec 11.2 asks for by name — reaches precision
+**0.88** / recall **1.00** on the gold set.
+
+**Both columns are reported, and the second one is bad.** The generated corpus
+scores 44.0%, and inspection showed why: an LLM asked to write a customer
+reply *for a given intent* writes a reply that is ambiguous between intents,
+so a large part of that number is the corpus being wrong rather than the
+classifier. It is kept here because deleting the unflattering half of an
+evaluation is how evaluations stop meaning anything — and because the gap
+between 95.2% and 44.0% is the honest measure of how much this result depends
+on the test set being real.
+
+**Opt-out is deliberately not left to the model.** Measured alone, the LLM
+recalled only 0.57 of opt-outs and every miss was Hindi or Hinglish. Missing
+one is a TCCCPR violation, not a lost sale, so a deterministic detector runs
+first and overrides the classifier — taking opt-out to precision
+**1.00** and recall **1.00**. Same argument as the compliance kernel,
+applied one level down: the thing that must not be wrong does not get to be
+probabilistic.
 
 ## Negotiation and Section 43B(h)
 
@@ -361,15 +406,15 @@ that denied everything would score a perfect 100% and be useless.
 pytest tests/test_all_stopping_rules.py
 ```
 
-- **7 of 11** reasons fire naturally in a real 2,000-case batch.
+- **8 of 11** reasons fire naturally in a real 2,000-case batch.
 - **11 of 11** are proven reachable by
   `test_every_stopping_rule_is_reachable`, which fails the build if any rule
   becomes unreachable.
 
-Both numbers are reported because they answer different questions. The four
+Both numbers are reported because they answer different questions. The three
 that do not occur naturally need conditions a normal batch does not produce
-(an engaged operator kill switch, a kernel denying every action, a case
-where nothing is ever worthwhile, and promise-to-pay — which is now a
+(`global_kill_switch`, an engaged operator halt; `regulatory_ceiling`, a
+kernel denying every available action; and `promise_to_pay_active` — which is now a
 *pause* that resolves later rather than a termination).
 
 ---

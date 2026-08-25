@@ -15,7 +15,7 @@ from __future__ import annotations
 import pytest
 
 from recovery_ledger.live import range as rng
-from recovery_ledger.live.session import build_kernel
+from recovery_ledger.live.session import EVAL_SEED, build_kernel
 from recovery_ledger.sim.generator import generate_cases
 
 
@@ -39,8 +39,8 @@ def test_case_generation_is_batch_size_dependent():
 
 
 def test_roster_is_stable_for_a_seed():
-    a = rng.roster(20260823)
-    b = rng.roster(20260823)
+    a = rng.roster(EVAL_SEED)
+    b = rng.roster(EVAL_SEED)
     assert len(a) == len(b) == rng.ROSTER_N
     assert [c.case_id for c in a] == [c.case_id for c in b]
     assert [c.amount_at_risk for c in a] == [c.amount_at_risk for c in b]
@@ -125,14 +125,14 @@ def test_disabling_every_rule_denies_by_default():
 def test_each_lever_engages_the_rule_it_advertises(lever, expected_rule):
     """A lever that changes the outcome for some *other* reason would be a lie
     told with real data. Each one must engage the rule it names."""
-    r = rng.counterfactual(seed=20260823, index=None, lever=lever)
+    r = rng.counterfactual(seed=EVAL_SEED, index=None, lever=lever)
     assert "error" not in r
     assert r["diverged"] is True, f"{lever} changed nothing"
     assert expected_rule in {d["rule"] for d in r["changed"]["denials"]}
 
 
 def test_high_value_lever_escalates_to_a_human():
-    r = rng.counterfactual(seed=20260823, index=None, lever="high_value")
+    r = rng.counterfactual(seed=EVAL_SEED, index=None, lever="high_value")
     assert r["changed"]["reason"] == "human_escalation_threshold"
 
 
@@ -140,8 +140,8 @@ def test_baseline_and_changed_share_everything_but_the_lever():
     """Common random numbers: same case, same seed, same models. Two runs of
     the *same* baseline must be identical, or nothing attributed to a lever
     means anything."""
-    a = rng.counterfactual(seed=20260823, index=0, lever="night")
-    b = rng.counterfactual(seed=20260823, index=0, lever="opted_out")
+    a = rng.counterfactual(seed=EVAL_SEED, index=0, lever="night")
+    b = rng.counterfactual(seed=EVAL_SEED, index=0, lever="opted_out")
     assert a["case"]["case_id"] == b["case"]["case_id"]
     assert a["baseline"]["reason"] == b["baseline"]["reason"]
     assert len(a["baseline"]["entries"]) == len(b["baseline"]["entries"])
@@ -152,7 +152,7 @@ def test_unknown_lever_is_an_error():
 
 
 def test_out_of_range_index_is_an_error():
-    assert "error" in rng.counterfactual(seed=20260823, index=9999, lever="night")
+    assert "error" in rng.counterfactual(seed=EVAL_SEED, index=9999, lever="night")
 
 
 # ── tamper check through the live path ───────────────────────────────────

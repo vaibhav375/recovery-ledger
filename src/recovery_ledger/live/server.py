@@ -32,7 +32,7 @@ from urllib.parse import parse_qs, urlparse
 from recovery_ledger.kernel.provenance import registry_json
 from recovery_ledger.live import range as krange
 from recovery_ledger.live.session import (
-    DEFAULT_SEED,
+    EVAL_SEED,
     RunSession,
     build_kernel,
     new_session,
@@ -121,7 +121,7 @@ class Handler(BaseHTTPRequestHandler):
         if route == "/api/levers":
             return self._json({
                 "levers": krange.lever_catalogue(),
-                "seed": DEFAULT_SEED,
+                "seed": EVAL_SEED,
                 "roster": krange.ROSTER_N,
             })
         if route == "/api/stream":
@@ -133,7 +133,7 @@ class Handler(BaseHTTPRequestHandler):
         body = self._body()
 
         if route == "/api/run":
-            seed = int(body.get("seed") or DEFAULT_SEED)
+            seed = int(body.get("seed") or EVAL_SEED)
             n_cases = max(1, min(int(body.get("n_cases") or 25), MAX_CASES))
             pace_ms = max(0, min(int(body.get("pace_ms") or 0), MAX_PACE_MS))
             session = new_session(seed=seed, n_cases=n_cases, pace_ms=pace_ms)
@@ -165,7 +165,7 @@ class Handler(BaseHTTPRequestHandler):
         if route == "/api/counterfactual":
             index = body.get("index")
             return self._json(krange.counterfactual(
-                seed=int(body.get("seed") or DEFAULT_SEED),
+                seed=int(body.get("seed") or EVAL_SEED),
                 index=None if index in (None, "", "auto") else int(index),
                 lever=str(body.get("lever") or ""),
             ))

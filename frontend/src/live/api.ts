@@ -175,6 +175,10 @@ export async function probe(): Promise<Health | null> {
   }
 }
 
+/** `seed: 0` means "let the server choose". The server's default is disjoint
+ *  from the seed the models were fitted on, and the client must not second-
+ *  guess that — hardcoding a seed here once had the console demonstrating the
+ *  agent on its own training distribution. */
 export const startRun = (seed: number, n_cases: number, pace_ms: number) =>
   post<{ run_id: string; seed: number; n_cases: number; pace_ms: number }>("/api/run", {
     seed,

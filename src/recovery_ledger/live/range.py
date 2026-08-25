@@ -39,7 +39,7 @@ from recovery_ledger.executor.executor import SimulatedExecutor
 from recovery_ledger.kernel.engine import KernelEngine
 from recovery_ledger.kernel.provenance import citation_for
 from recovery_ledger.ledger.ledger import Ledger
-from recovery_ledger.live.session import NOW, build_kernel, get_models
+from recovery_ledger.live.session import EVAL_SEED, NOW, build_kernel, get_models
 from recovery_ledger.policy.decision import LookaheadEVDecisionPolicy
 from recovery_ledger.sim.environment import (
     EnvironmentListener,
