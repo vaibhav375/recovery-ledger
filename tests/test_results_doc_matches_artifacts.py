@@ -36,6 +36,7 @@ FLEET = ROOT / "experiments" / "fleet" / "results_fleet.json"
 LISTENER = ROOT / "experiments" / "listener_eval" / "results_listener_gold.json"
 SENSITIVITY = ROOT / "experiments" / "sensitivity" / "results_sensitivity.json"
 REDTEAM = ROOT / "redteam" / "redteam_report.json"
+OPE = ROOT / "experiments" / "ope_deployment" / "results_ope_deployment.json"
 
 
 def _load(path: Path) -> dict:
@@ -174,6 +175,57 @@ def test_redteam_block_rate_matches(results_md):
     fuzz = _load(REDTEAM)["fuzz"]
     assert f"({fuzz['samples']:,} states)" in results_md
     assert fuzz["leaks"] == 0
+
+
+# ── off-policy evaluation in the deployment loop ─────────────────────────
+
+def _ope_rep(metric: str, epsilon: float) -> dict:
+    d = _load(OPE)
+    return next(
+        r for r in d["replication_study"]
+        if r["metric"] == metric and r["epsilon"] == epsilon
+    )
+
+
+@pytest.mark.parametrize("epsilon", [0.05, 0.10, 0.20, 0.40])
+@pytest.mark.parametrize("metric", ["payment_rate", "net_value"])
+def test_ope_coverage_rates_match(results_md, metric, epsilon):
+    """The whole point of this section is a coverage number. If the experiment
+    is re-run and coverage moves, the prose must move with it."""
+    cov = _ope_rep(metric, epsilon)["coverage"]["SNIPS"]
+    assert f"{cov * 100:.0f}%" in results_md
+
+
+@pytest.mark.parametrize("epsilon", [0.05, 0.10, 0.20, 0.40])
+@pytest.mark.parametrize("metric", ["payment_rate", "net_value"])
+def test_ope_ranking_agreement_matches(results_md, metric, epsilon):
+    d = _load(OPE)
+    reps = d["replications_per_epsilon"]
+    rate = _ope_rep(metric, epsilon)["ranking_agreement"]
+    assert f"{round(rate * reps)} / {reps}" in results_md
+
+
+def test_ope_exploration_cost_matches(results_md):
+    row = next(r for r in _load(OPE)["sweep"] if r["epsilon"] == 0.10)
+    assert f"₹{abs(row['exploration_cost_per_case']):.0f} per case" in results_md
+    assert f"₹{row['logged_net_value_per_case']:.0f} per case" in results_md
+
+
+def test_ope_identification_counts_match(results_md):
+    """At epsilon = 0 only the logging policy is estimable. If that ever stops
+    being true the claim about deterministic logs is wrong."""
+    row = next(r for r in _load(OPE)["sweep"] if r["epsilon"] == 0.0)
+    identified = sum(1 for p in row["policies"].values() if p["overlap"]["identified"])
+    assert identified == 1, "a deterministic log identified more than itself"
+    assert f"| 0.00 | {identified} / 6 |" in results_md
+
+
+def test_ope_states_its_contextual_bandit_limitation(results_md):
+    """The framing is a real limitation and must not quietly disappear from
+    the prose, because the number looks stronger without it."""
+    assert "contextual bandit" in results_md
+    assert "not*\nfull-sequence OPE" in results_md or "full-sequence OPE" in results_md
+    assert "contextual bandit" in _load(OPE)["framing"]
 
 
 # ── the README quotes the headline too ───────────────────────────────────

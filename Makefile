@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope
 
 setup:
 	uv venv --python 3.12
@@ -97,6 +97,15 @@ live: dashboard
 sensitivity:
 	PYTHONPATH=src:experiments/tier2_simulation .venv/bin/python3 \
 		experiments/sensitivity/run_sweep.py --n-train 3000 --n-eval 1500
+
+# Off-policy evaluation in the deployment loop: can a policy that was never
+# run be valued from the logs of the one that was? Deploys the EV policy with
+# epsilon-greedy exploration, estimates six candidate policies off-policy, and
+# checks every estimate against the truth the simulator can be asked for.
+# Replicated over independent logging draws, because coverage from a single
+# log is a coin flip.
+ope:
+	PYTHONPATH=src .venv/bin/python3 experiments/ope_deployment/run_ope_deployment.py
 
 # Adversarial suite against the compliance kernel (spec section 9.5).
 # Named attacks + a hostile policy end to end + randomised fuzz.

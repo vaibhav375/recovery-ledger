@@ -222,6 +222,27 @@ running.
       dependency-free single-file `dashboard/index.html` for environments
       without Node.
 
+- [x] **Off-policy evaluation in the deployment loop.** `make ope`. Tier 1
+      proved the estimators work on real randomised data; this asks the
+      question an operator actually has — *can you value a targeting rule I
+      have never shipped, from logs I already have?* The deployed policy runs
+      with ε-greedy exploration and logs propensity scores; six candidate
+      policies are then valued off-policy and every estimate is checked
+      against the truth, over 20 independent logging draws per setting.
+      Three findings, all measured:
+      **without exploration the logs can only describe themselves** (at ε = 0
+      exactly one of six policies is even identified, while effective sample
+      size still looks healthy — which is how OPE gets used to justify a bad
+      deployment); **the estimator is sound but the money is not estimable at
+      these sample sizes** — on the bounded payment-rate outcome ε = 0.10 gives
+      100% coverage and picks the truly best policy 20/20 times, while
+      on net rupees the same logs give 69% coverage against a nominal 95%
+      and pick the best policy 7/20 times, because one opt-out on a large
+      subscription outweighs the gap between two policies; and **exploration
+      costs ₹20 per case** at ε = 0.10, stated as a price rather than
+      hidden. The single-seed version of this experiment reported a clean pass
+      on all of it — replication is what showed that was luck.
+
 - [x] **The live console.** `make live` adds a backend — **standard library
       only**, nothing to install — that drives the real agent from the browser
       on four surfaces:
@@ -284,6 +305,8 @@ make dashboard         # compiles the front end and regenerates data.json from
 make dashboard-serve   # serves the built dashboard (static, no backend)
 make live              # the dashboard PLUS the live console: run the agent,
                        # attack the kernel, change one fact, break the trail
+make ope               # off-policy evaluation in the deployment loop: value a
+                       # policy you never ran, then check it against the truth
 make redteam          # 21 named attacks + hostile policy + 5,000-state fuzz —
                        # verified working, 100% block rate, mutation-tested
 ```

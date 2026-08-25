@@ -271,6 +271,99 @@ observed slice rather than judge it badly**. That is the correct direction:
 a false positive suppresses retries into a *working* issuer and destroys
 recovery outright, while a missed detection merely forgoes an optimisation.
 
+## Off-policy evaluation in the deployment loop
+
+```
+make ope        # 5,000 training + 4,000 evaluation cases, 20 logging draws per setting
+```
+
+Tier 1 proved the estimators recover a known answer on real randomised data.
+That establishes the method. It does not establish the thing an operator wants:
+**before shipping a new targeting rule, can you value it from logs you already
+have, without testing it on customers?**
+
+The deployed EV policy runs with ε-greedy exploration and logs the propensity
+score. Six candidate policies — none of them deployed — are then valued from
+those logs alone, and every estimate is checked against the truth the simulator
+can be asked for. Repeated over 20 independent logging draws, because
+coverage from a single log is a coin flip.
+
+**Framing, stated up front:** this is the single targeting decision (contact or
+not, once per case), evaluated as a contextual bandit. It is *not*
+full-sequence OPE of the multi-step agent loop — importance weights compound
+along a trajectory, and that needs sequential estimators this project has not
+validated.
+
+### Without exploration, logs can only describe themselves
+
+| ε | policies identified | usable overlap |
+|---:|---:|---:|
+| 0.00 | 1 / 6 | 1 / 6 |
+| 0.05 | 6 / 6 | 4 / 6 |
+| 0.10 | 6 / 6 | 6 / 6 |
+| 0.20 | 6 / 6 | 6 / 6 |
+| 0.40 | 6 / 6 | 6 / 6 |
+
+At ε = 0 one of the two actions has probability zero on every case, so for any
+policy that disagrees anywhere the estimand is **not identified** — no quantity
+of data recovers it. The single identified policy is the deployed one, which is
+not evaluation.
+
+This is why the check is not effective sample size. At ε = 0 the agreeing rows
+are numerous and evenly weighted, so **ESS looks healthy while the estimate
+answers a different question**: the value of the target policy restricted to the
+sub-population the logger agreed with. An early version of `overlap_report`
+judged on ESS alone and called those logs usable.
+
+### The estimator is sound. The money is the problem.
+
+Nominal coverage is 95%. Over 20 logging draws × 6 policies:
+
+| ε | coverage, payment rate | coverage, net ₹ | picks the best policy, payment rate | picks the best policy, net ₹ |
+|---:|---:|---:|---:|---:|
+| 0.05 | 92% | 69% | 18 / 20 | 5 / 20 |
+| 0.10 | 100% | 69% | 20 / 20 | 7 / 20 |
+| 0.20 | 98% | 77% | 20 / 20 | 13 / 20 |
+| 0.40 | 95% | 87% | 20 / 20 | 13 / 20 |
+
+On the **bounded** outcome the estimators do what they claim: at ε = 0.10 every
+interval covers the truth and the logs identify the truly best policy in
+20 / 20 runs.
+
+On **net rupees** they do not. Coverage runs 69%–87% against a nominal 95%, and at
+ε = 0.10 the logs pick the best policy 7 / 20 times.
+
+The cause is the tail, not the method. One opt-out on a large subscription costs
+`λ_churn × 6 × invoice`; a single case can move the mean by more than the gap
+between two policies. Mean absolute error falls monotonically as exploration
+rises (₹231 → ₹147 → ₹120 → ₹92), which is variance shrinking rather than bias being corrected.
+
+**The honest operating rule: choose policies on the bounded outcome, and treat
+the rupee figure as an estimate with no coverage guarantee.** That is narrower
+than "we can evaluate policies offline", and it is what the measurements
+support.
+
+### What exploration costs
+
+At ε = 0.10 the exploring policy earned **₹206 per case against the deployed
+policy's ₹227** — about **₹20 per case** to buy the ability to
+value any future policy from the same logs.
+
+A real price, stated as one. It is also the price every recovery system pays
+either way: a system that never explores is not saving it, it is paying it later
+as the cost of A/B testing each change on live customers — without an audit
+trail and without a confidence interval.
+
+### The single-seed run would have misled us
+
+The first version ran one logging draw per ε. At ε = 0.10 it reported every
+interval covering the truth and the ranking agreeing: a clean pass. Replication
+shows that was luck — the real coverage there is 69% and the ranking agrees
+35% of the time. Nothing about the code changed between those two
+conclusions; only the number of times it was run.
+
+Full detail: `experiments/ope_deployment/REPORT.md`.
+
 ## Reply-intent listener — spec section 8.5
 
 ```
