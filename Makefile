@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness
 
 setup:
 	uv venv --python 3.12
@@ -106,6 +106,14 @@ sensitivity:
 # log is a coin flip.
 ope:
 	PYTHONPATH=src .venv/bin/python3 experiments/ope_deployment/run_ope_deployment.py
+
+# Disparity audit of the POLICY, as distinct from the kernel's audit of each
+# action. Contact and work rates by language, B2B status, amount and loss
+# type, conditioned on the two things the objective is entitled to use
+# (predicted uplift and amount), with permutation tests and a Bonferroni
+# correction across the sixteen hypotheses.
+fairness:
+	PYTHONPATH=src .venv/bin/python3 experiments/fairness/run_fairness.py
 
 # Adversarial suite against the compliance kernel (spec section 9.5).
 # Named attacks + a hostile policy end to end + randomised fuzz.

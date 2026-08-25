@@ -37,6 +37,7 @@ LISTENER = ROOT / "experiments" / "listener_eval" / "results_listener_gold.json"
 SENSITIVITY = ROOT / "experiments" / "sensitivity" / "results_sensitivity.json"
 REDTEAM = ROOT / "redteam" / "redteam_report.json"
 OPE = ROOT / "experiments" / "ope_deployment" / "results_ope_deployment.json"
+FAIRNESS = ROOT / "experiments" / "fairness" / "results_fairness.json"
 
 
 def _load(path: Path) -> dict:
@@ -226,6 +227,64 @@ def test_ope_states_its_contextual_bandit_limitation(results_md):
     assert "contextual bandit" in results_md
     assert "not*\nfull-sequence OPE" in results_md or "full-sequence OPE" in results_md
     assert "contextual bandit" in _load(OPE)["framing"]
+
+
+# ── the disparity audit ──────────────────────────────────────────────────
+
+@pytest.mark.parametrize(
+    "segment", ["language", "b2b", "amount_quartile", "loss_type"]
+)
+def test_fairness_gaps_and_p_values_match(results_md, segment):
+    seg = _load(FAIRNESS)["segments"][segment]
+    j = seg["conditional_on_uplift_and_amount"]
+    t = seg["true_benefit_gap_in_same_cells"]
+    assert f"{j['excess']:+.3f} | {j['p']:.3f}" in results_md
+    assert f"₹{t['excess']:+,.0f} | {t['p']:.3f}" in results_md
+
+
+def test_fairness_verdicts_match(results_md):
+    """If any segment ever becomes an unexplained disparity, the document must
+    say so. A clean audit quietly going stale is the failure mode here."""
+    d = _load(FAIRNESS)
+    flagged = [k for k, v in d["segments"].items() if v["unexplained"]]
+    if flagged:
+        assert "**unexplained**" in results_md, (
+            f"segments {flagged} are flagged in the artifact but RESULTS.md "
+            f"still reports a clean audit"
+        )
+    else:
+        assert "**No unexplained disparity in any segment.**" in results_md
+
+
+def test_fairness_model_correlations_match(results_md):
+    """The headline finding of this section is the per-group model quality.
+    It is quoted to two decimals in the prose."""
+    g = _load(FAIRNESS)["segments"]["b2b"]["groups"]
+    assert f"{g['b2b']['model_correlation']:.2f} against {g['b2c']['model_correlation']:.2f}" in results_md
+    q1 = _load(FAIRNESS)["segments"]["amount_quartile"]["groups"]["Q1"]
+    assert f"correlation of {q1['model_correlation']:.2f}" in results_md
+
+
+def test_fairness_correction_is_applied_to_the_disparity_test_only(results_md):
+    """The rule that stops this audit crying wolf. If a future edit applies the
+    Bonferroni threshold to the explanation test as well, an underpowered
+    explanation becomes a 'disparity'."""
+    d = _load(FAIRNESS)
+    alpha = d["bonferroni_alpha"]
+    for name, seg in d["segments"].items():
+        if not seg["unexplained"]:
+            continue
+        assert seg["conditional_on_uplift_and_amount"]["p_exact"] < alpha, name
+        # The explanation test is judged at an ordinary 0.05, deliberately.
+        assert seg["true_benefit_gap_in_same_cells"]["p_exact"] >= 0.05, name
+
+
+def test_fairness_reports_worked_rate_not_only_contact(results_md):
+    """Measuring contact alone reported failed subscriptions as the most
+    neglected group when the policy works all of them by silent retry."""
+    sub = _load(FAIRNESS)["segments"]["loss_type"]["groups"]["FailedSubscription"]
+    assert sub["worked_rate"] > sub["contact_rate"]
+    assert f"works **{sub['worked_rate'] * 100:.0f}%** of them" in results_md
 
 
 # ── the README quotes the headline too ───────────────────────────────────

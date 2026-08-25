@@ -364,6 +364,90 @@ conclusions; only the number of times it was run.
 
 Full detail: `experiments/ope_deployment/REPORT.md`.
 
+## Disparity audit of the policy
+
+```
+make fairness     # 4,000 cases, 2,000 permutations, 16 hypotheses
+```
+
+The compliance kernel checks whether an **action** is permitted. Nothing else
+here checks whether the **policy** distributes its attention fairly. An agent
+can refuse every illegal action and still systematically decline to work one
+group's cases.
+
+Raw contact-rate gaps prove nothing — the policy contacts on expected value,
+uplift times amount, so a group with larger invoices *should* be contacted
+more. Every test conditions on predicted uplift crossed with amount, the two
+quantities the objective is entitled to use. Because this is a simulator, one
+further check is available that no production audit can run: within the same
+cells, does the *true* benefit differ? If treatment differs and true benefit
+does not, the model invented the difference.
+
+| segment | contact gap, excess over null | p | true-benefit gap | p | verdict |
+|---|---:|---:|---:|---:|---|
+| language | +0.017 | 0.080 | ₹+30 | 0.046 | no significant gap |
+| b2b | +0.056 | 0.001 | ₹+87 | 0.001 | explained |
+| amount quartile | +0.146 | 0.001 | ₹+209 | 0.001 | explained |
+| loss type | +0.476 | 0.001 | ₹+172 | 0.004 | explained |
+
+**No unexplained disparity in any segment.** The language result is the one
+that mattered most going in and it is clean: contact rates run
+21–28% across English, Hindi, Hinglish and regional speakers, and
+the gap does not survive conditioning.
+
+The detector is not merely incapable of firing:
+`tests/test_fairness_audit.py` plants a 25-point within-cell disparity and
+requires it to be caught, and plants one fully explained by the conditioning
+and requires it not to be.
+
+### The finding the treatment-rate tests cannot see
+
+Correlation between predicted and true uplift, by group:
+
+| group | correlation | contact rate |
+|---|---:|---:|
+| **B2B** | **0.11** | 0.311 |
+| B2C | 0.36 | 0.241 |
+| **Amount Q1 (smallest)** | **0.09** | 0.302 |
+| Amount Q3 | 0.33 | 0.132 |
+| every language | 0.31 – 0.35 | 0.21 – 0.28 |
+
+Language is even. The other two are not, and the pattern is uncomfortable:
+**the policy acts most confidently on the segments the model understands
+least.** B2B gets the highest contact rate (31.1% against 24.1%) and has the
+worst model correlation (0.11 against 0.36). The smallest invoices have a
+correlation of 0.09 — effectively no signal — and are contacted more than
+the quartiles the model reads best.
+
+That is not disparate treatment. It is **epistemic** inequality, and an audit
+that only checks contact rates passes it without comment.
+
+### Two targeting failures, surfaced in passing
+
+Descriptive, not significance-tested:
+
+- **Amount Q2 and Q3 are the wrong way round.** Q3 is worth ₹353 per case —
+  the highest in the book — and gets the lowest contact rate (13.2%). Q2 is
+  worth ₹239 and gets the highest (34.8%).
+- **Overdue receivables have negative true value** (₹-69 per case: contact
+  destroys more through opt-outs than it recovers) and are still contacted
+  20.2% of the time.
+
+### What "contact" had to be corrected to mean
+
+The first version measured only customer contact and reported failed
+subscriptions at 0.9% — apparently the most neglected group in the book.
+They are not: the policy works **100%** of them, by silent retry, because a
+subscription can be re-charged without messaging anyone. Measuring contact
+alone read correct channel choice as neglect. Both rates are now reported —
+the same distinction the kernel already makes when it exempts RETRY from the
+contact-hours rule.
+
+Two further methodology errors, both caught and both documented in
+`experiments/fairness/REPORT.md`: a gap statistic that could not report zero,
+and a multiple-comparison correction applied to the test where it made crying
+wolf *easier* rather than harder.
+
 ## Reply-intent listener — spec section 8.5
 
 ```

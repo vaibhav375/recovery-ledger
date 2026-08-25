@@ -243,6 +243,27 @@ running.
       hidden. The single-seed version of this experiment reported a clean pass
       on all of it — replication is what showed that was luck.
 
+- [x] **Disparity audit of the policy.** `make fairness`. The compliance
+      kernel checks whether an *action* is permitted; nothing checked whether
+      the *policy* distributes its attention fairly, and an agent can refuse
+      every illegal action while systematically declining to work one group's
+      cases. Contact and work rates by language, B2B status, amount and loss
+      type, conditioned on the two things the objective is entitled to use
+      (predicted uplift × amount), with permutation tests over 2,000 label
+      shuffles and a Bonferroni correction across 16 hypotheses.
+      **No unexplained disparity in any segment** — contact rates run
+      21–28% across English, Hindi, Hinglish and regional speakers and
+      the gap does not survive conditioning. The detector is not merely
+      incapable of firing: the tests plant a 25-point within-cell disparity
+      and require it to be caught.
+      The finding is elsewhere, and treatment-rate tests cannot see it:
+      **the policy acts most confidently on the segments the model understands
+      least.** B2B cases get the highest contact rate (31.1% against 24.1%)
+      and the worst model correlation (0.11 against 0.36); the smallest
+      invoices correlate 0.09 — effectively no signal — and are contacted
+      more than the quartiles the model reads best. That is epistemic
+      inequality rather than disparate treatment.
+
 - [x] **The live console.** `make live` adds a backend — **standard library
       only**, nothing to install — that drives the real agent from the browser
       on four surfaces:
@@ -307,6 +328,8 @@ make live              # the dashboard PLUS the live console: run the agent,
                        # attack the kernel, change one fact, break the trail
 make ope               # off-policy evaluation in the deployment loop: value a
                        # policy you never ran, then check it against the truth
+make fairness          # disparity audit of the policy: who does it decide not
+                       # to help, and is the difference explained?
 make redteam          # 21 named attacks + hostile policy + 5,000-state fuzz —
                        # verified working, 100% block rate, mutation-tested
 ```
