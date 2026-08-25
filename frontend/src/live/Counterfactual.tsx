@@ -130,7 +130,7 @@ function TracePane({
         <b>{trace.reason ? titleise(trace.reason) : "—"}</b>
         {trace.paid && <span className="rl-chip is-ok">paid</span>}
       </div>
-      <ul className="rl-trace is-compact">
+      <ul className="rl-trace rl-trace--compact">
         {trace.entries.map((e) => (
           <li key={e.seq} className={`rl-trace-row is-${entryTone(e)}`}>
             <span className="rl-trace-seq">#{e.seq}</span>

@@ -215,7 +215,7 @@ export default function Console() {
           {rows.length === 0 ? (
             <p className="rl-empty-note">Nothing yet.</p>
           ) : (
-            <ul className="rl-trace">
+            <ul className="rl-trace rl-trace--fixed">
               {rows.map((r) => (
                 <motion.li
                   key={r.seq}

@@ -47,9 +47,9 @@ export default function Subtraction({
   const claimY = useTransform(p, [0.6, 0.8], [26, 0]);
 
   return (
-    <section className="rl-sub" ref={ref}>
-      <div className="rl-sub-stage">
-       <div className="rl-sub-inner">
+    <section className="rl-subtraction" ref={ref}>
+      <div className="rl-subtraction-stage">
+       <div className="rl-subtraction-inner">
         <p className="rl-sectionmark">The measurement</p>
 
         <div className="rl-sub-row">

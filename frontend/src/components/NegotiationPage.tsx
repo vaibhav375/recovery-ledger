@@ -40,7 +40,7 @@ export default function NegotiationPage({ data }: { data: Dashboard }) {
               <dd>
                 {sc.offer_type}
                 {sc.discount_pct ? ` (${(sc.discount_pct * 100).toFixed(2)}%)` : ""}
-                <div className="rl-sub">{sc.solver_rationale}</div>
+                <div className="rl-kv-note">{sc.solver_rationale}</div>
               </dd>
 
               <dt>Kernel</dt>
