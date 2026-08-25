@@ -1,8 +1,34 @@
 .PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness
 
+# `uv pip install` honours an ambient VIRTUAL_ENV over the venv it was just
+# told to create. Anyone who runs `make setup` with another virtualenv active
+# — which is most people, most of the time — gets `uv venv` making ./.venv and
+# then `uv pip install` putting every dependency somewhere else. It exits 0.
+# The repo's venv is left empty and every later target dies on
+# `ModuleNotFoundError: No module named 'pydantic'`, several commands after
+# the one that actually failed. It also silently rewrites the OTHER
+# environment's editable install, which is how this was found.
+#
+# `--python .venv/bin/python3` names the target explicitly, so the ambient
+# variable cannot win. Verified by tests/test_makefile_setup.py.
 setup:
 	uv venv --python 3.12
-	uv pip install -e ".[dev]"
+	uv pip install --python .venv/bin/python3 -e ".[dev]"
+	@# macOS only, and non-fatal. uv writes .pth files with the UF_HIDDEN flag
+	@# set, and CPython's site.addpackage skips hidden .pth files without a
+	@# word (site.py: "Skipping hidden .pth file"). The editable install is
+	@# therefore installed correctly and silently never on sys.path, so
+	@# `import recovery_ledger` fails in a plain REPL while every make target
+	@# works, because they all set PYTHONPATH=src. Clearing the flag makes the
+	@# editable install behave the way `pip install -e` is supposed to.
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		chflags nohidden .venv/lib/python*/site-packages/*.pth 2>/dev/null || true; \
+	fi
+	@.venv/bin/python3 -c "import pydantic, numpy, sklearn, pandas" \
+		|| (echo "setup FAILED - .venv is missing dependencies"; exit 1)
+	@.venv/bin/python3 -c "import recovery_ledger" 2>/dev/null \
+		&& echo "setup OK - dependencies and recovery_ledger importable from .venv" \
+		|| echo "setup OK - dependencies installed (editable import needs PYTHONPATH=src, which every make target sets)"
 
 test:
 	.venv/bin/python3 -m pytest -v

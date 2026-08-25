@@ -1242,3 +1242,59 @@ assumed up front — the first being opt-out detection. Both were places I had
 initially assumed a model would be fine.
 
 183/183 tests passing.
+
+## 2026-08-26 — `make setup` exited 0 and installed nothing
+
+Verifying Definition-of-Done item 1 ("`make demo` runs the agent end to end
+from a clean clone") for the first time end to end. It did not.
+
+`make setup` ran `uv venv --python 3.12`, creating `./.venv`, and then
+`uv pip install -e ".[dev]"` printed:
+
+    Using Python 3.12.6 environment at: /Users/vaibhav/Desktop/razorpay/.venv
+
+**uv honours an ambient `VIRTUAL_ENV` over the venv it was just told to
+create.** Every dependency went into the *other* environment. Exit code 0. The
+clone's `.venv` was left empty, and the failure surfaced one command later as
+`ModuleNotFoundError: No module named 'pydantic'` from `make demo` — pointing
+at the wrong command entirely.
+
+Two things make this worse than a normal setup bug. Anyone running `make setup`
+with a virtualenv already active hits it, which is most people most of the
+time. And it *rewrites the other environment's editable install* — it
+uninstalled this repo's own editable install and replaced it with one pointing
+at the clone, so the main working tree's package resolution silently started
+resolving to a temp directory.
+
+Fixed by naming the target explicitly, `uv pip install --python
+.venv/bin/python3`, so the ambient variable cannot win, plus a post-install
+import check so setup fails loudly at the command that actually failed rather
+than silently at the next one.
+
+### And the second bug underneath it
+
+While confirming the fix, `import recovery_ledger` still failed from a plain
+REPL even though the editable install was present and correct — the `.pth`
+file existed, contained the right path, and that path existed. Other `.pth`
+files in the same directory *were* being honoured.
+
+`site.addpackage`, called manually on the file, added nothing. The cause is in
+CPython's `site.py`:
+
+    if ((getattr(st, 'st_flags', 0) & stat.UF_HIDDEN) or ...):
+        _trace(f"Skipping hidden .pth file: {fullname!r}")
+        return
+
+**uv writes `.pth` files with the macOS `UF_HIDDEN` flag set, and CPython
+silently skips hidden `.pth` files.** `ls -lO` shows `hidden` on every `.pth`
+uv installed. No error, no warning, nothing in the install output.
+
+This is the actual explanation for a workaround this repo has carried since
+2026-08-22, when the editable install was found "silently ignored" and pytest
+was pointed at `pythonpath = ["src"]` instead. The workaround was right; the
+diagnosis at the time was incomplete. Every make target sets `PYTHONPATH=src`,
+so nothing in the project depended on it — but a judge opening a REPL and
+typing `import recovery_ledger` would have seen a broken install.
+
+`make setup` now clears the flag on Darwin, non-fatally, and reports which of
+the two import paths is working.
