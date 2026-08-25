@@ -160,10 +160,43 @@ def test_listener_accuracy_matches(results_md):
     assert f"{acc * 100:.1f}%" in results_md or f"{acc * 100:.2f}%" in results_md
 
 
-def test_sensitivity_claim_matches(results_md):
+def test_sensitivity_claims_match(results_md):
     s = _load(SENSITIVITY)["summary"]
-    c1 = s["c1_ev_beats_random"]
-    assert f"{c1['held']} / {c1['of']} settings" in results_md
+    for key in ("c1_ev_beats_random", "c2_ev_more_contact_efficient_than_blast"):
+        claim = s[key]
+        assert f"**{claim['held']} / {claim['of']}**" in results_md
+        assert ", ".join(claim["per_draw"]) in results_md
+    assert f"**{s['eval_draws']} independent evaluation populations**" in results_md
+
+
+def test_sensitivity_margin_is_quoted_as_a_median_not_a_max(results_md):
+    """The largest ratio in the sweep is ~82x, produced by a near-zero
+    denominator at the one unstable setting. Quoting it as the top of a range
+    would be quoting an artifact, so the document must carry the median and
+    percentiles instead — recomputed here from the artifact so the two cannot
+    drift apart."""
+    import statistics as st
+
+    d = _load(SENSITIVITY)
+    rows = [r for dr in d["draws"] for rs in dr["sweeps"].values() for r in rs]
+    ratios = sorted(r["c1_margin_ratio"] for r in rows if r.get("c1_margin_ratio"))
+    med = st.median(ratios)
+    p10, p90 = ratios[len(ratios) // 10], ratios[-len(ratios) // 10]
+    assert f"median margin {med:.2f}x, 10th–90th pct {p10:.2f}x–{p90:.2f}x" in results_md
+    assert f"largest single ratio in\nthe sweep is {max(ratios):.0f}x" in results_md
+
+
+def test_sensitivity_flips_are_reported_if_any_exist(results_md):
+    """C2 was 24/25 on one evaluation draw and 25/25 on three others. If a
+    flip ever reappears, the document must name it rather than reporting a
+    clean sweep."""
+    c2 = _load(SENSITIVITY)["summary"]["c2_ev_more_contact_efficient_than_blast"]
+    if c2["settings_that_ever_flip"]:
+        for setting in c2["settings_that_ever_flip"]:
+            param = setting.split("=")[0]
+            assert param in results_md, (
+                f"C2 flips at {setting} but RESULTS.md does not mention {param}"
+            )
 
 
 def test_redteam_block_rate_matches(results_md):

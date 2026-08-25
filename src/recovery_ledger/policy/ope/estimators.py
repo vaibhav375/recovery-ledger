@@ -32,9 +32,40 @@ from sklearn.base import ClassifierMixin, clone
 from sklearn.model_selection import StratifiedKFold
 
 
+# Below this, a logged action was so unlikely that the row carries no usable
+# information about it. Matches the clip in `_match_weights`.
+MIN_PROPENSITY = 1e-6
+
+
 @dataclass(frozen=True)
 class PolicyValueEstimate:
-    """Estimated value of a policy, with a bootstrap confidence interval."""
+    """Estimated value of a policy, with a bootstrap confidence interval.
+
+    The support fields are not decoration. These estimators fail *quietly*:
+    given a logged policy that never takes the action the target policy wants
+    on some cases, none of them raises, returns a NaN, or produces an absurd
+    number. They return the value of the target policy **restricted to the
+    rows where the logging policy happened to agree** — a perfectly plausible
+    figure, with a confidence interval, answering a question nobody asked.
+
+    Measured on this project's own simulator: with a deterministic logging
+    policy, `contact_everyone` had 574 of 1,200 rows carrying zero probability
+    for the action it wanted, and IPS returned a comfortable finite number
+    with a maximum importance weight of 1.0. Nothing about the output looked
+    wrong.
+
+    So every estimate now carries what a reader needs to reject it:
+
+    n_matched          rows where the logged action equals the policy's action
+    n_unsupported      rows where the policy's action had ~zero probability
+    identified         n_unsupported == 0; False means the estimand does not
+                       exist and the point estimate is answering a different
+                       question
+    effective_sample_size
+                       Kish's ESS over the importance weights. An estimate
+                       over 2,000 rows with an ESS of 40 is an estimate over
+                       40 rows wearing a large-sample interval.
+    """
 
     method: str
     point_estimate: float
@@ -42,12 +73,46 @@ class PolicyValueEstimate:
     ci_high: float
     n: int
     confidence: float = 0.95
+    n_matched: int = -1
+    n_unsupported: int = -1
+    effective_sample_size: float = float("nan")
+    min_action_propensity: float = float("nan")
+    degenerate_bootstrap_draws: int = 0
+
+    @property
+    def identified(self) -> bool:
+        """False when some case's policy action could never have been logged."""
+        return self.n_unsupported == 0
+
+    @property
+    def ess_fraction(self) -> float:
+        return self.effective_sample_size / self.n if self.n else 0.0
 
     def __repr__(self) -> str:  # pragma: no cover - cosmetic
+        flag = "" if self.identified else "  [NOT IDENTIFIED]"
         return (
             f"{self.method}: {self.point_estimate:.4f} "
-            f"[{self.ci_low:.4f}, {self.ci_high:.4f}] (n={self.n})"
+            f"[{self.ci_low:.4f}, {self.ci_high:.4f}] "
+            f"(n={self.n}, ess={self.effective_sample_size:.0f}){flag}"
         )
+
+
+def _support(
+    treatment: NDArray[np.int_],
+    propensity: NDArray[np.float64],
+    policy_actions: NDArray[np.int_],
+) -> dict:
+    """How much of this log actually speaks to this policy."""
+    action_propensity = np.where(policy_actions == 1, propensity, 1.0 - propensity)
+    weights = _match_weights(treatment, propensity, policy_actions)
+    total = float(np.sum(weights))
+    ess = float(total**2 / np.sum(weights**2)) if total > 0 else 0.0
+    return {
+        "n_matched": int(np.sum(treatment == policy_actions)),
+        "n_unsupported": int(np.sum(action_propensity < MIN_PROPENSITY)),
+        "effective_sample_size": round(ess, 1),
+        "min_action_propensity": float(np.min(action_propensity)) if len(treatment) else float("nan"),
+    }
 
 
 def _match_weights(
@@ -59,7 +124,10 @@ def _match_weights(
     policy's chosen action for that sample, else 0."""
     matches = (treatment == policy_actions).astype(np.float64)
     action_propensity = np.where(treatment == 1, propensity, 1.0 - propensity)
-    action_propensity = np.clip(action_propensity, 1e-6, 1.0)
+    # The clip stabilises division. It does NOT make an unsupported row
+    # informative — the weight is zero there anyway, because the actions
+    # disagree. `_support` is what tells the caller those rows existed.
+    action_propensity = np.clip(action_propensity, MIN_PROPENSITY, 1.0)
     return matches / action_propensity
 
 
@@ -69,16 +137,27 @@ def _bootstrap_ci(
     n_boot: int,
     seed: int,
     confidence: float,
-) -> tuple[float, float]:
+) -> tuple[float, float, int]:
+    """Percentile bootstrap. Returns (lo, hi, degenerate_draws).
+
+    Degenerate draws — resamples for which the statistic is undefined, e.g. a
+    SNIPS resample containing no matched rows at all — are excluded via
+    nanquantile and counted. Silently folding them in as zero would drag the
+    interval toward zero and narrow it, which is the opposite of what missing
+    evidence should do to an interval.
+    """
     rng = np.random.default_rng(seed)
     n = len(values)
     boot_stats = np.empty(n_boot)
     for b in range(n_boot):
         idx = rng.integers(0, n, size=n)
         boot_stats[b] = point_fn(idx)
+    degenerate = int(np.sum(~np.isfinite(boot_stats)))
     alpha = (1 - confidence) / 2
-    lo, hi = np.quantile(boot_stats, [alpha, 1 - alpha])
-    return float(lo), float(hi)
+    if degenerate == n_boot:
+        return float("nan"), float("nan"), degenerate
+    lo, hi = np.nanquantile(boot_stats, [alpha, 1 - alpha])
+    return float(lo), float(hi), degenerate
 
 
 def ips_value(
@@ -99,8 +178,12 @@ def ips_value(
     def stat(idx: NDArray[np.int_]) -> float:
         return float(np.mean(contrib[idx]))
 
-    lo, hi = _bootstrap_ci(contrib, stat, n_boot, seed, confidence)
-    return PolicyValueEstimate("IPS", point, lo, hi, n=len(outcome), confidence=confidence)
+    lo, hi, degenerate = _bootstrap_ci(contrib, stat, n_boot, seed, confidence)
+    return PolicyValueEstimate(
+        "IPS", point, lo, hi, n=len(outcome), confidence=confidence,
+        degenerate_bootstrap_draws=degenerate,
+        **_support(treatment, propensity, policy_actions),
+    )
 
 
 def snips_value(
@@ -120,12 +203,22 @@ def snips_value(
         w = weights[idx]
         denom = np.sum(w)
         if denom <= 0:
-            return 0.0
+            # No matched rows: this resample carries no information about the
+            # policy. Previously this returned 0.0, which reports "we have no
+            # evidence" as "it is worth exactly zero" — indistinguishable from
+            # a real estimate, and for a monetary objective a plausible one.
+            return float("nan")
         return float(np.sum(w * outcome[idx]) / denom)
 
     point = stat(np.arange(len(outcome)))
-    lo, hi = _bootstrap_ci(np.arange(len(outcome)), stat, n_boot, seed, confidence)
-    return PolicyValueEstimate("SNIPS", point, lo, hi, n=len(outcome), confidence=confidence)
+    lo, hi, degenerate = _bootstrap_ci(
+        np.arange(len(outcome)), stat, n_boot, seed, confidence
+    )
+    return PolicyValueEstimate(
+        "SNIPS", point, lo, hi, n=len(outcome), confidence=confidence,
+        degenerate_bootstrap_draws=degenerate,
+        **_support(treatment, propensity, policy_actions),
+    )
 
 
 def doubly_robust_value(
@@ -191,8 +284,12 @@ def doubly_robust_value(
     def stat(idx: NDArray[np.int_]) -> float:
         return float(np.mean(contrib[idx]))
 
-    lo, hi = _bootstrap_ci(contrib, stat, n_boot, seed, confidence)
-    return PolicyValueEstimate("DR", point, lo, hi, n=n, confidence=confidence)
+    lo, hi, degenerate = _bootstrap_ci(contrib, stat, n_boot, seed, confidence)
+    return PolicyValueEstimate(
+        "DR", point, lo, hi, n=n, confidence=confidence,
+        degenerate_bootstrap_draws=degenerate,
+        **_support(treatment, propensity, policy_actions),
+    )
 
 
 def always_treat_policy(n: int) -> NDArray[np.int_]:

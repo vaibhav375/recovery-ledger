@@ -94,7 +94,17 @@ SWEEPS: dict[str, tuple[str, list[float]]] = {
 }
 
 
-def evaluate_setting(params: ResponseParams, *, n_train: int, n_eval: int) -> dict:
+# SEED + 6000, not + 2000: run_baselines.py already uses + 2000, and these two
+# experiments only avoided evaluating on an identical population because they
+# happen to pass different --n-eval (generate_cases is batch-size dependent).
+# Correctness resting on an incidental argument value is the same fragility
+# that has bitten this repo twice. Offsets are now pairwise distinct by
+# construction, pinned by tests/test_experiment_seeds.py.
+BASE_EVAL_SEED = SEED + 6000
+
+
+def evaluate_setting(params: ResponseParams, *, n_train: int, n_eval: int,
+                     eval_seed: int = BASE_EVAL_SEED) -> dict:
     """Train on this simulator, then compare policies on a disjoint batch.
 
     The uplift model is retrained for every setting. Reusing a model fitted
@@ -112,7 +122,13 @@ def evaluate_setting(params: ResponseParams, *, n_train: int, n_eval: int) -> di
     model = TLearnerModel(random_state=SEED)
     model.fit(cases_to_feature_matrix(train_cases), treatment, outcomes)
 
-    eval_seed = SEED + 2000
+    # SEED + 6000, not + 2000: run_baselines.py already uses + 2000, and these
+    # two experiments only avoided evaluating on an identical population
+    # because they happen to pass different --n-eval (generate_cases is
+    # batch-size dependent). Correctness resting on an incidental argument
+    # value is the same fragility that has bitten this repo twice. The offsets
+    # are now pairwise distinct by construction, pinned by
+    # tests/test_experiment_seeds.py.
     cases = generate_cases(n_eval, seed=eval_seed, now=NOW)
     traits = generate_population(cases, seed=eval_seed, params=params)
 
@@ -155,23 +171,59 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--n-train", type=int, default=3000)
     ap.add_argument("--n-eval", type=int, default=1500)
+    ap.add_argument(
+        "--eval-draws", type=int, default=3,
+        help="independent evaluation populations to repeat the whole sweep over",
+    )
     args = ap.parse_args()
 
+    # One draw is not a robustness result. Moving this experiment's evaluation
+    # seed off a collision with run_baselines.py changed C2 from 24/25 to
+    # 25/25 — same code, same settings, different customers. A claim that
+    # flips on the evaluation draw is a claim about that draw, so the sweep is
+    # now repeated over several and the spread is what gets reported.
+    draws = [BASE_EVAL_SEED + 100 * d for d in range(args.eval_draws)]
+    per_draw: list[dict] = []
+
+    for draw_i, eval_seed in enumerate(draws):
+        print(f"\n########## evaluation draw {draw_i + 1}/{len(draws)} "
+              f"(eval_seed={eval_seed}) ##########")
+        results, c1_h, c1_t, c2_h, c2_t, flips = _one_draw(
+            eval_seed, args.n_train, args.n_eval
+        )
+        per_draw.append({
+            "eval_seed": eval_seed,
+            "c1_held": c1_h, "c1_of": c1_t,
+            "c2_held": c2_h, "c2_of": c2_t,
+            "c2_flip_settings": flips,
+            "sweeps": results,
+        })
+        print(f"  draw {draw_i + 1}: C1 {c1_h}/{c1_t}, C2 {c2_h}/{c2_t}"
+              + (f", C2 flipped at {flips}" if flips else ""))
+
+    _report(per_draw, args)
+
+
+def _one_draw(eval_seed: int, n_train: int, n_eval: int):
     results: dict[str, list[dict]] = {}
     c1_total = c1_held = 0
     c2_total = c2_held = 0
+    c2_flips: list[str] = []
 
     for param, (rationale, values) in SWEEPS.items():
         print(f"\n=== {param} ===\n  {rationale}")
         rows = []
         for v in values:
             setting = replace(DEFAULT_PARAMS, **{param: v})
-            r = evaluate_setting(setting, n_train=args.n_train, n_eval=args.n_eval)
+            r = evaluate_setting(setting, n_train=n_train, n_eval=n_eval,
+                                 eval_seed=eval_seed)
             ev, rand, blast = (r["policies"][k] for k in ("ev_policy", "random_targeting", "blast_everyone"))
             c1_total += 1
             c2_total += 1
             c1_held += bool(r["c1_ev_beats_random"])
             c2_held += bool(r["c2_ev_more_efficient_than_blast"])
+            if not r["c2_ev_more_efficient_than_blast"]:
+                c2_flips.append(f"{param}={v}")
             ratio = r["c1_margin_ratio"]
             print(
                 f"  {param}={v:<6} ev={ev['incremental']:>10,.0f}  random={rand['incremental']:>10,.0f}  "
@@ -183,18 +235,50 @@ def main() -> None:
             rows.append({"value": v, **r})
         results[param] = rows
 
+    return results, c1_held, c1_total, c2_held, c2_total, c2_flips
+
+
+def _report(per_draw: list[dict], args) -> None:
+    c1_held = sum(d["c1_held"] for d in per_draw)
+    c1_total = sum(d["c1_of"] for d in per_draw)
+    c2_held = sum(d["c2_held"] for d in per_draw)
+    c2_total = sum(d["c2_of"] for d in per_draw)
+    all_flips = sorted({f for d in per_draw for f in d["c2_flip_settings"]})
+    # A setting that flips in every draw is a real boundary of the claim. One
+    # that flips in some but not others is sampling noise, and reporting
+    # either the best or the worst draw alone would misrepresent it.
+    consistent = sorted(
+        f for f in all_flips
+        if all(f in d["c2_flip_settings"] for d in per_draw)
+    )
+
     summary = {
-        "c1_ev_beats_random": {"held": c1_held, "of": c1_total, "rate": c1_held / c1_total},
-        "c2_ev_more_contact_efficient_than_blast": {"held": c2_held, "of": c2_total, "rate": c2_held / c2_total},
+        "eval_draws": len(per_draw),
+        "c1_ev_beats_random": {
+            "held": c1_held, "of": c1_total, "rate": c1_held / c1_total,
+            "per_draw": [f"{d['c1_held']}/{d['c1_of']}" for d in per_draw],
+        },
+        "c2_ev_more_contact_efficient_than_blast": {
+            "held": c2_held, "of": c2_total, "rate": c2_held / c2_total,
+            "per_draw": [f"{d['c2_held']}/{d['c2_of']}" for d in per_draw],
+            "settings_that_ever_flip": all_flips,
+            "settings_that_flip_in_every_draw": consistent,
+        },
     }
-    print("\n=== RANKING STABILITY ===")
-    print(f"  C1 (EV beats random targeting):        {c1_held}/{c1_total} settings")
-    print(f"  C2 (EV more contact-efficient):        {c2_held}/{c2_total} settings")
+
+    print("\n=== RANKING STABILITY ACROSS EVALUATION DRAWS ===")
+    print(f"  C1 (EV beats random targeting):   {c1_held}/{c1_total}  "
+          f"per draw {summary['c1_ev_beats_random']['per_draw']}")
+    print(f"  C2 (EV more contact-efficient):   {c2_held}/{c2_total}  "
+          f"per draw {summary['c2_ev_more_contact_efficient_than_blast']['per_draw']}")
+    if all_flips:
+        print(f"  C2 flips somewhere: {all_flips}")
+        print(f"  C2 flips in EVERY draw: {consistent or 'none — every flip is draw-dependent'}")
 
     (HERE / "results_sensitivity.json").write_text(
-        json.dumps({"summary": summary, "sweeps": results,
+        json.dumps({"summary": summary, "draws": per_draw,
                     "n_train": args.n_train, "n_eval": args.n_eval}, indent=2, default=str))
-    _plot(results)
+    _plot(per_draw[0]["sweeps"])
     print(f"\nWrote {HERE / 'results_sensitivity.json'}")
 
 

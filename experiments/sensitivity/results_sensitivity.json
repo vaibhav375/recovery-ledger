@@ -1,828 +1,2491 @@
 {
   "summary": {
+    "eval_draws": 3,
     "c1_ev_beats_random": {
-      "held": 25,
-      "of": 25,
-      "rate": 1.0
+      "held": 75,
+      "of": 75,
+      "rate": 1.0,
+      "per_draw": [
+        "25/25",
+        "25/25",
+        "25/25"
+      ]
     },
     "c2_ev_more_contact_efficient_than_blast": {
-      "held": 24,
-      "of": 25,
-      "rate": 0.96
+      "held": 75,
+      "of": 75,
+      "rate": 1.0,
+      "per_draw": [
+        "25/25",
+        "25/25",
+        "25/25"
+      ],
+      "settings_that_ever_flip": [],
+      "settings_that_flip_in_every_draw": []
     }
   },
-  "sweeps": {
-    "base_organic_resolution": [
-      {
-        "value": 0.02,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+  "draws": [
+    {
+      "eval_seed": 20266823,
+      "c1_held": 25,
+      "c1_of": 25,
+      "c2_held": 25,
+      "c2_of": 25,
+      "c2_flip_settings": [],
+      "sweeps": {
+        "base_organic_resolution": [
+          {
+            "value": 0.02,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 720112.3784472011,
+                "contacts": 3272,
+                "incremental_per_contact": 220.0832452466996,
+                "dnd_rate": 0.18856968215158923
+              },
+              "random_targeting": {
+                "incremental": 317769.93657040095,
+                "contacts": 1523,
+                "incremental_per_contact": 208.64736478686865,
+                "dnd_rate": 0.16940249507550886
+              },
+              "ev_policy": {
+                "incremental": 750972.1037992955,
+                "contacts": 1927,
+                "incremental_per_contact": 389.710484587076,
+                "dnd_rate": 0.22366372599896212
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.3632572417149347,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 726523.3385316886,
-            "contacts": 3338,
-            "incremental_per_contact": 217.65228835580842,
-            "dnd_rate": 0.2085080886758538
+          {
+            "value": 0.035,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 627150.6980969686,
+                "contacts": 3219,
+                "incremental_per_contact": 194.82780307454755,
+                "dnd_rate": 0.1904318111214663
+              },
+              "random_targeting": {
+                "incremental": 262093.75095043238,
+                "contacts": 1497,
+                "incremental_per_contact": 175.07932595219265,
+                "dnd_rate": 0.17034068136272545
+              },
+              "ev_policy": {
+                "incremental": 656515.2056336115,
+                "contacts": 1757,
+                "incremental_per_contact": 373.6569184027385,
+                "dnd_rate": 0.23392145702902675
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.50488690879842,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 326802.52872424125,
-            "contacts": 1557,
-            "incremental_per_contact": 209.8924397715101,
-            "dnd_rate": 0.21708413615928066
+          {
+            "value": 0.05,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 577322.4026617554,
+                "contacts": 3169,
+                "incremental_per_contact": 182.1781011870481,
+                "dnd_rate": 0.19343641527295677
+              },
+              "random_targeting": {
+                "incremental": 240897.23153139115,
+                "contacts": 1471,
+                "incremental_per_contact": 163.76426344758067,
+                "dnd_rate": 0.1733514615907546
+              },
+              "ev_policy": {
+                "incremental": 603678.0662700227,
+                "contacts": 1816,
+                "incremental_per_contact": 332.4218426597041,
+                "dnd_rate": 0.20704845814977973
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.5059568448853584,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 706221.6500112247,
-            "contacts": 1824,
-            "incremental_per_contact": 387.1829221552767,
-            "dnd_rate": 0.2637061403508772
+          {
+            "value": 0.08,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 325769.05165107944,
+                "contacts": 3076,
+                "incremental_per_contact": 105.90671380074104,
+                "dnd_rate": 0.1960338101430429
+              },
+              "random_targeting": {
+                "incremental": 127814.37510603131,
+                "contacts": 1427,
+                "incremental_per_contact": 89.56858802104506,
+                "dnd_rate": 0.17659425367904696
+              },
+              "ev_policy": {
+                "incremental": 401204.9389634279,
+                "contacts": 1715,
+                "incremental_per_contact": 233.93873992036612,
+                "dnd_rate": 0.20116618075801748
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 3.1389656963905606,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.12,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 117903.95924659283,
+                "contacts": 2939,
+                "incremental_per_contact": 40.11703274807514,
+                "dnd_rate": 0.19802653963933312
+              },
+              "random_targeting": {
+                "incremental": 88486.32978346199,
+                "contacts": 1372,
+                "incremental_per_contact": 64.49440946316471,
+                "dnd_rate": 0.17711370262390672
+              },
+              "ev_policy": {
+                "incremental": 347310.0516973932,
+                "contacts": 1180,
+                "incremental_per_contact": 294.33055228592644,
+                "dnd_rate": 0.12627118644067797
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 3.9250136438849688,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 2.1610042393739874,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.035,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+        ],
+        "annoyance_decay_per_excess_contact": [
+          {
+            "value": 0.0,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 582508.3127150056,
+                "contacts": 3169,
+                "incremental_per_contact": 183.81455118807372,
+                "dnd_rate": 0.19343641527295677
+              },
+              "random_targeting": {
+                "incremental": 242175.97154656914,
+                "contacts": 1471,
+                "incremental_per_contact": 164.6335632539559,
+                "dnd_rate": 0.1733514615907546
+              },
+              "ev_policy": {
+                "incremental": 607585.236308095,
+                "contacts": 1816,
+                "incremental_per_contact": 334.57336801106555,
+                "dnd_rate": 0.20704845814977973
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.508858465305092,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 659228.0347566999,
-            "contacts": 3291,
-            "incremental_per_contact": 200.31237762281978,
-            "dnd_rate": 0.2093588574901246
+          {
+            "value": 0.025,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 579839.5205387771,
+                "contacts": 3169,
+                "incremental_per_contact": 182.97239524732632,
+                "dnd_rate": 0.19343641527295677
+              },
+              "random_targeting": {
+                "incremental": 240897.23153139115,
+                "contacts": 1471,
+                "incremental_per_contact": 163.76426344758067,
+                "dnd_rate": 0.1733514615907546
+              },
+              "ev_policy": {
+                "incremental": 606195.1841470443,
+                "contacts": 1816,
+                "incremental_per_contact": 333.8079207858174,
+                "dnd_rate": 0.20704845814977973
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.516405773090221,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 291720.1875591208,
-            "contacts": 1539,
-            "incremental_per_contact": 189.55177879085173,
-            "dnd_rate": 0.21702404158544508
+          {
+            "value": 0.05,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 577322.4026617554,
+                "contacts": 3169,
+                "incremental_per_contact": 182.1781011870481,
+                "dnd_rate": 0.19343641527295677
+              },
+              "random_targeting": {
+                "incremental": 240897.23153139115,
+                "contacts": 1471,
+                "incremental_per_contact": 163.76426344758067,
+                "dnd_rate": 0.1733514615907546
+              },
+              "ev_policy": {
+                "incremental": 603678.0662700227,
+                "contacts": 1816,
+                "incremental_per_contact": 332.4218426597041,
+                "dnd_rate": 0.20704845814977973
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.5059568448853584,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 596310.6915357838,
-            "contacts": 1670,
-            "incremental_per_contact": 357.07227038070886,
-            "dnd_rate": 0.23053892215568864
+          {
+            "value": 0.1,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 577322.4026617554,
+                "contacts": 3169,
+                "incremental_per_contact": 182.1781011870481,
+                "dnd_rate": 0.19343641527295677
+              },
+              "random_targeting": {
+                "incremental": 240897.23153139115,
+                "contacts": 1471,
+                "incremental_per_contact": 163.76426344758067,
+                "dnd_rate": 0.1733514615907546
+              },
+              "ev_policy": {
+                "incremental": 603678.0662700227,
+                "contacts": 1816,
+                "incremental_per_contact": 332.4218426597041,
+                "dnd_rate": 0.20704845814977973
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.5059568448853584,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.2,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 559471.6661589623,
+                "contacts": 3169,
+                "incremental_per_contact": 176.5451770776151,
+                "dnd_rate": 0.19343641527295677
+              },
+              "random_targeting": {
+                "incremental": 235884.01420950424,
+                "contacts": 1471,
+                "incremental_per_contact": 160.35622991808583,
+                "dnd_rate": 0.1733514615907546
+              },
+              "ev_policy": {
+                "incremental": 601983.2602702843,
+                "contacts": 1816,
+                "incremental_per_contact": 331.4885794439891,
+                "dnd_rate": 0.20704845814977973
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.5520307609129587,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 2.0441187033548505,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.05,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+        ],
+        "retry_success_generic": [
+          {
+            "value": 0.05,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 577322.4026617554,
+                "contacts": 3169,
+                "incremental_per_contact": 182.1781011870481,
+                "dnd_rate": 0.19343641527295677
+              },
+              "random_targeting": {
+                "incremental": 240897.23153139115,
+                "contacts": 1471,
+                "incremental_per_contact": 163.76426344758067,
+                "dnd_rate": 0.1733514615907546
+              },
+              "ev_policy": {
+                "incremental": 524766.8357933164,
+                "contacts": 1816,
+                "incremental_per_contact": 288.96852191261917,
+                "dnd_rate": 0.20704845814977973
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.178384668256075,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 603976.4798174873,
-            "contacts": 3246,
-            "incremental_per_contact": 186.06792354204785,
-            "dnd_rate": 0.2113370301910043
+          {
+            "value": 0.11,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 577322.4026617554,
+                "contacts": 3169,
+                "incremental_per_contact": 182.1781011870481,
+                "dnd_rate": 0.19343641527295677
+              },
+              "random_targeting": {
+                "incremental": 240897.23153139115,
+                "contacts": 1471,
+                "incremental_per_contact": 163.76426344758067,
+                "dnd_rate": 0.1733514615907546
+              },
+              "ev_policy": {
+                "incremental": 578004.6491707028,
+                "contacts": 1816,
+                "incremental_per_contact": 318.28449844201697,
+                "dnd_rate": 0.20704845814977973
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.399382697328273,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 253781.58747974248,
-            "contacts": 1514,
-            "incremental_per_contact": 167.62324140009412,
-            "dnd_rate": 0.2192866578599736
+          {
+            "value": 0.17,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 577322.4026617554,
+                "contacts": 3169,
+                "incremental_per_contact": 182.1781011870481,
+                "dnd_rate": 0.19343641527295677
+              },
+              "random_targeting": {
+                "incremental": 240897.23153139115,
+                "contacts": 1471,
+                "incremental_per_contact": 163.76426344758067,
+                "dnd_rate": 0.1733514615907546
+              },
+              "ev_policy": {
+                "incremental": 603678.0662700227,
+                "contacts": 1816,
+                "incremental_per_contact": 332.4218426597041,
+                "dnd_rate": 0.20704845814977973
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.5059568448853584,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 507119.0174437859,
-            "contacts": 1530,
-            "incremental_per_contact": 331.45033819855286,
-            "dnd_rate": 0.15163398692810456
+          {
+            "value": 0.25,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 577322.4026617554,
+                "contacts": 3169,
+                "incremental_per_contact": 182.1781011870481,
+                "dnd_rate": 0.19343641527295677
+              },
+              "random_targeting": {
+                "incremental": 240897.23153139115,
+                "contacts": 1471,
+                "incremental_per_contact": 163.76426344758067,
+                "dnd_rate": 0.1733514615907546
+              },
+              "ev_policy": {
+                "incremental": 624303.6736584781,
+                "contacts": 1816,
+                "incremental_per_contact": 343.77955597933817,
+                "dnd_rate": 0.20704845814977973
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.591576788532439,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.35,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 577322.4026617554,
+                "contacts": 3169,
+                "incremental_per_contact": 182.1781011870481,
+                "dnd_rate": 0.19343641527295677
+              },
+              "random_targeting": {
+                "incremental": 240897.23153139115,
+                "contacts": 1471,
+                "incremental_per_contact": 163.76426344758067,
+                "dnd_rate": 0.1733514615907546
+              },
+              "ev_policy": {
+                "incremental": 647436.4360596458,
+                "contacts": 1816,
+                "incremental_per_contact": 356.5178612663248,
+                "dnd_rate": 0.20704845814977973
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.6876043030626477,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 1.998249843418075,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.08,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+        ],
+        "amount_liquidity_coupling": [
+          {
+            "value": 0.0,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 981220.4736749437,
+                "contacts": 3065,
+                "incremental_per_contact": 320.1371855383177,
+                "dnd_rate": 0.1298531810766721
+              },
+              "random_targeting": {
+                "incremental": 422255.36877128354,
+                "contacts": 1421,
+                "incremental_per_contact": 297.1536726047034,
+                "dnd_rate": 0.11681914144968332
+              },
+              "ev_policy": {
+                "incremental": 934947.68700368,
+                "contacts": 1688,
+                "incremental_per_contact": 553.8789614950712,
+                "dnd_rate": 0.16291469194312796
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.2141759611589413,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 355587.964691784,
-            "contacts": 3153,
-            "incremental_per_contact": 112.7776608600647,
-            "dnd_rate": 0.21408182683158897
+          {
+            "value": 0.125,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 756197.6409546586,
+                "contacts": 3120,
+                "incremental_per_contact": 242.3710387675188,
+                "dnd_rate": 0.15576923076923077
+              },
+              "random_targeting": {
+                "incremental": 361488.2790820651,
+                "contacts": 1446,
+                "incremental_per_contact": 249.99189424762454,
+                "dnd_rate": 0.13831258644536654
+              },
+              "ev_policy": {
+                "incremental": 748267.7623535688,
+                "contacts": 1668,
+                "incremental_per_contact": 448.6017759913482,
+                "dnd_rate": 0.18525179856115107
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.0699641057620486,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 96797.89206272014,
-            "contacts": 1478,
-            "incremental_per_contact": 65.49248448086614,
-            "dnd_rate": 0.22259810554803788
+          {
+            "value": 0.25,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 577322.4026617554,
+                "contacts": 3169,
+                "incremental_per_contact": 182.1781011870481,
+                "dnd_rate": 0.19343641527295677
+              },
+              "random_targeting": {
+                "incremental": 240897.23153139115,
+                "contacts": 1471,
+                "incremental_per_contact": 163.76426344758067,
+                "dnd_rate": 0.1733514615907546
+              },
+              "ev_policy": {
+                "incremental": 603678.0662700227,
+                "contacts": 1816,
+                "incremental_per_contact": 332.4218426597041,
+                "dnd_rate": 0.20704845814977973
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.5059568448853584,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 227459.9547814764,
-            "contacts": 1515,
-            "incremental_per_contact": 150.13858401417585,
-            "dnd_rate": 0.25676567656765675
+          {
+            "value": 0.4,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 402264.6016632351,
+                "contacts": 3226,
+                "incremental_per_contact": 124.69454484291231,
+                "dnd_rate": 0.231556106633602
+              },
+              "random_targeting": {
+                "incremental": 189179.17269023485,
+                "contacts": 1502,
+                "incremental_per_contact": 125.9515131093441,
+                "dnd_rate": 0.21837549933422104
+              },
+              "ev_policy": {
+                "incremental": 498497.12011620565,
+                "contacts": 1544,
+                "incremental_per_contact": 322.86082909080676,
+                "dnd_rate": 0.26424870466321243
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.635052860350823,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.55,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 265495.68900284125,
+                "contacts": 3274,
+                "incremental_per_contact": 81.09214691595639,
+                "dnd_rate": 0.28313989004276113
+              },
+              "random_targeting": {
+                "incremental": 124358.48779222777,
+                "contacts": 1520,
+                "incremental_per_contact": 81.81479460014985,
+                "dnd_rate": 0.2756578947368421
+              },
+              "ev_policy": {
+                "incremental": 464770.79216518626,
+                "contacts": 1382,
+                "incremental_per_contact": 336.30303340462103,
+                "dnd_rate": 0.2865412445730825
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 3.7373467659216244,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 2.349844091998345,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.12,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+        ],
+        "opt_out_per_contact": [
+          {
+            "value": 0.005,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 577322.4026617554,
+                "contacts": 3202,
+                "incremental_per_contact": 180.30056297993613,
+                "dnd_rate": 0.1930043722673329
+              },
+              "random_targeting": {
+                "incremental": 240897.23153139115,
+                "contacts": 1487,
+                "incremental_per_contact": 162.00217318856164,
+                "dnd_rate": 0.17283120376597175
+              },
+              "ev_policy": {
+                "incremental": 603678.0662700227,
+                "contacts": 1838,
+                "incremental_per_contact": 328.44290874321143,
+                "dnd_rate": 0.20729053318824808
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.5059568448853584,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 236769.83628497017,
-            "contacts": 3047,
-            "incremental_per_contact": 77.70588653920912,
-            "dnd_rate": 0.21496553987528716
+          {
+            "value": 0.01,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 577322.4026617554,
+                "contacts": 3185,
+                "incremental_per_contact": 181.26292077292166,
+                "dnd_rate": 0.19309262166405022
+              },
+              "random_targeting": {
+                "incremental": 240897.23153139115,
+                "contacts": 1482,
+                "incremental_per_contact": 162.5487392249603,
+                "dnd_rate": 0.17273954116059378
+              },
+              "ev_policy": {
+                "incremental": 603678.0662700227,
+                "contacts": 1827,
+                "incremental_per_contact": 330.42039752053785,
+                "dnd_rate": 0.20689655172413793
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.5059568448853584,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 32380.566213476006,
-            "contacts": 1418,
-            "incremental_per_contact": 22.83537814772638,
-            "dnd_rate": 0.22708039492242596
+          {
+            "value": 0.015,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 577322.4026617554,
+                "contacts": 3169,
+                "incremental_per_contact": 182.1781011870481,
+                "dnd_rate": 0.19343641527295677
+              },
+              "random_targeting": {
+                "incremental": 240897.23153139115,
+                "contacts": 1471,
+                "incremental_per_contact": 163.76426344758067,
+                "dnd_rate": 0.1733514615907546
+              },
+              "ev_policy": {
+                "incremental": 603678.0662700227,
+                "contacts": 1816,
+                "incremental_per_contact": 332.4218426597041,
+                "dnd_rate": 0.20704845814977973
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.5059568448853584,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 82575.74362614262,
-            "contacts": 1365,
-            "incremental_per_contact": 60.495050275562356,
-            "dnd_rate": 0.18754578754578755
+          {
+            "value": 0.03,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 562851.7780746352,
+                "contacts": 3125,
+                "incremental_per_contact": 180.11256898388325,
+                "dnd_rate": 0.19328
+              },
+              "random_targeting": {
+                "incremental": 236816.7929483269,
+                "contacts": 1450,
+                "incremental_per_contact": 163.32192617125995,
+                "dnd_rate": 0.17310344827586208
+              },
+              "ev_policy": {
+                "incremental": 598652.9991680011,
+                "contacts": 1790,
+                "incremental_per_contact": 334.44301629497267,
+                "dnd_rate": 0.20726256983240224
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.5279161655509217,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.06,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 534466.3494764012,
+                "contacts": 3025,
+                "incremental_per_contact": 176.6830907360004,
+                "dnd_rate": 0.1937190082644628
+              },
+              "random_targeting": {
+                "incremental": 227449.0555816315,
+                "contacts": 1402,
+                "incremental_per_contact": 162.2318513421052,
+                "dnd_rate": 0.17261055634807418
+              },
+              "ev_policy": {
+                "incremental": 583444.6738933171,
+                "contacts": 1734,
+                "incremental_per_contact": 336.47328367550006,
+                "dnd_rate": 0.20530565167243367
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.565166394739849,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 2.5501636716833134,
-        "c2_ev_more_efficient_than_blast": false
+        ]
       }
-    ],
-    "annoyance_decay_per_excess_contact": [
-      {
-        "value": 0.0,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+    },
+    {
+      "eval_seed": 20266923,
+      "c1_held": 25,
+      "c1_of": 25,
+      "c2_held": 25,
+      "c2_of": 25,
+      "c2_flip_settings": [],
+      "sweeps": {
+        "base_organic_resolution": [
+          {
+            "value": 0.02,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 753323.4259476487,
+                "contacts": 3412,
+                "incremental_per_contact": 220.78646715933434,
+                "dnd_rate": 0.20691676436107856
+              },
+              "random_targeting": {
+                "incremental": 334810.0306884248,
+                "contacts": 1570,
+                "incremental_per_contact": 213.2547966168311,
+                "dnd_rate": 0.20127388535031848
+              },
+              "ev_policy": {
+                "incremental": 703902.4589594319,
+                "contacts": 2082,
+                "incremental_per_contact": 338.0895576174024,
+                "dnd_rate": 0.2276657060518732
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.1023935797625057,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 610946.313763673,
-            "contacts": 3246,
-            "incremental_per_contact": 188.21513054949875,
-            "dnd_rate": 0.2113370301910043
+          {
+            "value": 0.035,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 625404.4531729394,
+                "contacts": 3378,
+                "incremental_per_contact": 185.1404538700235,
+                "dnd_rate": 0.20899940793368857
+              },
+              "random_targeting": {
+                "incremental": 268326.6122524119,
+                "contacts": 1560,
+                "incremental_per_contact": 172.00423862334097,
+                "dnd_rate": 0.20256410256410257
+              },
+              "ev_policy": {
+                "incremental": 647700.1326815584,
+                "contacts": 1911,
+                "incremental_per_contact": 338.93256550578667,
+                "dnd_rate": 0.23495552066980638
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.4138497752592425,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 255924.48041384644,
-            "contacts": 1514,
-            "incremental_per_contact": 169.03862642922485,
-            "dnd_rate": 0.2192866578599736
+          {
+            "value": 0.05,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 427493.6075373506,
+                "contacts": 3337,
+                "incremental_per_contact": 128.10716438038676,
+                "dnd_rate": 0.2112676056338028
+              },
+              "random_targeting": {
+                "incremental": 198749.7412921962,
+                "contacts": 1533,
+                "incremental_per_contact": 129.6475807515957,
+                "dnd_rate": 0.2054794520547945
+              },
+              "ev_policy": {
+                "incremental": 429310.04017586284,
+                "contacts": 1937,
+                "incremental_per_contact": 221.6365721093768,
+                "dnd_rate": 0.20753742901393907
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.1600533282944174,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 507119.0174437859,
-            "contacts": 1530,
-            "incremental_per_contact": 331.45033819855286,
-            "dnd_rate": 0.15163398692810456
+          {
+            "value": 0.08,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 271877.3789138226,
+                "contacts": 3231,
+                "incremental_per_contact": 84.14651157964178,
+                "dnd_rate": 0.2135561745589601
+              },
+              "random_targeting": {
+                "incremental": 178524.21756166383,
+                "contacts": 1495,
+                "incremental_per_contact": 119.41419234893901,
+                "dnd_rate": 0.20735785953177258
+              },
+              "ev_policy": {
+                "incremental": 322098.7153812172,
+                "contacts": 1865,
+                "incremental_per_contact": 172.70708599529073,
+                "dnd_rate": 0.21286863270777479
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.8042298113977813,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.12,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 97233.41595129715,
+                "contacts": 3096,
+                "incremental_per_contact": 31.406142103132154,
+                "dnd_rate": 0.2157622739018088
+              },
+              "random_targeting": {
+                "incremental": 2604.66355919512,
+                "contacts": 1439,
+                "incremental_per_contact": 1.8100511182731895,
+                "dnd_rate": 0.2126476719944406
+              },
+              "ev_policy": {
+                "incremental": 214113.49711364252,
+                "contacts": 1315,
+                "incremental_per_contact": 162.82395217767493,
+                "dnd_rate": 0.13460076045627375
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 82.20389783462352,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 1.9815182065574253,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.025,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+        ],
+        "annoyance_decay_per_excess_contact": [
+          {
+            "value": 0.0,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 437223.9619920659,
+                "contacts": 3337,
+                "incremental_per_contact": 131.02306322806888,
+                "dnd_rate": 0.2112676056338028
+              },
+              "random_targeting": {
+                "incremental": 201780.62067149812,
+                "contacts": 1533,
+                "incremental_per_contact": 131.62467101858977,
+                "dnd_rate": 0.2054794520547945
+              },
+              "ev_policy": {
+                "incremental": 429310.04017586284,
+                "contacts": 1937,
+                "incremental_per_contact": 221.6365721093768,
+                "dnd_rate": 0.20753742901393907
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.127607887948695,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 608803.420829569,
-            "contacts": 3246,
-            "incremental_per_contact": 187.55496636770457,
-            "dnd_rate": 0.2113370301910043
+          {
+            "value": 0.025,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 429221.2741222433,
+                "contacts": 3337,
+                "incremental_per_contact": 128.62489485233542,
+                "dnd_rate": 0.2112676056338028
+              },
+              "random_targeting": {
+                "incremental": 200477.40787708876,
+                "contacts": 1533,
+                "incremental_per_contact": 130.7745648252373,
+                "dnd_rate": 0.2054794520547945
+              },
+              "ev_policy": {
+                "incremental": 429310.04017586284,
+                "contacts": 1937,
+                "incremental_per_contact": 221.6365721093768,
+                "dnd_rate": 0.20753742901393907
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.1414385028315497,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 253781.58747974248,
-            "contacts": 1514,
-            "incremental_per_contact": 167.62324140009412,
-            "dnd_rate": 0.2192866578599736
+          {
+            "value": 0.05,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 427493.6075373506,
+                "contacts": 3337,
+                "incremental_per_contact": 128.10716438038676,
+                "dnd_rate": 0.2112676056338028
+              },
+              "random_targeting": {
+                "incremental": 198749.7412921962,
+                "contacts": 1533,
+                "incremental_per_contact": 129.6475807515957,
+                "dnd_rate": 0.2054794520547945
+              },
+              "ev_policy": {
+                "incremental": 429310.04017586284,
+                "contacts": 1937,
+                "incremental_per_contact": 221.6365721093768,
+                "dnd_rate": 0.20753742901393907
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.1600533282944174,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 507119.0174437859,
-            "contacts": 1530,
-            "incremental_per_contact": 331.45033819855286,
-            "dnd_rate": 0.15163398692810456
+          {
+            "value": 0.1,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 421906.7810668915,
+                "contacts": 3337,
+                "incremental_per_contact": 126.43295806619464,
+                "dnd_rate": 0.2112676056338028
+              },
+              "random_targeting": {
+                "incremental": 196391.7734347285,
+                "contacts": 1533,
+                "incremental_per_contact": 128.1094412490075,
+                "dnd_rate": 0.2054794520547945
+              },
+              "ev_policy": {
+                "incremental": 429310.04017586284,
+                "contacts": 1937,
+                "incremental_per_contact": 221.6365721093768,
+                "dnd_rate": 0.20753742901393907
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.18598789892055,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.2,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 411530.1482282365,
+                "contacts": 3337,
+                "incremental_per_contact": 123.323388740856,
+                "dnd_rate": 0.2112676056338028
+              },
+              "random_targeting": {
+                "incremental": 193579.51769837213,
+                "contacts": 1533,
+                "incremental_per_contact": 126.27496262124731,
+                "dnd_rate": 0.2054794520547945
+              },
+              "ev_policy": {
+                "incremental": 427900.3820474183,
+                "contacts": 1937,
+                "incremental_per_contact": 220.90881881642656,
+                "dnd_rate": 0.20753742901393907
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.2104631065056974,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 1.998249843418075,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.05,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+        ],
+        "retry_success_generic": [
+          {
+            "value": 0.05,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 427493.6075373506,
+                "contacts": 3337,
+                "incremental_per_contact": 128.10716438038676,
+                "dnd_rate": 0.2112676056338028
+              },
+              "random_targeting": {
+                "incremental": 198749.7412921962,
+                "contacts": 1533,
+                "incremental_per_contact": 129.6475807515957,
+                "dnd_rate": 0.2054794520547945
+              },
+              "ev_policy": {
+                "incremental": 383893.67591544776,
+                "contacts": 1937,
+                "incremental_per_contact": 198.18981719950838,
+                "dnd_rate": 0.20753742901393907
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.931543021990948,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 603976.4798174873,
-            "contacts": 3246,
-            "incremental_per_contact": 186.06792354204785,
-            "dnd_rate": 0.2113370301910043
+          {
+            "value": 0.11,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 427493.6075373506,
+                "contacts": 3337,
+                "incremental_per_contact": 128.10716438038676,
+                "dnd_rate": 0.2112676056338028
+              },
+              "random_targeting": {
+                "incremental": 198749.7412921962,
+                "contacts": 1533,
+                "incremental_per_contact": 129.6475807515957,
+                "dnd_rate": 0.2054794520547945
+              },
+              "ev_policy": {
+                "incremental": 412569.0466111717,
+                "contacts": 1937,
+                "incremental_per_contact": 212.99382891645413,
+                "dnd_rate": 0.20753742901393907
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.075821804490424,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 253781.58747974248,
-            "contacts": 1514,
-            "incremental_per_contact": 167.62324140009412,
-            "dnd_rate": 0.2192866578599736
+          {
+            "value": 0.17,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 427493.6075373506,
+                "contacts": 3337,
+                "incremental_per_contact": 128.10716438038676,
+                "dnd_rate": 0.2112676056338028
+              },
+              "random_targeting": {
+                "incremental": 198749.7412921962,
+                "contacts": 1533,
+                "incremental_per_contact": 129.6475807515957,
+                "dnd_rate": 0.2054794520547945
+              },
+              "ev_policy": {
+                "incremental": 429310.04017586284,
+                "contacts": 1937,
+                "incremental_per_contact": 221.6365721093768,
+                "dnd_rate": 0.20753742901393907
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.1600533282944174,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 507119.0174437859,
-            "contacts": 1530,
-            "incremental_per_contact": 331.45033819855286,
-            "dnd_rate": 0.15163398692810456
+          {
+            "value": 0.25,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 427493.6075373506,
+                "contacts": 3337,
+                "incremental_per_contact": 128.10716438038676,
+                "dnd_rate": 0.2112676056338028
+              },
+              "random_targeting": {
+                "incremental": 198749.7412921962,
+                "contacts": 1533,
+                "incremental_per_contact": 129.6475807515957,
+                "dnd_rate": 0.2054794520547945
+              },
+              "ev_policy": {
+                "incremental": 465913.8280355525,
+                "contacts": 1937,
+                "incremental_per_contact": 240.53372639935597,
+                "dnd_rate": 0.20753742901393907
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.344223569833881,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.35,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 427493.6075373506,
+                "contacts": 3337,
+                "incremental_per_contact": 128.10716438038676,
+                "dnd_rate": 0.2112676056338028
+              },
+              "random_targeting": {
+                "incremental": 198749.7412921962,
+                "contacts": 1533,
+                "incremental_per_contact": 129.6475807515957,
+                "dnd_rate": 0.2054794520547945
+              },
+              "ev_policy": {
+                "incremental": 506736.50505372975,
+                "contacts": 1937,
+                "incremental_per_contact": 261.6089339461692,
+                "dnd_rate": 0.20753742901393907
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.5496209542670054,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 1.998249843418075,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.1,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+        ],
+        "amount_liquidity_coupling": [
+          {
+            "value": 0.0,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 680605.4829408061,
+                "contacts": 3229,
+                "incremental_per_contact": 210.77902847346115,
+                "dnd_rate": 0.1353360173428306
+              },
+              "random_targeting": {
+                "incremental": 345656.8212010546,
+                "contacts": 1489,
+                "incremental_per_contact": 232.1402425796203,
+                "dnd_rate": 0.12357286769644056
+              },
+              "ev_policy": {
+                "incremental": 642488.8417401684,
+                "contacts": 1867,
+                "incremental_per_contact": 344.1289993252107,
+                "dnd_rate": 0.13336904124263524
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.8587477588543193,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 582777.4722410995,
-            "contacts": 3246,
-            "incremental_per_contact": 179.5371140607207,
-            "dnd_rate": 0.2113370301910043
+          {
+            "value": 0.125,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 526810.3587715924,
+                "contacts": 3281,
+                "incremental_per_contact": 160.56396183224393,
+                "dnd_rate": 0.16915574519963425
+              },
+              "random_targeting": {
+                "incremental": 297708.79809379065,
+                "contacts": 1509,
+                "incremental_per_contact": 197.28879926692554,
+                "dnd_rate": 0.16302186878727634
+              },
+              "ev_policy": {
+                "incremental": 478679.2699786895,
+                "contacts": 1852,
+                "incremental_per_contact": 258.46612849821247,
+                "dnd_rate": 0.1787257019438445
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.6078774730328447,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 245639.78831849084,
-            "contacts": 1514,
-            "incremental_per_contact": 162.24556692106395,
-            "dnd_rate": 0.2192866578599736
+          {
+            "value": 0.25,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 427493.6075373506,
+                "contacts": 3337,
+                "incremental_per_contact": 128.10716438038676,
+                "dnd_rate": 0.2112676056338028
+              },
+              "random_targeting": {
+                "incremental": 198749.7412921962,
+                "contacts": 1533,
+                "incremental_per_contact": 129.6475807515957,
+                "dnd_rate": 0.2054794520547945
+              },
+              "ev_policy": {
+                "incremental": 429310.04017586284,
+                "contacts": 1937,
+                "incremental_per_contact": 221.6365721093768,
+                "dnd_rate": 0.20753742901393907
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.1600533282944174,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 503643.7260522437,
-            "contacts": 1530,
-            "incremental_per_contact": 329.17890591649916,
-            "dnd_rate": 0.15163398692810456
+          {
+            "value": 0.4,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 293204.12958457274,
+                "contacts": 3388,
+                "incremental_per_contact": 86.54195088092466,
+                "dnd_rate": 0.26092089728453366
+              },
+              "random_targeting": {
+                "incremental": 116959.0023495144,
+                "contacts": 1557,
+                "incremental_per_contact": 75.11817748844855,
+                "dnd_rate": 0.24470134874759153
+              },
+              "ev_policy": {
+                "incremental": 326476.05253365915,
+                "contacts": 1718,
+                "incremental_per_contact": 190.03262662029053,
+                "dnd_rate": 0.27473806752037255
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.7913717283431896,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.55,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 33770.415374941425,
+                "contacts": 3435,
+                "incremental_per_contact": 9.831270851511333,
+                "dnd_rate": 0.3042212518195051
+              },
+              "random_targeting": {
+                "incremental": 22904.43249754631,
+                "contacts": 1577,
+                "incremental_per_contact": 14.524053581196139,
+                "dnd_rate": 0.2828154724159797
+              },
+              "ev_policy": {
+                "incremental": 240727.60769572994,
+                "contacts": 1585,
+                "incremental_per_contact": 151.87861684273182,
+                "dnd_rate": 0.31482649842271293
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 10.510088286252822,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 2.050334473498369,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.2,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+        ],
+        "opt_out_per_contact": [
+          {
+            "value": 0.005,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 441871.36740262574,
+                "contacts": 3370,
+                "incremental_per_contact": 131.1191001194735,
+                "dnd_rate": 0.20979228486646884
+              },
+              "random_targeting": {
+                "incremental": 208225.9786410164,
+                "contacts": 1552,
+                "incremental_per_contact": 134.16622335117037,
+                "dnd_rate": 0.20425257731958762
+              },
+              "ev_policy": {
+                "incremental": 442253.81665177434,
+                "contacts": 1959,
+                "incremental_per_contact": 225.75488343633197,
+                "dnd_rate": 0.2062276671771312
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.1239127775416735,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 579433.510066981,
-            "contacts": 3246,
-            "incremental_per_contact": 178.50693470948275,
-            "dnd_rate": 0.2113370301910043
+          {
+            "value": 0.01,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 433157.97186416364,
+                "contacts": 3351,
+                "incremental_per_contact": 129.26230136203034,
+                "dnd_rate": 0.21068337809609072
+              },
+              "random_targeting": {
+                "incremental": 199512.58310255432,
+                "contacts": 1540,
+                "incremental_per_contact": 129.55362539126904,
+                "dnd_rate": 0.2051948051948052
+              },
+              "ev_policy": {
+                "incremental": 433540.42111331224,
+                "contacts": 1947,
+                "incremental_per_contact": 222.67099184042746,
+                "dnd_rate": 0.20698510529019004
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.1729978850028817,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 243651.38660042826,
-            "contacts": 1514,
-            "incremental_per_contact": 160.93222364625382,
-            "dnd_rate": 0.2192866578599736
+          {
+            "value": 0.015,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 427493.6075373506,
+                "contacts": 3337,
+                "incremental_per_contact": 128.10716438038676,
+                "dnd_rate": 0.2112676056338028
+              },
+              "random_targeting": {
+                "incremental": 198749.7412921962,
+                "contacts": 1533,
+                "incremental_per_contact": 129.6475807515957,
+                "dnd_rate": 0.2054794520547945
+              },
+              "ev_policy": {
+                "incremental": 429310.04017586284,
+                "contacts": 1937,
+                "incremental_per_contact": 221.6365721093768,
+                "dnd_rate": 0.20753742901393907
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.1600533282944174,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 502529.4461584445,
-            "contacts": 1530,
-            "incremental_per_contact": 328.4506184042121,
-            "dnd_rate": 0.15163398692810456
+          {
+            "value": 0.03,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 414844.2092302034,
+                "contacts": 3285,
+                "incremental_per_contact": 126.284386371447,
+                "dnd_rate": 0.21187214611872146
+              },
+              "random_targeting": {
+                "incremental": 191896.52745591302,
+                "contacts": 1511,
+                "incremental_per_contact": 126.99968726400597,
+                "dnd_rate": 0.20516214427531437
+              },
+              "ev_policy": {
+                "incremental": 424139.8822326476,
+                "contacts": 1906,
+                "incremental_per_contact": 222.52879445574376,
+                "dnd_rate": 0.20776495278069254
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.2102530350899183,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.06,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 358127.5328154317,
+                "contacts": 3163,
+                "incremental_per_contact": 113.22400658091424,
+                "dnd_rate": 0.20961112867530826
+              },
+              "random_targeting": {
+                "incremental": 185729.7641583432,
+                "contacts": 1468,
+                "incremental_per_contact": 126.51891291440272,
+                "dnd_rate": 0.2064032697547684
+              },
+              "ev_policy": {
+                "incremental": 382762.7408351614,
+                "contacts": 1850,
+                "incremental_per_contact": 206.898778829817,
+                "dnd_rate": 0.20810810810810812
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.0608583797524154,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 2.062493684809431,
-        "c2_ev_more_efficient_than_blast": true
+        ]
       }
-    ],
-    "retry_success_generic": [
-      {
-        "value": 0.05,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+    },
+    {
+      "eval_seed": 20267023,
+      "c1_held": 25,
+      "c1_of": 25,
+      "c2_held": 25,
+      "c2_of": 25,
+      "c2_flip_settings": [],
+      "sweeps": {
+        "base_organic_resolution": [
+          {
+            "value": 0.02,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 797126.2572295803,
+                "contacts": 3295,
+                "incremental_per_contact": 241.91995667058583,
+                "dnd_rate": 0.2094081942336874
+              },
+              "random_targeting": {
+                "incremental": 372358.09207196656,
+                "contacts": 1525,
+                "incremental_per_contact": 244.1692407029289,
+                "dnd_rate": 0.2039344262295082
+              },
+              "ev_policy": {
+                "incremental": 804237.9471211068,
+                "contacts": 1995,
+                "incremental_per_contact": 403.1267905368956,
+                "dnd_rate": 0.23609022556390977
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.159850864650122,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 603976.4798174873,
-            "contacts": 3246,
-            "incremental_per_contact": 186.06792354204785,
-            "dnd_rate": 0.2113370301910043
+          {
+            "value": 0.035,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 703223.0409765495,
+                "contacts": 3236,
+                "incremental_per_contact": 217.3124354068447,
+                "dnd_rate": 0.2126081582200247
+              },
+              "random_targeting": {
+                "incremental": 353647.64988622884,
+                "contacts": 1497,
+                "incremental_per_contact": 236.23757507430116,
+                "dnd_rate": 0.20774883099532399
+              },
+              "ev_policy": {
+                "incremental": 756226.1829644314,
+                "contacts": 1811,
+                "incremental_per_contact": 417.57381720841045,
+                "dnd_rate": 0.24516841524019878
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.138360549568801,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 253781.58747974248,
-            "contacts": 1514,
-            "incremental_per_contact": 167.62324140009412,
-            "dnd_rate": 0.2192866578599736
+          {
+            "value": 0.05,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 469537.96076596016,
+                "contacts": 3193,
+                "incremental_per_contact": 147.05228962291267,
+                "dnd_rate": 0.21515815847165676
+              },
+              "random_targeting": {
+                "incremental": 306102.2102583782,
+                "contacts": 1482,
+                "incremental_per_contact": 206.54670057920256,
+                "dnd_rate": 0.20985155195681512
+              },
+              "ev_policy": {
+                "incremental": 552866.5187625787,
+                "contacts": 1848,
+                "incremental_per_contact": 299.17019413559456,
+                "dnd_rate": 0.22402597402597402
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.8061500382369307,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 418532.1533681138,
-            "contacts": 1530,
-            "incremental_per_contact": 273.5504270379829,
-            "dnd_rate": 0.15163398692810456
+          {
+            "value": 0.08,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 246661.9201171943,
+                "contacts": 3104,
+                "incremental_per_contact": 79.46582478002394,
+                "dnd_rate": 0.21778350515463918
+              },
+              "random_targeting": {
+                "incremental": 219411.43826362444,
+                "contacts": 1426,
+                "incremental_per_contact": 153.86496371923172,
+                "dnd_rate": 0.2138849929873773
+              },
+              "ev_policy": {
+                "incremental": 331494.88037520135,
+                "contacts": 1805,
+                "incremental_per_contact": 183.65367333806168,
+                "dnd_rate": 0.23601108033240997
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.510836823269477,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.12,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": -36955.194417657796,
+                "contacts": 2982,
+                "incremental_per_contact": -12.3927546672226,
+                "dnd_rate": 0.22099262240107312
+              },
+              "random_targeting": {
+                "incremental": -10733.695798271568,
+                "contacts": 1370,
+                "incremental_per_contact": -7.8348144512931155,
+                "dnd_rate": 0.2167883211678832
+              },
+              "ev_policy": {
+                "incremental": 190543.57668962562,
+                "contacts": 1208,
+                "incremental_per_contact": 157.734748915253,
+                "dnd_rate": 0.1390728476821192
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": null,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 1.6491825018689432,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.11,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+        ],
+        "annoyance_decay_per_excess_contact": [
+          {
+            "value": 0.0,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 477923.8326182347,
+                "contacts": 3193,
+                "incremental_per_contact": 149.67861967373463,
+                "dnd_rate": 0.21515815847165676
+              },
+              "random_targeting": {
+                "incremental": 307288.6306930657,
+                "contacts": 1482,
+                "incremental_per_contact": 207.34725417885676,
+                "dnd_rate": 0.20985155195681512
+              },
+              "ev_policy": {
+                "incremental": 554052.9391972662,
+                "contacts": 1848,
+                "incremental_per_contact": 299.81219653531724,
+                "dnd_rate": 0.22402597402597402
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.8030375479484637,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 603976.4798174873,
-            "contacts": 3246,
-            "incremental_per_contact": 186.06792354204785,
-            "dnd_rate": 0.2113370301910043
+          {
+            "value": 0.025,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 473577.7018411043,
+                "contacts": 3193,
+                "incremental_per_contact": 148.31747630476175,
+                "dnd_rate": 0.21515815847165676
+              },
+              "random_targeting": {
+                "incremental": 306102.2102583782,
+                "contacts": 1482,
+                "incremental_per_contact": 206.54670057920256,
+                "dnd_rate": 0.20985155195681512
+              },
+              "ev_policy": {
+                "incremental": 552866.5187625787,
+                "contacts": 1848,
+                "incremental_per_contact": 299.17019413559456,
+                "dnd_rate": 0.22402597402597402
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.8061500382369307,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 253781.58747974248,
-            "contacts": 1514,
-            "incremental_per_contact": 167.62324140009412,
-            "dnd_rate": 0.2192866578599736
+          {
+            "value": 0.05,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 469537.96076596016,
+                "contacts": 3193,
+                "incremental_per_contact": 147.05228962291267,
+                "dnd_rate": 0.21515815847165676
+              },
+              "random_targeting": {
+                "incremental": 306102.2102583782,
+                "contacts": 1482,
+                "incremental_per_contact": 206.54670057920256,
+                "dnd_rate": 0.20985155195681512
+              },
+              "ev_policy": {
+                "incremental": 552866.5187625787,
+                "contacts": 1848,
+                "incremental_per_contact": 299.17019413559456,
+                "dnd_rate": 0.22402597402597402
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.8061500382369307,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 470216.82171769394,
-            "contacts": 1530,
-            "incremental_per_contact": 307.33125602463656,
-            "dnd_rate": 0.15163398692810456
+          {
+            "value": 0.1,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 457287.13604474184,
+                "contacts": 3193,
+                "incremental_per_contact": 143.21551395074908,
+                "dnd_rate": 0.21515815847165676
+              },
+              "random_targeting": {
+                "incremental": 302456.05643076263,
+                "contacts": 1482,
+                "incremental_per_contact": 204.08640784801798,
+                "dnd_rate": 0.20985155195681512
+              },
+              "ev_policy": {
+                "incremental": 548126.751085601,
+                "contacts": 1848,
+                "incremental_per_contact": 296.60538478658066,
+                "dnd_rate": 0.22402597402597402
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.81225252208192,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.2,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 453149.05392284924,
+                "contacts": 3193,
+                "incremental_per_contact": 141.91952831908839,
+                "dnd_rate": 0.21515815847165676
+              },
+              "random_targeting": {
+                "incremental": 302456.05643076263,
+                "contacts": 1482,
+                "incremental_per_contact": 204.08640784801798,
+                "dnd_rate": 0.20985155195681512
+              },
+              "ev_policy": {
+                "incremental": 545742.0893200003,
+                "contacts": 1848,
+                "incremental_per_contact": 295.31498339826857,
+                "dnd_rate": 0.22402597402597402
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.804368197351439,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 1.8528405720341232,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.17,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+        ],
+        "retry_success_generic": [
+          {
+            "value": 0.05,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 469537.96076596016,
+                "contacts": 3193,
+                "incremental_per_contact": 147.05228962291267,
+                "dnd_rate": 0.21515815847165676
+              },
+              "random_targeting": {
+                "incremental": 306102.2102583782,
+                "contacts": 1482,
+                "incremental_per_contact": 206.54670057920256,
+                "dnd_rate": 0.20985155195681512
+              },
+              "ev_policy": {
+                "incremental": 474530.1788849225,
+                "contacts": 1848,
+                "incremental_per_contact": 256.78039982950355,
+                "dnd_rate": 0.22402597402597402
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.550234408579983,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 603976.4798174873,
-            "contacts": 3246,
-            "incremental_per_contact": 186.06792354204785,
-            "dnd_rate": 0.2113370301910043
+          {
+            "value": 0.11,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 469537.96076596016,
+                "contacts": 3193,
+                "incremental_per_contact": 147.05228962291267,
+                "dnd_rate": 0.21515815847165676
+              },
+              "random_targeting": {
+                "incremental": 306102.2102583782,
+                "contacts": 1482,
+                "incremental_per_contact": 206.54670057920256,
+                "dnd_rate": 0.20985155195681512
+              },
+              "ev_policy": {
+                "incremental": 521669.0875855535,
+                "contacts": 1848,
+                "incremental_per_contact": 282.2884673082,
+                "dnd_rate": 0.22402597402597402
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.7042316915817668,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 253781.58747974248,
-            "contacts": 1514,
-            "incremental_per_contact": 167.62324140009412,
-            "dnd_rate": 0.2192866578599736
+          {
+            "value": 0.17,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 469537.96076596016,
+                "contacts": 3193,
+                "incremental_per_contact": 147.05228962291267,
+                "dnd_rate": 0.21515815847165676
+              },
+              "random_targeting": {
+                "incremental": 306102.2102583782,
+                "contacts": 1482,
+                "incremental_per_contact": 206.54670057920256,
+                "dnd_rate": 0.20985155195681512
+              },
+              "ev_policy": {
+                "incremental": 552866.5187625787,
+                "contacts": 1848,
+                "incremental_per_contact": 299.17019413559456,
+                "dnd_rate": 0.22402597402597402
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.8061500382369307,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 507119.0174437859,
-            "contacts": 1530,
-            "incremental_per_contact": 331.45033819855286,
-            "dnd_rate": 0.15163398692810456
+          {
+            "value": 0.25,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 469537.96076596016,
+                "contacts": 3193,
+                "incremental_per_contact": 147.05228962291267,
+                "dnd_rate": 0.21515815847165676
+              },
+              "random_targeting": {
+                "incremental": 306102.2102583782,
+                "contacts": 1482,
+                "incremental_per_contact": 206.54670057920256,
+                "dnd_rate": 0.20985155195681512
+              },
+              "ev_policy": {
+                "incremental": 583478.412622445,
+                "contacts": 1848,
+                "incremental_per_contact": 315.7350717653923,
+                "dnd_rate": 0.22402597402597402
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.9061555031893955,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.35,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 469537.96076596016,
+                "contacts": 3193,
+                "incremental_per_contact": 147.05228962291267,
+                "dnd_rate": 0.21515815847165676
+              },
+              "random_targeting": {
+                "incremental": 306102.2102583782,
+                "contacts": 1482,
+                "incremental_per_contact": 206.54670057920256,
+                "dnd_rate": 0.20985155195681512
+              },
+              "ev_policy": {
+                "incremental": 609779.9731052066,
+                "contacts": 1848,
+                "incremental_per_contact": 329.96751791407286,
+                "dnd_rate": 0.22402597402597402
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.992079614813943,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 1.998249843418075,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.25,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+        ],
+        "amount_liquidity_coupling": [
+          {
+            "value": 0.0,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 855284.22634967,
+                "contacts": 3096,
+                "incremental_per_contact": 276.2545950741828,
+                "dnd_rate": 0.12919896640826872
+              },
+              "random_targeting": {
+                "incremental": 443505.52503228886,
+                "contacts": 1425,
+                "incremental_per_contact": 311.2319473910799,
+                "dnd_rate": 0.11368421052631579
+              },
+              "ev_policy": {
+                "incremental": 817605.1496628034,
+                "contacts": 1804,
+                "incremental_per_contact": 453.21793218558946,
+                "dnd_rate": 0.1457871396895787
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.8435061200269798,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 603976.4798174873,
-            "contacts": 3246,
-            "incremental_per_contact": 186.06792354204785,
-            "dnd_rate": 0.2113370301910043
+          {
+            "value": 0.125,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 591999.915053199,
+                "contacts": 3144,
+                "incremental_per_contact": 188.29513837569945,
+                "dnd_rate": 0.17048346055979643
+              },
+              "random_targeting": {
+                "incremental": 367566.18582944665,
+                "contacts": 1454,
+                "incremental_per_contact": 252.79655146454377,
+                "dnd_rate": 0.1609353507565337
+              },
+              "ev_policy": {
+                "incremental": 632330.1442411186,
+                "contacts": 1775,
+                "incremental_per_contact": 356.2423347837288,
+                "dnd_rate": 0.19830985915492957
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.7203164181552988,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 253781.58747974248,
-            "contacts": 1514,
-            "incremental_per_contact": 167.62324140009412,
-            "dnd_rate": 0.2192866578599736
+          {
+            "value": 0.25,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 469537.96076596016,
+                "contacts": 3193,
+                "incremental_per_contact": 147.05228962291267,
+                "dnd_rate": 0.21515815847165676
+              },
+              "random_targeting": {
+                "incremental": 306102.2102583782,
+                "contacts": 1482,
+                "incremental_per_contact": 206.54670057920256,
+                "dnd_rate": 0.20985155195681512
+              },
+              "ev_policy": {
+                "incremental": 552866.5187625787,
+                "contacts": 1848,
+                "incremental_per_contact": 299.17019413559456,
+                "dnd_rate": 0.22402597402597402
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.8061500382369307,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 543710.2621522769,
-            "contacts": 1530,
-            "incremental_per_contact": 355.3661844132529,
-            "dnd_rate": 0.15163398692810456
+          {
+            "value": 0.4,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 263514.2889384796,
+                "contacts": 3255,
+                "incremental_per_contact": 80.95677079523183,
+                "dnd_rate": 0.26697388632872504
+              },
+              "random_targeting": {
+                "incremental": 200119.77403743868,
+                "contacts": 1503,
+                "incremental_per_contact": 133.1468889137982,
+                "dnd_rate": 0.25615435795076513
+              },
+              "ev_policy": {
+                "incremental": 426211.87820340996,
+                "contacts": 1600,
+                "incremental_per_contact": 266.3824238771312,
+                "dnd_rate": 0.288125
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.129783926918055,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.55,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 92341.82580879529,
+                "contacts": 3305,
+                "incremental_per_contact": 27.940038066201296,
+                "dnd_rate": 0.302874432677761
+              },
+              "random_targeting": {
+                "incremental": 111976.84980062966,
+                "contacts": 1528,
+                "incremental_per_contact": 73.28327866533354,
+                "dnd_rate": 0.2905759162303665
+              },
+              "ev_policy": {
+                "incremental": 335842.3388599288,
+                "contacts": 1439,
+                "incremental_per_contact": 233.38591998605196,
+                "dnd_rate": 0.3113273106323836
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 2.9992122430474044,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 2.142433844597482,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.35,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
+        ],
+        "opt_out_per_contact": [
+          {
+            "value": 0.005,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 481237.5341150188,
+                "contacts": 3229,
+                "incremental_per_contact": 149.0360898467076,
+                "dnd_rate": 0.21585630226076186
+              },
+              "random_targeting": {
+                "incremental": 317801.7836074368,
+                "contacts": 1491,
+                "incremental_per_contact": 213.14673615522256,
+                "dnd_rate": 0.20925553319919518
+              },
+              "ev_policy": {
+                "incremental": 564199.7845277321,
+                "contacts": 1864,
+                "incremental_per_contact": 302.68228783676614,
+                "dnd_rate": 0.22478540772532188
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.775319754733212,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "blast_everyone": {
-            "incremental": 603976.4798174873,
-            "contacts": 3246,
-            "incremental_per_contact": 186.06792354204785,
-            "dnd_rate": 0.2113370301910043
+          {
+            "value": 0.01,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 472537.8841825896,
+                "contacts": 3210,
+                "incremental_per_contact": 147.20806360828337,
+                "dnd_rate": 0.21526479750778815
+              },
+              "random_targeting": {
+                "incremental": 309102.1336750074,
+                "contacts": 1488,
+                "incremental_per_contact": 207.72992854503184,
+                "dnd_rate": 0.20967741935483872
+              },
+              "ev_policy": {
+                "incremental": 555866.4421792079,
+                "contacts": 1852,
+                "incremental_per_contact": 300.1438672673909,
+                "dnd_rate": 0.22408207343412526
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.7983261246706586,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "random_targeting": {
-            "incremental": 253781.58747974248,
-            "contacts": 1514,
-            "incremental_per_contact": 167.62324140009412,
-            "dnd_rate": 0.2192866578599736
+          {
+            "value": 0.015,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 469537.96076596016,
+                "contacts": 3193,
+                "incremental_per_contact": 147.05228962291267,
+                "dnd_rate": 0.21515815847165676
+              },
+              "random_targeting": {
+                "incremental": 306102.2102583782,
+                "contacts": 1482,
+                "incremental_per_contact": 206.54670057920256,
+                "dnd_rate": 0.20985155195681512
+              },
+              "ev_policy": {
+                "incremental": 552866.5187625787,
+                "contacts": 1848,
+                "incremental_per_contact": 299.17019413559456,
+                "dnd_rate": 0.22402597402597402
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.8061500382369307,
+            "c2_ev_more_efficient_than_blast": true
           },
-          "ev_policy": {
-            "incremental": 595426.1785615571,
-            "contacts": 1530,
-            "incremental_per_contact": 389.16743696833794,
-            "dnd_rate": 0.15163398692810456
+          {
+            "value": 0.03,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 447808.5742873468,
+                "contacts": 3135,
+                "incremental_per_contact": 142.84165049038177,
+                "dnd_rate": 0.21403508771929824
+              },
+              "random_targeting": {
+                "incremental": 295723.713611868,
+                "contacts": 1453,
+                "incremental_per_contact": 203.52629980169854,
+                "dnd_rate": 0.20922229869236064
+              },
+              "ev_policy": {
+                "incremental": 541989.8720993721,
+                "contacts": 1816,
+                "incremental_per_contact": 298.452572741945,
+                "dnd_rate": 0.22411894273127753
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.8327575610345674,
+            "c2_ev_more_efficient_than_blast": true
+          },
+          {
+            "value": 0.06,
+            "policies": {
+              "do_nothing": {
+                "incremental": 0.0,
+                "contacts": 0,
+                "incremental_per_contact": null,
+                "dnd_rate": null
+              },
+              "blast_everyone": {
+                "incremental": 418661.48232997535,
+                "contacts": 3048,
+                "incremental_per_contact": 137.35612937335148,
+                "dnd_rate": 0.2152230971128609
+              },
+              "random_targeting": {
+                "incremental": 271240.66741826315,
+                "contacts": 1395,
+                "incremental_per_contact": 194.43775442169402,
+                "dnd_rate": 0.2121863799283154
+              },
+              "ev_policy": {
+                "incremental": 523604.96480601234,
+                "contacts": 1774,
+                "incremental_per_contact": 295.15499707216026,
+                "dnd_rate": 0.22604284103720407
+              }
+            },
+            "c1_ev_beats_random": true,
+            "c1_margin_ratio": 1.930407301345392,
+            "c2_ev_more_efficient_than_blast": true
           }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 2.346215044498,
-        "c2_ev_more_efficient_than_blast": true
+        ]
       }
-    ],
-    "amount_liquidity_coupling": [
-      {
-        "value": 0.0,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
-          },
-          "blast_everyone": {
-            "incremental": 1015545.4292929624,
-            "contacts": 3144,
-            "incremental_per_contact": 323.01063272676924,
-            "dnd_rate": 0.1180025445292621
-          },
-          "random_targeting": {
-            "incremental": 405611.2505438002,
-            "contacts": 1473,
-            "incremental_per_contact": 275.3640533223355,
-            "dnd_rate": 0.11948404616429056
-          },
-          "ev_policy": {
-            "incremental": 707880.9580829358,
-            "contacts": 1781,
-            "incremental_per_contact": 397.46263789047487,
-            "dnd_rate": 0.10892756878158338
-          }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 1.745220225360822,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.125,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
-          },
-          "blast_everyone": {
-            "incremental": 832441.843413451,
-            "contacts": 3194,
-            "incremental_per_contact": 260.62675122525076,
-            "dnd_rate": 0.1596743894802755
-          },
-          "random_targeting": {
-            "incremental": 322213.8143974559,
-            "contacts": 1494,
-            "incremental_per_contact": 215.67189718705214,
-            "dnd_rate": 0.15461847389558234
-          },
-          "ev_policy": {
-            "incremental": 606863.3499254528,
-            "contacts": 1660,
-            "incremental_per_contact": 365.5803312803933,
-            "dnd_rate": 0.13192771084337349
-          }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 1.883418161509603,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.25,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
-          },
-          "blast_everyone": {
-            "incremental": 603976.4798174873,
-            "contacts": 3246,
-            "incremental_per_contact": 186.06792354204785,
-            "dnd_rate": 0.2113370301910043
-          },
-          "random_targeting": {
-            "incremental": 253781.58747974248,
-            "contacts": 1514,
-            "incremental_per_contact": 167.62324140009412,
-            "dnd_rate": 0.2192866578599736
-          },
-          "ev_policy": {
-            "incremental": 507119.0174437859,
-            "contacts": 1530,
-            "incremental_per_contact": 331.45033819855286,
-            "dnd_rate": 0.15163398692810456
-          }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 1.998249843418075,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.4,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
-          },
-          "blast_everyone": {
-            "incremental": 354082.5431634919,
-            "contacts": 3298,
-            "incremental_per_contact": 107.36280872149541,
-            "dnd_rate": 0.25651910248635534
-          },
-          "random_targeting": {
-            "incremental": 137269.59773654724,
-            "contacts": 1541,
-            "incremental_per_contact": 89.07825940074447,
-            "dnd_rate": 0.25957170668397145
-          },
-          "ev_policy": {
-            "incremental": 461957.2912368323,
-            "contacts": 1384,
-            "incremental_per_contact": 333.78416996880946,
-            "dnd_rate": 0.14089595375722544
-          }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 3.3653285130436337,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.55,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
-          },
-          "blast_everyone": {
-            "incremental": 197498.5312676815,
-            "contacts": 3349,
-            "incremental_per_contact": 58.97238915129337,
-            "dnd_rate": 0.2971036130188116
-          },
-          "random_targeting": {
-            "incremental": 89879.53697556909,
-            "contacts": 1564,
-            "incremental_per_contact": 57.467734639110674,
-            "dnd_rate": 0.29987212276214836
-          },
-          "ev_policy": {
-            "incremental": 380832.49507608823,
-            "contacts": 1064,
-            "incremental_per_contact": 357.9252773271506,
-            "dnd_rate": 0.22462406015037595
-          }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 4.237143491066331,
-        "c2_ev_more_efficient_than_blast": true
-      }
-    ],
-    "opt_out_per_contact": [
-      {
-        "value": 0.005,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
-          },
-          "blast_everyone": {
-            "incremental": 621717.5766637521,
-            "contacts": 3276,
-            "incremental_per_contact": 189.7794800560904,
-            "dnd_rate": 0.21123321123321123
-          },
-          "random_targeting": {
-            "incremental": 255710.9386658686,
-            "contacts": 1529,
-            "incremental_per_contact": 167.2406400692404,
-            "dnd_rate": 0.21778940483976456
-          },
-          "ev_policy": {
-            "incremental": 507546.5525046345,
-            "contacts": 1538,
-            "incremental_per_contact": 330.0042604061343,
-            "dnd_rate": 0.1527958387516255
-          }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 1.98484490007615,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.01,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
-          },
-          "blast_everyone": {
-            "incremental": 618745.6468517443,
-            "contacts": 3263,
-            "incremental_per_contact": 189.62477684699488,
-            "dnd_rate": 0.21115537848605578
-          },
-          "random_targeting": {
-            "incremental": 253781.58747974248,
-            "contacts": 1522,
-            "incremental_per_contact": 166.74217311415407,
-            "dnd_rate": 0.21813403416557162
-          },
-          "ev_policy": {
-            "incremental": 507119.0174437859,
-            "contacts": 1536,
-            "incremental_per_contact": 330.1556103149648,
-            "dnd_rate": 0.15299479166666666
-          }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 1.998249843418075,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.015,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
-          },
-          "blast_everyone": {
-            "incremental": 603976.4798174873,
-            "contacts": 3246,
-            "incremental_per_contact": 186.06792354204785,
-            "dnd_rate": 0.2113370301910043
-          },
-          "random_targeting": {
-            "incremental": 253781.58747974248,
-            "contacts": 1514,
-            "incremental_per_contact": 167.62324140009412,
-            "dnd_rate": 0.2192866578599736
-          },
-          "ev_policy": {
-            "incremental": 507119.0174437859,
-            "contacts": 1530,
-            "incremental_per_contact": 331.45033819855286,
-            "dnd_rate": 0.15163398692810456
-          }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 1.998249843418075,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.03,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
-          },
-          "blast_everyone": {
-            "incremental": 580993.220178159,
-            "contacts": 3188,
-            "incremental_per_contact": 182.24379553894573,
-            "dnd_rate": 0.2104767879548306
-          },
-          "random_targeting": {
-            "incremental": 236793.5863138201,
-            "contacts": 1494,
-            "incremental_per_contact": 158.4963763814057,
-            "dnd_rate": 0.21887550200803213
-          },
-          "ev_policy": {
-            "incremental": 489716.89921133174,
-            "contacts": 1503,
-            "incremental_per_contact": 325.82628024706037,
-            "dnd_rate": 0.14770459081836326
-          }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 2.068117244367907,
-        "c2_ev_more_efficient_than_blast": true
-      },
-      {
-        "value": 0.06,
-        "policies": {
-          "do_nothing": {
-            "incremental": 0.0,
-            "contacts": 0,
-            "incremental_per_contact": null,
-            "dnd_rate": null
-          },
-          "blast_everyone": {
-            "incremental": 544410.7891155805,
-            "contacts": 3093,
-            "incremental_per_contact": 176.0138341789785,
-            "dnd_rate": 0.2091820239249919
-          },
-          "random_targeting": {
-            "incremental": 206783.7318101558,
-            "contacts": 1444,
-            "incremental_per_contact": 143.20203033944307,
-            "dnd_rate": 0.2195290858725762
-          },
-          "ev_policy": {
-            "incremental": 472837.52278914,
-            "contacts": 1463,
-            "incremental_per_contact": 323.1972131162953,
-            "dnd_rate": 0.14900888585099112
-          }
-        },
-        "c1_ev_beats_random": true,
-        "c1_margin_ratio": 2.2866282499594464,
-        "c2_ev_more_efficient_than_blast": true
-      }
-    ]
-  },
+    }
+  ],
   "n_train": 3000,
   "n_eval": 1500
 }

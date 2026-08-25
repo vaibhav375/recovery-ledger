@@ -148,31 +148,66 @@ make sensitivity
 ```
 
 Five invented simulator constants, five values each, uplift model
-**retrained at every setting**.
+**retrained at every setting** — and the whole sweep repeated over
+**3 independent evaluation populations**, because one draw is not a
+robustness result.
 
-| Claim | Holds at |
-|---|---|
-| **C1 — targeting beats matched-volume random targeting** | **25 / 25 settings** (margin 1.65x–4.24x) |
-| C2 — targeting is more contact-efficient than mass-contact | 24 / 25 settings |
+| Claim | Holds at | Per draw |
+|---|---|---|
+| **C1 — targeting beats matched-volume random targeting** | **75 / 75** (median margin 2.16x, 10th–90th pct 1.80x–2.69x) | 25/25, 25/25, 25/25 |
+| **C2 — targeting is more contact-efficient than mass-contact** | **75 / 75** | 25/25, 25/25, 25/25 |
+
+**The margin is quoted as a median, not a range.** The largest single ratio in
+the sweep is 82x, and it is not a finding: at `base_organic_resolution = 0.12`
+random targeting's incremental recovery swings from ₹-10,734 to
+₹88,486 across draws, so in one of them the ratio is a division by a
+near-zero denominator and in another the denominator is negative and the ratio
+is undefined. C1 still holds at that setting in every draw — targeting beats
+random even when random loses money — but the *ratio* there carries no
+information and quoting it as a headline would be quoting an artifact.
 
 C1 never flips, including in the two settings constructed to break it (zero
 annoyance decay, so persistence is never punished; zero amount↔liquidity
 coupling, so the amount weighting carries no hidden signal).
 
-**The single C2 flip is stated, not averaged.** At
-`base_organic_resolution = 0.12`, mass-contact wins: when 12% of cases fix
-themselves there is little incremental value left to target, learned τ̂
-shrinks toward zero, and the selective policy correctly declines while brute
-force scrapes up the remainder. "C2 holds except when organic recovery is
-very high" is the truthful phrasing; "holds 96% of the time" would hide the
-exact condition under which it fails.
+### Why this is measured across draws, and what that changed
 
-**Best finding in the sweep, and it was not one I set out to test:** as the
+An earlier version of this experiment ran one evaluation population and
+reported **C2 at 24/25**, with a paragraph explaining the single flip: at
+`base_organic_resolution = 0.12`, mass-contact appeared to win.
+
+That evaluation seed collided with `run_baselines.py`'s. Moving it — the two
+experiments had only avoided sharing a population because they happen to be
+invoked with different `--n-eval` — changed C2 to 25/25. Same code, same
+settings, different customers.
+
+Neither number is reportable on its own. So the sweep now runs 3 draws, and
+the flip does not reproduce in any of them.
+
+**It was not a marginal call — the metric is unstable there.** Incremental
+rupees *per contact* at `base_organic_resolution = 0.12`:
+
+| evaluation draw | targeting | mass-contact |
+|---|---:|---:|
+| original (the flip) | ₹60 | ₹78 |
+| draw 1 | ₹294 | ₹40 |
+| draw 2 | ₹163 | ₹31 |
+| draw 3 | ₹158 | ₹-12 |
+
+Targeting's figure spans ₹60–₹294 and mass-contact's spans ₹-12–₹78
+across draws. When 12% of cases resolve themselves there is little
+incremental value left to divide by a contact count, and the ratio becomes a
+quotient of two small noisy numbers. **A single-draw verdict at that setting
+is uninformative in either direction** — which is the honest replacement for
+the previous paragraph, not an upgrade from 24/25 to 25/25.
+
+**Best finding in the sweep, and not one I set out to test:** as the
 amount↔liquidity coupling strengthens — high-value cases becoming
 increasingly likely to be do-not-disturbs — the targeting advantage *widens*
-from 1.75x to **4.24x** while mass-contact collapses from ₹1,015,545 to
-₹197,499. **The harder the do-not-disturb problem, the more targeting is
-worth.** Novelty claim N2 as a measured gradient rather than an assertion.
+from 2.21x to **3.74x** while mass-contact collapses from
+₹981,220 to ₹265,496. **The harder the do-not-disturb problem, the
+more targeting is worth.** Novelty claim N2 as a measured gradient rather
+than an assertion.
 
 ---
 

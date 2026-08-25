@@ -233,6 +233,17 @@ def _render(estimates, truth) -> dict:
             rendered[k] = v
         elif v is None:
             rendered[k] = None
+        elif not np.isfinite(v.point_estimate):
+            # SNIPS returns NaN when no logged row matches the target policy —
+            # "no evidence", which is not a number. Emitted as null rather than
+            # a bare NaN literal, which json.dumps will happily write and a
+            # strict JSON reader will refuse.
+            rendered[k] = {
+                "point": None,
+                "reason": "no matched rows: the log says nothing about this policy",
+                "n_matched": v.n_matched,
+                "identified": v.identified,
+            }
         else:
             rendered[k] = {
                 "point": round(v.point_estimate, 4),
@@ -243,6 +254,11 @@ def _render(estimates, truth) -> dict:
                     round(abs(v.point_estimate - truth) / abs(truth), 4) if truth else None
                 ),
                 "covers_truth": bool(v.ci_low <= truth <= v.ci_high),
+                # Reported on every estimate now, because an estimate over
+                # 4,000 rows with an effective sample size of 100 is an
+                # estimate over 100 rows wearing a large-sample interval.
+                "effective_sample_size": v.effective_sample_size,
+                "identified": v.identified,
             }
     return rendered
 
@@ -364,6 +380,12 @@ def replicate(epsilon: float, cases, traits, model, greedy, truths, targets,
             for method, fn in (("IPS", ips_value), ("SNIPS", snips_value)):
                 est = fn(value, logged_action, p_contact, target, n_boot=n_boot,
                          seed=base_seed + r)
+                if not np.isfinite(est.point_estimate):
+                    # No matched rows in this draw. Scoring it as a miss would
+                    # understate coverage; scoring it as a hit would inflate
+                    # it. Excluded, and `intervals_scored` reports the count
+                    # that actually contributed.
+                    continue
                 total[method] += 1
                 covered[method] += int(est.ci_low <= truths[name] <= est.ci_high)
                 abs_err[method].append(abs(est.point_estimate - truths[name]))

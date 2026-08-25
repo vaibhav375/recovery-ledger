@@ -168,11 +168,22 @@ running.
       produces 31 violations, so the 100% is a real gate, not a vacuous one.
 - [x] **Sensitivity sweep — ranking stability (spec 7.3).** `make sensitivity`:
       5 simulator parameters x 5 values, uplift model retrained at every
-      setting. **C1 (targeting beats matched-volume random) holds at 25/25
-      settings**, margin 1.65x–4.24x, including the settings built to be
-      hostile to it. C2 (contact efficiency vs mass-contact) holds at 24/25 —
-      the single flip is reported, not averaged away. Best finding: the
-      *harder* the do-not-disturb problem, the more targeting is worth.
+      setting, and the whole sweep repeated over **3 independent evaluation
+      populations** — because one draw is not a robustness result. **C1
+      (targeting beats matched-volume random) holds 75/75**, median margin
+      2.16x, including the settings built to be hostile to it. **C2 (contact
+      efficiency vs mass-contact) holds 75/75**.
+      That C2 figure replaced a previously reported 24/25, and the reason is
+      the point: this experiment's evaluation seed collided with
+      `run_baselines.py`'s, and the two only avoided sharing a population
+      because they happen to be invoked with different `--n-eval`. Moving the
+      seed flipped C2 to 25/25 — same code, same settings, different
+      customers. Neither number is reportable alone, so the sweep now runs
+      three draws and the flip reproduces in none of them. At the setting
+      where it used to occur the metric is simply unstable: random targeting's
+      incremental recovery there swings from -Rs 10,734 to Rs 88,486 across
+      draws. Best finding, unchanged: the *harder* the do-not-disturb problem,
+      the more targeting is worth.
 - [x] **LLM reply-intent listener, validated (spec 8.5).** `make listener-eval`:
       **95.2% accuracy** on a hand-authored 42-example gold set (100% English,
       92% Hinglish, 92% Hindi), with promise-to-pay precision 0.88 / recall

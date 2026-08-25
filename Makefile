@@ -96,7 +96,7 @@ live: dashboard
 # simulator's invented constants are swept across defensible ranges?
 sensitivity:
 	PYTHONPATH=src:experiments/tier2_simulation .venv/bin/python3 \
-		experiments/sensitivity/run_sweep.py --n-train 3000 --n-eval 1500
+		experiments/sensitivity/run_sweep.py --n-train 3000 --n-eval 1500 --eval-draws 3
 
 # Off-policy evaluation in the deployment loop: can a policy that was never
 # run be valued from the logs of the one that was? Deploys the EV policy with
