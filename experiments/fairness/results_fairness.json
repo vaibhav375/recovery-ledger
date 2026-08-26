@@ -6008,7 +6008,7 @@
   "scatter_note": "a random sample of the evaluation batch; tau_hat is the model's predicted uplift, tau_true the simulator's hidden persuadability, contacted the decision the policy actually took",
   "overall_contact_rate": 0.2522,
   "uplift_correlation": 0.3324,
-  "n_permutations": 400,
+  "n_permutations": 2000,
   "n_hypotheses_tested": 16,
   "bonferroni_alpha": 0.00313,
   "segments": {
@@ -6071,31 +6071,31 @@
       "contact_rate_ratio_min_over_max": 0.7754,
       "conditional_on_predicted_uplift": {
         "observed": 0.1198,
-        "null_mean": 0.0784,
-        "excess": 0.0414,
-        "p": 0.0025,
-        "p_exact": 0.0024937655860349127
+        "null_mean": 0.0786,
+        "excess": 0.0412,
+        "p": 0.0005,
+        "p_exact": 0.0004997501249375312
       },
       "conditional_on_uplift_and_amount": {
         "observed": 0.0946,
-        "null_mean": 0.0777,
-        "excess": 0.0168,
-        "p": 0.0798,
-        "p_exact": 0.0798004987531172
+        "null_mean": 0.078,
+        "excess": 0.0166,
+        "p": 0.08,
+        "p_exact": 0.079960019990005
       },
       "worked_at_all_conditional_on_uplift_and_amount": {
         "observed": 0.1002,
-        "null_mean": 0.0689,
-        "excess": 0.0313,
-        "p": 0.0025,
-        "p_exact": 0.0024937655860349127
+        "null_mean": 0.0679,
+        "excess": 0.0323,
+        "p": 0.001,
+        "p_exact": 0.0009995002498750624
       },
       "true_benefit_gap_in_same_cells": {
         "observed": 121.5326,
-        "null_mean": 91.8572,
-        "excess": 29.6754,
-        "p": 0.0399,
-        "p_exact": 0.0399002493765586
+        "null_mean": 91.4672,
+        "excess": 30.0654,
+        "p": 0.0465,
+        "p_exact": 0.046476761619190406
       },
       "attention_aligned_with_true_value": -0.6,
       "attention_alignment_is_descriptive_only": true,
@@ -6135,31 +6135,31 @@
       "contact_rate_ratio_min_over_max": 0.7763,
       "conditional_on_predicted_uplift": {
         "observed": 0.1151,
-        "null_mean": 0.0411,
-        "excess": 0.074,
-        "p": 0.0025,
-        "p_exact": 0.0024937655860349127
+        "null_mean": 0.042,
+        "excess": 0.0731,
+        "p": 0.0005,
+        "p_exact": 0.0004997501249375312
       },
       "conditional_on_uplift_and_amount": {
         "observed": 0.0973,
-        "null_mean": 0.0418,
-        "excess": 0.0555,
-        "p": 0.0025,
-        "p_exact": 0.0024937655860349127
+        "null_mean": 0.0417,
+        "excess": 0.0556,
+        "p": 0.0005,
+        "p_exact": 0.0004997501249375312
       },
       "worked_at_all_conditional_on_uplift_and_amount": {
         "observed": 0.0869,
-        "null_mean": 0.0383,
-        "excess": 0.0486,
-        "p": 0.005,
-        "p_exact": 0.004987531172069825
+        "null_mean": 0.038,
+        "excess": 0.049,
+        "p": 0.001,
+        "p_exact": 0.0009995002498750624
       },
       "true_benefit_gap_in_same_cells": {
         "observed": 143.9991,
-        "null_mean": 56.037,
-        "excess": 87.9622,
-        "p": 0.0025,
-        "p_exact": 0.0024937655860349127
+        "null_mean": 57.2583,
+        "excess": 86.7408,
+        "p": 0.0005,
+        "p_exact": 0.0004997501249375312
       },
       "attention_aligned_with_true_value": 1.0,
       "attention_alignment_is_descriptive_only": true,
@@ -6225,31 +6225,31 @@
       "contact_rate_ratio_min_over_max": 0.3793,
       "conditional_on_predicted_uplift": {
         "observed": 0.2941,
-        "null_mean": 0.0906,
-        "excess": 0.2035,
-        "p": 0.0025,
-        "p_exact": 0.0024937655860349127
+        "null_mean": 0.0901,
+        "excess": 0.2039,
+        "p": 0.0005,
+        "p_exact": 0.0004997501249375312
       },
       "conditional_on_uplift_and_amount": {
         "observed": 0.178,
-        "null_mean": 0.0318,
-        "excess": 0.1462,
-        "p": 0.0025,
-        "p_exact": 0.0024937655860349127
+        "null_mean": 0.0315,
+        "excess": 0.1465,
+        "p": 0.0005,
+        "p_exact": 0.0004997501249375312
       },
       "worked_at_all_conditional_on_uplift_and_amount": {
         "observed": 0.1116,
-        "null_mean": 0.028,
-        "excess": 0.0835,
-        "p": 0.0025,
-        "p_exact": 0.0024937655860349127
+        "null_mean": 0.0278,
+        "excess": 0.0838,
+        "p": 0.0005,
+        "p_exact": 0.0004997501249375312
       },
       "true_benefit_gap_in_same_cells": {
         "observed": 246.0417,
-        "null_mean": 37.9532,
-        "excess": 208.0884,
-        "p": 0.0025,
-        "p_exact": 0.0024937655860349127
+        "null_mean": 37.4366,
+        "excess": 208.605,
+        "p": 0.0005,
+        "p_exact": 0.0004997501249375312
       },
       "attention_aligned_with_true_value": -0.2,
       "attention_alignment_is_descriptive_only": true,
@@ -6315,31 +6315,31 @@
       "contact_rate_ratio_min_over_max": 0.0152,
       "conditional_on_predicted_uplift": {
         "observed": 0.5785,
-        "null_mean": 0.09,
-        "excess": 0.4884,
-        "p": 0.0025,
-        "p_exact": 0.0024937655860349127
+        "null_mean": 0.0898,
+        "excess": 0.4887,
+        "p": 0.0005,
+        "p_exact": 0.0004997501249375312
       },
       "conditional_on_uplift_and_amount": {
         "observed": 0.5789,
         "null_mean": 0.1026,
         "excess": 0.4763,
-        "p": 0.0025,
-        "p_exact": 0.0024937655860349127
+        "p": 0.0005,
+        "p_exact": 0.0004997501249375312
       },
       "worked_at_all_conditional_on_uplift_and_amount": {
         "observed": 0.5042,
-        "null_mean": 0.0977,
-        "excess": 0.4065,
-        "p": 0.0025,
-        "p_exact": 0.0024937655860349127
+        "null_mean": 0.0979,
+        "excess": 0.4064,
+        "p": 0.0005,
+        "p_exact": 0.0004997501249375312
       },
       "true_benefit_gap_in_same_cells": {
         "observed": 316.9787,
-        "null_mean": 143.3868,
-        "excess": 173.5919,
-        "p": 0.005,
-        "p_exact": 0.004987531172069825
+        "null_mean": 144.9095,
+        "excess": 172.0693,
+        "p": 0.0035,
+        "p_exact": 0.0034982508745627187
       },
       "attention_aligned_with_true_value": 0.2,
       "attention_alignment_is_descriptive_only": true,
