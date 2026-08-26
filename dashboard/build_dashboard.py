@@ -434,6 +434,13 @@ def build_data(ledger_path: Path, max_cases: int) -> dict:
         # own — so it needs both arms, not just the incremental figure.
         "batch": load_optional(ROOT / "experiments" / "tier2_simulation" / "results.json"),
         "sensitivity": load_optional(ROOT / "experiments" / "sensitivity" / "results_sensitivity.json"),
+        # The four experiments in which this project audits itself. Three of
+        # them found something wrong with it, which is the reason they are
+        # surfaced here rather than left in JSON nobody opens.
+        "ope": load_optional(ROOT / "experiments" / "ope_deployment" / "results_ope_deployment.json"),
+        "fairness": load_optional(ROOT / "experiments" / "fairness" / "results_fairness.json"),
+        "pessimism": load_optional(ROOT / "experiments" / "pessimism" / "results_pessimism.json"),
+        "dnd_signal": load_optional(ROOT / "experiments" / "dnd_signal" / "results_dnd_signal.json"),
         # Where each rule comes from. Embedded rather than fetched, so the
         # static dashboard can answer "says who?" with no server running —
         # the live console gets the same registry from /api/provenance.

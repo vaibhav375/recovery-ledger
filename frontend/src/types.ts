@@ -50,5 +50,9 @@ export type Dashboard = {
   baselines: any | null;
   batch: any | null;
   sensitivity: any | null;
+  ope: any | null;
+  fairness: any | null;
+  pessimism: any | null;
+  dnd_signal: any | null;
   rule_provenance?: Record<string, import("./live/api").Citation>;
 };
