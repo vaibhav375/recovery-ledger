@@ -41,6 +41,8 @@ EVAL_SEED_SOURCES = {
     "fleet/run_fleet.py": EVAL_SEED_PATTERN,
     "ope_deployment/run_ope_deployment.py": EVAL_SEED_PATTERN,
     "fairness/run_fairness.py": EVAL_SEED_PATTERN,
+    "pessimism/run_pessimism.py": EVAL_SEED_PATTERN,
+    "dnd_signal/run_dnd_signal.py": EVAL_SEED_PATTERN,
 }
 
 

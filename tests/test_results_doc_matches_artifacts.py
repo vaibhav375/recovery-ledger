@@ -38,6 +38,12 @@ SENSITIVITY = ROOT / "experiments" / "sensitivity" / "results_sensitivity.json"
 REDTEAM = ROOT / "redteam" / "redteam_report.json"
 OPE = ROOT / "experiments" / "ope_deployment" / "results_ope_deployment.json"
 FAIRNESS = ROOT / "experiments" / "fairness" / "results_fairness.json"
+DND = ROOT / "experiments" / "dnd_signal" / "results_dnd_signal.json"
+PESSIMISM = ROOT / "experiments" / "pessimism" / "results_pessimism.json"
+TIER1 = {
+    "hillstrom": ROOT / "experiments" / "tier1_criteo" / "results_hillstrom.json",
+    "criteo": ROOT / "experiments" / "tier1_criteo" / "results_criteo.json",
+}
 
 
 def _load(path: Path) -> dict:
@@ -88,6 +94,37 @@ def test_supporting_diagnostics_match_the_batch_artifact(results_md, key, render
 def test_chain_is_reported_valid_only_if_it_is(results_md):
     assert _load(BATCH)["ledger_chain_valid"] is True
     assert "hash chain verified" in results_md
+
+
+# ── Tier 1: the kill gate ────────────────────────────────────────────────
+
+@pytest.mark.parametrize("dataset", ["hillstrom", "criteo"])
+@pytest.mark.parametrize("estimator", ["ips", "snips", "dr"])
+def test_tier1_ope_table_matches_the_artifacts(results_md, dataset, estimator):
+    """The whole two-tier argument rests on this table. If the estimators are
+    re-run and move, the claim that they reproduce a known effect on real
+    randomised data has to move with them."""
+    ope = _load(TIER1[dataset])["ope_validation"]
+    assert f"{ope[estimator]['implied_ate']:+.4f}" in results_md
+
+
+@pytest.mark.parametrize("dataset", ["hillstrom", "criteo"])
+def test_tier1_ground_truth_ate_matches(results_md, dataset):
+    direct = _load(TIER1[dataset])["ope_validation"]["direct_ate"]
+    assert f"{direct:+.4f}" in results_md
+
+
+def test_tier1_dr_is_still_reported_as_the_weak_spot(results_md):
+    """DR is materially off on Criteo and that is stated rather than dropped.
+    If it ever stops being off, the prose should stop saying it is."""
+    c = _load(TIER1["criteo"])["ope_validation"]
+    off_by = abs(c["dr"]["implied_ate"] - c["direct_ate"])
+    if off_by > 0.001:
+        assert "honest weak spot" in results_md
+    else:
+        assert "honest weak spot" not in results_md, (
+            "DR now matches on Criteo; RESULTS.md still calls it a weak spot"
+        )
 
 
 # ── stopping rules ───────────────────────────────────────────────────────
@@ -318,6 +355,160 @@ def test_fairness_reports_worked_rate_not_only_contact(results_md):
     sub = _load(FAIRNESS)["segments"]["loss_type"]["groups"]["FailedSubscription"]
     assert sub["worked_rate"] > sub["contact_rate"]
     assert f"works **{sub['worked_rate'] * 100:.0f}%** of them" in results_md
+
+
+# ── the README's own claims ──────────────────────────────────────────────
+#
+# RESULTS.md was tested against its artifacts; the README was not, and it had
+# drifted further. Four claims were wrong at once: the kernel's rule count in
+# two places, how many stopping rules fire naturally, and a headline paragraph
+# quoting a policy variant that is not the one that ships.
+
+@pytest.fixture(scope="module")
+def readme() -> str:
+    return README_MD.read_text()
+
+
+def test_readme_states_the_real_number_of_kernel_rules(readme):
+    from recovery_ledger.ledger.ledger import Ledger
+    from recovery_ledger.cli import build_default_agent
+
+    n = len(build_default_agent(Ledger(), clock=lambda: None).kernel.rules)
+    for wrong in range(8, 20):
+        if wrong == n:
+            continue
+        assert f"{wrong} rules" not in readme, (
+            f"README claims {wrong} rules; the default kernel registers {n}"
+        )
+    assert f"{n} rules" in readme
+
+
+def test_readme_stopping_rule_counts_match_the_batch(readme):
+    from recovery_ledger.events.actions import StopReason
+
+    total = len(list(StopReason))
+    fired = _load(BATCH)["distinct_stop_reasons_fired"]
+    words = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five"}
+    assert f"**{fired} of {total} naturally**" in readme
+    assert f"the other {words[total - fired]}" in readme
+
+
+def test_readme_headline_quotes_the_deployed_policy(readme):
+    """The headline compared the *no-churn* variant against random while the
+    shipped policy is the lookahead with the churn term. Both numbers are
+    real; only one describes the system a judge can run."""
+    pol = {p["policy"]: p for p in _load(BASELINES)["policies"]}
+    deployed, blast, rand = (
+        pol["ev_policy_lookahead"], pol["blast_everyone"], pol["random_targeting"]
+    )
+    ratio = (
+        deployed["incremental_per_1000_cases"]["point"]
+        / rand["incremental_per_1000_cases"]["point"]
+    )
+    fewer = 1 - deployed["contacts_sent"] / blast["contacts_sent"]
+    cost = blast["cost_per_incremental_rupee"] / deployed["cost_per_incremental_rupee"]
+    assert f"**{ratio:.2f}x more incremental revenue" in readme
+    assert f"**{fewer:.0%} fewer" in readme
+    assert f"{cost:.1f}x better cost per incremental rupee" in readme
+
+
+def test_readme_and_results_agree_on_the_headline(readme, results_md):
+    inc = _load(BATCH)["incremental_per_1000_cases"]
+    figure = f"₹{inc['point']:,.0f}"
+    assert figure in readme and figure in results_md
+
+
+# ── the do-not-disturb signal behind novelty claim N2 ────────────────────
+
+def test_dnd_ratio_matches_the_artifact_everywhere_it_is_asserted(readme, results_md):
+    """Reported as 1.93x from a single n=5,000 draw, where the ratio ranges
+    0.72x-1.87x across seeds. Asserted in five places at once."""
+    d = _load(DND)
+    stated = f"**{d['ratio']:.2f}x** (95% CI {d['ci_low']:.2f}–{d['ci_high']:.2f})"
+    assert stated in readme
+    assert stated in results_md
+
+    src = ROOT / "src" / "recovery_ledger" / "policy"
+    for f in ("churn.py", "decision.py"):
+        text = (src / f).read_text()
+        assert "1.93x" not in text, f"{f} still asserts the superseded figure"
+        assert f"{d['ratio']:.2f}x" in text
+
+
+def test_dnd_effect_is_real_and_the_old_figure_is_not_inside_the_interval():
+    d = _load(DND)
+    assert d["effect_excludes_one"] is True, "N2's supporting signal is not distinguishable from none"
+    assert d["previously_reported_inside_ci"] is False
+    assert d["opt_out_rate_without_contact"] == 0.0, (
+        "the effect is only attributable to contact if there is no opt-out without it"
+    )
+
+
+def test_dnd_measurement_is_not_taken_at_a_sample_size_where_it_is_unstable():
+    """The actual defect: measured at whatever n was convenient. The headline
+    n must be one where repeated seeds agree."""
+    d = _load(DND)
+    by_n = {row["n"]: row["spread"] for row in d["stability_by_sample_size"]}
+    assert d["headline_n"] == max(by_n), "headline is not taken at the largest sample measured"
+    assert by_n[max(by_n)] < by_n[min(by_n)], "spread does not shrink with sample size"
+    assert by_n[5000] > 0.5, (
+        "n=5,000 is no longer unstable — if the simulator changed, the "
+        "cautionary note in the docs should change with it"
+    )
+
+
+# ── acting on a lower bound ──────────────────────────────────────────────
+
+def test_pessimism_correlation_comparison_is_matched(readme, results_md):
+    """The ensemble's correlation may only be quoted against a single learner
+    scored on the SAME populations. Comparing it to the 0.347 published from a
+    different evaluation seed would not be a comparison."""
+    import statistics as st
+
+    d = _load(PESSIMISM)
+    single = st.mean(d["correlation_per_draw"]["single"])
+    ens = st.mean(d["correlation_per_draw"]["ensemble"])
+    assert len(d["correlation_per_draw"]["single"]) == d["eval_draws"]
+    assert f"{single:.3f}" in readme and f"{ens:.3f}" in readme
+    assert f"{single:.3f}" in results_md and f"{ens:.3f}" in results_md
+
+
+def test_pessimism_reports_best_k_as_a_range_when_it_is_unstable(readme, results_md):
+    """Best k landed at 0.5, 0.5 and 0.25. Reporting a single tuned value from
+    an unstable argmax is how a hyperparameter gets overfitted to one draw."""
+    d = _load(PESSIMISM)
+    if not d["best_k_is_stable"]:
+        assert "not stable" in readme.lower()
+        assert "range" in results_md.lower()
+        assert str(d["best_k_per_draw"]) in results_md
+    lo, hi = min(d["improvement_per_case_per_draw"]), max(d["improvement_per_case_per_draw"])
+    assert f"₹{lo:.0f}" in results_md and f"₹{hi:.0f}" in results_md
+
+
+def test_pessimism_k_zero_is_the_deployed_policy():
+    """The sweep's origin must be the shipped behaviour, or every reported
+    gain is measured against a baseline nobody runs."""
+    from recovery_ledger.policy.decision import (
+        EVDecisionPolicy,
+        LookaheadEVDecisionPolicy,
+    )
+
+    d = _load(PESSIMISM)
+    assert d["draws"][0]["sweep"][0]["uncertainty_k"] == 0.0
+    for cls in (EVDecisionPolicy, LookaheadEVDecisionPolicy):
+        assert cls.__dataclass_fields__["uncertainty_k"].default == 0.0
+
+
+def test_pessimism_harm_reduction_figures_match(readme, results_md):
+    import statistics as st
+
+    d = _load(PESSIMISM)
+    ks = [r["uncertainty_k"] for r in d["draws"][0]["sweep"]]
+    i0, ib = 0, ks.index(0.5)
+    m = lambda i, f: st.mean(dr["sweep"][i][f] for dr in d["draws"])
+    for doc in (readme, results_md):
+        assert f"{m(i0, 'harmful_contacts'):.0f} → {m(ib, 'harmful_contacts'):.0f}" in doc
+        assert f"₹{m(ib, 'net_value_per_contact'):,.0f}" in doc
 
 
 # ── the README quotes the headline too ───────────────────────────────────

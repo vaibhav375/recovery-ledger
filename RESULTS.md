@@ -229,7 +229,7 @@ the LTV multiplier is an assumption — and one named parameter is very
 different from a silently missing term.
 
 It works because it is an **independent** signal: measured on this
-simulator, true do-not-disturbs opt out **1.93x** more often than others
+simulator, true do-not-disturbs opt out **1.29x** (95% CI 1.09–1.51) more often than others
 when contacted. Two models must now both be wrong before a do-not-disturb
 gets contacted.
 
@@ -482,6 +482,77 @@ Two further methodology errors, both caught and both documented in
 `experiments/fairness/REPORT.md`: a gap statistic that could not report zero,
 and a multiple-comparison correction applied to the test where it made crying
 wolf *easier* rather than harder.
+
+## Acting on a lower bound instead of a point estimate
+
+```
+make pessimism    # 5,000 training + 4,000 evaluation cases, 3 draws, 20-model ensemble
+```
+
+The disparity audit found the policy doing two things badly. Overdue
+receivables are worth **−₹69 per contact** — contact destroys more through
+opt-outs than it recovers — and the policy contacts 20.2% of them anyway. The
+smallest invoices get the model's *highest* predicted uplift and its worst
+correlation with truth (0.09).
+
+Both are the same failure. `τ̂ = 0.02` from a model that understands a segment
+and `τ̂ = 0.02` from a model that is guessing produce identical decisions,
+because a point estimate cannot tell them apart.
+
+`BootstrapEnsembleModel` fits the same learner on 20 bootstrap resamples and
+reports a per-case standard error; the policy acts on **τ̂ − k·se**. k = 0 is
+exactly the deployed policy, so the sweep's origin is what ships rather than a
+separate branch.
+
+### The ensemble improves the estimate before any caution is applied
+
+Correlation with true persuadability, both models scored on the **same**
+evaluation populations:
+
+| model | mean | per draw |
+|---|---:|---|
+| single T-learner (deployed) | 0.364 | 0.364, 0.371, 0.357 |
+| **20-model bootstrap ensemble** | **0.459** | 0.455, 0.467, 0.454 |
+
+A consistent **+0.095** in every draw, from averaging alone. The matched
+comparison matters: quoting the ensemble against the 0.347 published elsewhere
+would be comparing across different evaluation populations, which is not a
+comparison.
+
+### What caution buys, and what it costs
+
+Mean over 3 draws:
+
+| k | contacts | net ₹/case | ₹/contact | harmful contacts | % harmful |
+|---:|---:|---:|---:|---:|---:|
+| 0.00 | 1,047 | ₹183 | ₹699 | 79 | 7.5% |
+| 0.25 | 878 | ₹186 | ₹849 | 53 | 6.1% |
+| 0.50 | 713 | ₹192 | ₹1,075 | 34 | 4.8% |
+| 1.00 | 432 | ₹172 | ₹1,592 | 15 | 3.5% |
+| 1.50 | 233 | ₹167 | ₹2,874 | 8 | 3.6% |
+| 2.00 | 99 | ₹162 | ₹6,524 | 4 | 3.7% |
+
+"Harmful" means the case's *true* expected value of contact is negative — a
+quantity only a simulator can supply, and the cleanest statement of what a
+point estimate was costing.
+
+**The net-value gain is small and not stable. The harm reduction is large and
+consistent.** Best k lands at [0.5, 0.5, 0.25] across the three draws, improving net value
+by ₹4–₹14 per case — so it is reported as a **range, k ≈ 0.25–0.5, not
+a tuned value**. At k = 0.5 the agent sends **32% fewer messages**, cuts
+harmful contacts **79 → 34**, and lifts value per contact from
+**₹699 to ₹1,075**.
+
+Past k = 0.5 the curve turns: k = 1.0 sends 432 messages and earns
+₹172/case, *below* k = 0. Caution keeps buying harm reduction long
+after it stops buying money, which is a real trade to state rather than a
+number to tune.
+
+**A single draw would have reported this as a clean +7.4% win.** It is not;
+the third draw improves by ₹4/case, a fifth of the first two. That is the
+third time in this project a single-draw conclusion has failed replication.
+
+Full detail: `experiments/pessimism/REPORT.md`.
 
 ## Reply-intent listener — spec section 8.5
 

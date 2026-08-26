@@ -9,6 +9,8 @@ every commit, even with stub components inside it).
 
 from __future__ import annotations
 
+from numpy.typing import NDArray
+
 import hashlib
 from dataclasses import dataclass
 
@@ -193,6 +195,43 @@ def _terminal_reason(
     return StopReason.BUDGET_EXHAUSTED
 
 
+def _acted_on_tau(uplift_model, features: NDArray, uncertainty_k: float) -> float:
+    """The uplift figure a policy should actually act on.
+
+    With `uncertainty_k = 0` this is the point estimate, which is what every
+    policy did before and what keeps existing results reproducible. Above
+    zero it returns a lower confidence bound, `tau_hat - k * se`, using the
+    per-case standard error a `BootstrapEnsembleModel` reports.
+
+    The reason to want that is in the disparity audit: the model predicts a
+    small positive uplift on overdue receivables, where contact truly destroys
+    value, and its highest uplift of all on the smallest invoices, where its
+    correlation with truth is 0.09. A point estimate cannot distinguish "this
+    is worth doing" from "I have no idea"; a lower bound can, and it declines
+    in exactly the second case.
+
+    A model with no `predict_cate_std` silently gets the point estimate — that
+    would make `uncertainty_k` look like it was working when it was not, so it
+    raises instead.
+    """
+    if uncertainty_k <= 0:
+        return float(uplift_model.predict_cate(features)[0])
+    if not hasattr(uplift_model, "predict_cate_std"):
+        raise TypeError(
+            f"uncertainty_k={uncertainty_k} needs a model that reports its own "
+            f"standard error (e.g. BootstrapEnsembleModel); "
+            f"{type(uplift_model).__name__} does not"
+        )
+    # One pass over the ensemble, not two. See predict_cate_with_std.
+    if hasattr(uplift_model, "predict_cate_with_std"):
+        tau_hat, se = (float(a[0]) for a in uplift_model.predict_cate_with_std(features))
+    else:
+        tau_hat = float(uplift_model.predict_cate(features)[0])
+        se = float(uplift_model.predict_cate_std(features)[0])
+    return tau_hat - uncertainty_k * se
+
+
+
 @dataclass
 class EVDecisionPolicy:
     """EV(action | state) = delta_p_pay(action) x amount_at_risk
@@ -229,15 +268,19 @@ class EVDecisionPolicy:
     # This is defence in depth for novelty claim N2: avoiding
     # do-not-disturbs previously rested entirely on tau_hat being right, and
     # tau_hat correlates only ~0.35-0.42 with truth. Churn risk is an
-    # independent signal (measured: true do-not-disturbs opt out 1.93x more
-    # often when contacted), so two models must now both be wrong before a
-    # do-not-disturb is contacted.
+    # independent signal (measured: true do-not-disturbs opt out 1.29x, 95% CI
+    # 1.09-1.51, more often when contacted — see experiments/dnd_signal/),
+    # so two models must now both be wrong before a do-not-disturb is contacted.
     #
     # Defaults to None, so behaviour is unchanged unless a caller opts in.
     # Fleet-level degradation (novelty claim N6). When set, retries into an
     # issuer currently detected as degraded are valued at zero, so the agent
     # stops burning attempts on a dead rail. Costs no customer contact at all.
     degraded_issuers: DegradedIssuerRegistry | None = None
+    # Act on a lower confidence bound instead of the point estimate: the EV
+    # uses `tau_hat - uncertainty_k * se`. Defaults to 0, which is exactly the
+    # previous behaviour, so this is a knob rather than a change.
+    uncertainty_k: float = 0.0
     churn_model: ChurnRiskModel | None = None
     # Chosen from a measured sweep, not picked by feel. Against lambda_churn=0
     # this cuts do-not-disturb contacts 20.1% -> 13.6% and raises incremental
@@ -282,7 +325,7 @@ class EVDecisionPolicy:
             return escalation
 
         features = case_to_features(case).reshape(1, -1)
-        tau_hat = float(self.uplift_model.predict_cate(features)[0])
+        tau_hat = _acted_on_tau(self.uplift_model, features, self.uncertainty_k)
         retry_available = isinstance(case, (FailedPaymentCase, FailedSubscriptionCase))
 
         if attempts_so_far >= self.max_attempts:
@@ -417,6 +460,8 @@ class LookaheadEVDecisionPolicy:
     autonomy_limit_rupees: float = 25_000.0
     churn_model: ChurnRiskModel | None = None
     lambda_churn: float = 4.0
+    # See EVDecisionPolicy.uncertainty_k — same knob, same default.
+    uncertainty_k: float = 0.0
 
     def _churn_cost(self, case: RecoveryCase, features) -> float:
         if self.churn_model is None:
@@ -476,7 +521,7 @@ class LookaheadEVDecisionPolicy:
         if escalation is not None:
             return escalation
         features = case_to_features(case).reshape(1, -1)
-        tau_hat = float(self.uplift_model.predict_cate(features)[0])
+        tau_hat = _acted_on_tau(self.uplift_model, features, self.uncertainty_k)
         retry_available = isinstance(case, (FailedPaymentCase, FailedSubscriptionCase))
 
         if attempts_so_far >= self.max_attempts:

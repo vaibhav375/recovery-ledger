@@ -1,0 +1,49 @@
+{
+  "headline_n": 60000,
+  "seed": 20268823,
+  "ratio": 1.2943,
+  "ci_low": 1.0934,
+  "ci_high": 1.5114,
+  "opt_out_rate_do_not_disturbs": 0.01827,
+  "opt_out_rate_others": 0.01412,
+  "opt_out_rate_without_contact": 0.0,
+  "n_do_not_disturbs": 10344,
+  "effect_excludes_one": true,
+  "previously_reported": 1.93,
+  "previously_reported_inside_ci": false,
+  "stability_by_sample_size": [
+    {
+      "n": 5000,
+      "ratios": [
+        1.141,
+        1.0,
+        1.871,
+        1.19,
+        0.86
+      ],
+      "spread": 1.011
+    },
+    {
+      "n": 20000,
+      "ratios": [
+        1.326,
+        1.126,
+        1.517,
+        1.256,
+        1.164
+      ],
+      "spread": 0.391
+    },
+    {
+      "n": 60000,
+      "ratios": [
+        1.294,
+        1.059,
+        1.044,
+        1.265,
+        1.241
+      ],
+      "spread": 0.25
+    }
+  ]
+}

@@ -15,7 +15,7 @@ problem (novelty claim N2) had the agent contacting them at 20.1% — level
 with untargeted policies, not better. The cause is that avoiding them rested
 entirely on `τ̂_pay` being right, and `τ̂_pay` correlates only ~0.35-0.42 with
 truth. Churn risk is an **independent** signal: measured on this simulator,
-true do-not-disturbs opt out **1.93x** more often than others when
+true do-not-disturbs opt out **1.29x** (95% CI 1.09-1.51) more often than others when
 contacted. Adding it means two models must both be wrong before a
 do-not-disturb gets contacted, rather than one.
 """

@@ -1072,7 +1072,9 @@ Checked the signal was real before building anything:
 - opt-out rate when contacted: 1.33%; when not contacted: **0.0%** — contact
   is the entire cause, so the effect is cleanly identified
 - true do-not-disturbs opt out **1.93x** more often than others when
-  contacted
+  contacted — **superseded 2026-08-26, see below: this was measured once at
+  n = 5,000 and does not survive a larger sample. The figure is 1.29x
+  (95% CI 1.09-1.51).**
 
 That 1.93x is the whole argument. Churn risk is an **independent** signal
 from `τ̂_pay`. Avoiding do-not-disturbs previously required one model
@@ -1298,3 +1300,48 @@ typing `import recovery_ledger` would have seen a broken install.
 
 `make setup` now clears the flag on Darwin, non-fatally, and reports which of
 the two import paths is working.
+
+
+## 2026-08-26 — the 1.93x supporting N2 was measured at a sample size where it swings by more than its own size
+
+Auditing every numeric claim in the repository against its artifact, ahead of
+submission. Most held. This one did not.
+
+Novelty claim N2 argues churn risk is a signal *independent* of predicted
+payment uplift, so avoiding a do-not-disturb stops depending on one model
+being right. The evidence offered was a single ratio: true do-not-disturbs
+opt out **1.93x** more often than everyone else when contacted. It appeared in
+README.md, RESULTS.md, this log, `policy/churn.py` and `policy/decision.py`.
+
+It was measured once, at n = 5,000 — the training batch size, which is simply
+where the measurement happened to be sitting. Opt-out on first contact is a
+~1.4% event, so a 5,000-case draw produces about 20 events in the
+do-not-disturb arm, and a ratio of two small counts is very unstable.
+
+Across five seeds at n = 5,000 the ratio ranges **0.72x to 1.87x** — a spread
+wider than the effect, with draws landing on both sides of 1.0. One of my own
+probes during this audit returned 0.72x and I briefly believed I had caught a
+false claim pointing the wrong way. I had not; I had reproduced the
+instability.
+
+At n = 60,000 it converges: **1.29x, 95% CI [1.09, 1.51]**, on an
+evaluation seed disjoint from every other experiment. 1.93x is outside that
+interval.
+
+**The claim survives in direction and not in magnitude.** The interval
+excludes 1.0, so the effect is real; opt-out with no contact is exactly 0.0000
+at n = 60,000, so it is cleanly attributable to contact; and the mechanism is
+traceable in the simulator, since persuadability rises with the annoyance
+threshold and opt-out probability falls with it. The number is just 33% of the
+way to what was claimed, not 93%.
+
+Nothing downstream changes. The lambda_churn sweep, the do-not-disturb contact
+rate falling 20.1% to 13.6%, and the baselines table are separately measured
+and unaffected — this was the *motivating* statistic, not an input to any of
+them.
+
+Now `make dnd-signal`, with an artifact, a stability table by sample size, and
+a doc test that fails the build if the prose and the artifact disagree. The
+generalisable lesson is the same one the sensitivity sweep and the off-policy
+evaluation experiment each taught this month: a number measured once, at
+whatever n was convenient, is not a measurement.

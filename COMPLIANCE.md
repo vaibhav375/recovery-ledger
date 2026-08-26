@@ -106,6 +106,23 @@ promised date, rather than being an invisible branch in control flow.
 |---|---|---|---|
 | `POLICY.CONTACT_BUDGET` | `rules/budget.py` | Contact attempts per customer per rolling window stay under a cap. | Spec sections 8.3 / 9.1 (also backs stopping rule 3, "budget exhausted", section 10) |
 
+## Negotiation envelope (internal policy, not a specific regulation)
+
+| Rule | File | What it checks | Source |
+|---|---|---|---|
+| `POLICY.NEGOTIATION_ENVELOPE` | `rules/negotiation.py` | A settlement offer must stay inside the discount ceiling the merchant authorised, and the case must sit below the agent's per-case autonomy limit in rupees. Above it the kernel returns `DENY` and no message is drafted at all. | Spec section 9.4 (bounded authority) and section 10, rule 8 ("amount or sensitivity exceeds autonomy limit") |
+
+Not law. The envelope is *sized* against Section 43B(h) of the Income-tax
+Act, 1961 (inserted by the Finance Act, 2023) read with s. 15 of the MSMED
+Act, 2006 — a buyer who does not pay a micro or small enterprise inside the
+statutory window has the deduction deferred to the year of actual payment,
+which is what makes early settlement the buyer's own interest and means the
+agent rarely needs to concede margin at all. That statute shapes the
+negotiation; it does not impose this rule.
+
+Verified in `experiments/negotiation/`: the ₹900,000 scenario returns `DENY`
+on this rule, with no draft produced.
+
 ## Ambiguities flagged rather than silently resolved
 
 **`TCCCPR.CONSENT.VALIDITY`'s 7-day explicit-consent window.** The spec's

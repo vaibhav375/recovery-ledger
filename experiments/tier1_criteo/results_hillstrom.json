@@ -13,7 +13,7 @@
       "auuc": 0.018577268999393104,
       "mean_predicted_cate": 0.04256201002184142,
       "std_predicted_cate": 0.030879328104645106,
-      "fit_seconds": 2.69
+      "fit_seconds": 2.68
     },
     "t_learner": {
       "qini_coefficient": 0.054576728330003196,
@@ -27,14 +27,14 @@
       "auuc": 0.02194505353417573,
       "mean_predicted_cate": 0.045365900387299506,
       "std_predicted_cate": 0.04197092264797565,
-      "fit_seconds": 6.21
+      "fit_seconds": 6.15
     },
     "causal_forest": {
       "qini_coefficient": 0.03863428529082421,
       "auuc": 0.017875375043718052,
       "mean_predicted_cate": 0.04359210879341988,
       "std_predicted_cate": 0.06595091042082965,
-      "fit_seconds": 23.99
+      "fit_seconds": 22.63
     }
   },
   "ope_validation": {

@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal
 
 # `uv pip install` honours an ambient VIRTUAL_ENV over the venv it was just
 # told to create. Anyone who runs `make setup` with another virtualenv active
@@ -140,6 +140,20 @@ ope:
 # correction across the sixteen hypotheses.
 fairness:
 	PYTHONPATH=src .venv/bin/python3 experiments/fairness/run_fairness.py
+
+# Acting on a lower confidence bound instead of a point estimate. The
+# disparity audit found the policy contacting cases whose true value of
+# contact is negative, because tau_hat = 0.02 from a model that understands a
+# segment and tau_hat = 0.02 from a model that is guessing produce the same
+# decision. This sweeps `tau_hat - k * se` and measures what caution buys.
+pessimism:
+	PYTHONPATH=src .venv/bin/python3 experiments/pessimism/run_pessimism.py
+
+# The statistic behind novelty claim N2, measured at a sample size where it
+# converges. It was reported as 1.93x from a single n=5,000 draw, where the
+# ratio ranges 0.72x-1.87x across seeds.
+dnd-signal:
+	PYTHONPATH=src .venv/bin/python3 experiments/dnd_signal/run_dnd_signal.py
 
 # Adversarial suite against the compliance kernel (spec section 9.5).
 # Named attacks + a hostile policy end to end + randomised fuzz.

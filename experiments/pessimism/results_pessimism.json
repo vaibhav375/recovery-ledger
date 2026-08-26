@@ -1,0 +1,275 @@
+{
+  "n_train": 5000,
+  "n_eval": 4000,
+  "n_models": 20,
+  "seed": 20260823,
+  "eval_seed": 20267823,
+  "eval_draws": 3,
+  "uplift_correlation_single_tlearner": 0.364,
+  "uplift_correlation_ensemble": 0.4586,
+  "correlation_per_draw": {
+    "single": [
+      0.3636,
+      0.3714,
+      0.3569
+    ],
+    "ensemble": [
+      0.4546,
+      0.4672,
+      0.454
+    ]
+  },
+  "best_k_per_draw": [
+    0.5,
+    0.5,
+    0.25
+  ],
+  "best_k_is_stable": false,
+  "improvement_per_case_per_draw": [
+    13.46,
+    13.8,
+    3.54
+  ],
+  "draws": [
+    {
+      "eval_seed": 20267823,
+      "se_median": 0.07551,
+      "best_k": 0.5,
+      "improvement_per_case": 13.46,
+      "sweep": [
+        {
+          "uncertainty_k": 0.0,
+          "contact_rate": 0.2657,
+          "contacts": 1063,
+          "net_value_per_case": 181.2,
+          "net_value_per_contact": 681.85,
+          "payment_rate": 0.0965,
+          "opt_out_rate": 0.003,
+          "harmful_contacts": 84,
+          "pct_contacts_that_are_harmful": 0.079,
+          "value_destroyed_on_harmful_contacts": -6240.17
+        },
+        {
+          "uncertainty_k": 0.25,
+          "contact_rate": 0.2223,
+          "contacts": 889,
+          "net_value_per_case": 189.34,
+          "net_value_per_contact": 851.93,
+          "payment_rate": 0.0905,
+          "opt_out_rate": 0.0027,
+          "harmful_contacts": 58,
+          "pct_contacts_that_are_harmful": 0.0652,
+          "value_destroyed_on_harmful_contacts": -6232.37
+        },
+        {
+          "uncertainty_k": 0.5,
+          "contact_rate": 0.1775,
+          "contacts": 710,
+          "net_value_per_case": 194.66,
+          "net_value_per_contact": 1096.69,
+          "payment_rate": 0.0833,
+          "opt_out_rate": 0.0022,
+          "harmful_contacts": 35,
+          "pct_contacts_that_are_harmful": 0.0493,
+          "value_destroyed_on_harmful_contacts": -6226.47
+        },
+        {
+          "uncertainty_k": 1.0,
+          "contact_rate": 0.1062,
+          "contacts": 425,
+          "net_value_per_case": 181.23,
+          "net_value_per_contact": 1705.67,
+          "payment_rate": 0.0707,
+          "opt_out_rate": 0.0013,
+          "harmful_contacts": 14,
+          "pct_contacts_that_are_harmful": 0.0329,
+          "value_destroyed_on_harmful_contacts": -4.6
+        },
+        {
+          "uncertainty_k": 1.5,
+          "contact_rate": 0.0575,
+          "contacts": 230,
+          "net_value_per_case": 167.62,
+          "net_value_per_contact": 2915.12,
+          "payment_rate": 0.06,
+          "opt_out_rate": 0.0008,
+          "harmful_contacts": 10,
+          "pct_contacts_that_are_harmful": 0.0435,
+          "value_destroyed_on_harmful_contacts": -3.4
+        },
+        {
+          "uncertainty_k": 2.0,
+          "contact_rate": 0.025,
+          "contacts": 100,
+          "net_value_per_case": 165.16,
+          "net_value_per_contact": 6606.57,
+          "payment_rate": 0.0545,
+          "opt_out_rate": 0.0,
+          "harmful_contacts": 6,
+          "pct_contacts_that_are_harmful": 0.06,
+          "value_destroyed_on_harmful_contacts": -1.8
+        }
+      ]
+    },
+    {
+      "eval_seed": 20267923,
+      "se_median": 0.07555,
+      "best_k": 0.5,
+      "improvement_per_case": 13.8,
+      "sweep": [
+        {
+          "uncertainty_k": 0.0,
+          "contact_rate": 0.2572,
+          "contacts": 1029,
+          "net_value_per_case": 189.95,
+          "net_value_per_contact": 738.4,
+          "payment_rate": 0.0925,
+          "opt_out_rate": 0.0022,
+          "harmful_contacts": 62,
+          "pct_contacts_that_are_harmful": 0.0603,
+          "value_destroyed_on_harmful_contacts": -25057.42
+        },
+        {
+          "uncertainty_k": 0.25,
+          "contact_rate": 0.2162,
+          "contacts": 865,
+          "net_value_per_case": 188.47,
+          "net_value_per_contact": 871.52,
+          "payment_rate": 0.0877,
+          "opt_out_rate": 0.0018,
+          "harmful_contacts": 43,
+          "pct_contacts_that_are_harmful": 0.0497,
+          "value_destroyed_on_harmful_contacts": -11.7
+        },
+        {
+          "uncertainty_k": 0.5,
+          "contact_rate": 0.178,
+          "contacts": 712,
+          "net_value_per_case": 203.75,
+          "net_value_per_contact": 1144.66,
+          "payment_rate": 0.0825,
+          "opt_out_rate": 0.001,
+          "harmful_contacts": 29,
+          "pct_contacts_that_are_harmful": 0.0407,
+          "value_destroyed_on_harmful_contacts": -8.3
+        },
+        {
+          "uncertainty_k": 1.0,
+          "contact_rate": 0.1095,
+          "contacts": 438,
+          "net_value_per_case": 174.83,
+          "net_value_per_contact": 1596.64,
+          "payment_rate": 0.07,
+          "opt_out_rate": 0.0008,
+          "harmful_contacts": 15,
+          "pct_contacts_that_are_harmful": 0.0342,
+          "value_destroyed_on_harmful_contacts": -4.5
+        },
+        {
+          "uncertainty_k": 1.5,
+          "contact_rate": 0.0575,
+          "contacts": 230,
+          "net_value_per_case": 175.69,
+          "net_value_per_contact": 3055.51,
+          "payment_rate": 0.0583,
+          "opt_out_rate": 0.0,
+          "harmful_contacts": 9,
+          "pct_contacts_that_are_harmful": 0.0391,
+          "value_destroyed_on_harmful_contacts": -2.9
+        },
+        {
+          "uncertainty_k": 2.0,
+          "contact_rate": 0.0255,
+          "contacts": 102,
+          "net_value_per_case": 166.95,
+          "net_value_per_contact": 6547.08,
+          "payment_rate": 0.0515,
+          "opt_out_rate": 0.0,
+          "harmful_contacts": 3,
+          "pct_contacts_that_are_harmful": 0.0294,
+          "value_destroyed_on_harmful_contacts": -1.1
+        }
+      ]
+    },
+    {
+      "eval_seed": 20268023,
+      "se_median": 0.07741,
+      "best_k": 0.25,
+      "improvement_per_case": 3.54,
+      "sweep": [
+        {
+          "uncertainty_k": 0.0,
+          "contact_rate": 0.2625,
+          "contacts": 1050,
+          "net_value_per_case": 177.74,
+          "net_value_per_contact": 677.1,
+          "payment_rate": 0.0887,
+          "opt_out_rate": 0.0047,
+          "harmful_contacts": 90,
+          "pct_contacts_that_are_harmful": 0.0857,
+          "value_destroyed_on_harmful_contacts": -1477.25
+        },
+        {
+          "uncertainty_k": 0.25,
+          "contact_rate": 0.22,
+          "contacts": 880,
+          "net_value_per_case": 181.28,
+          "net_value_per_contact": 824.02,
+          "payment_rate": 0.0823,
+          "opt_out_rate": 0.0045,
+          "harmful_contacts": 59,
+          "pct_contacts_that_are_harmful": 0.067,
+          "value_destroyed_on_harmful_contacts": -1468.15
+        },
+        {
+          "uncertainty_k": 0.5,
+          "contact_rate": 0.179,
+          "contacts": 716,
+          "net_value_per_case": 176.26,
+          "net_value_per_contact": 984.68,
+          "payment_rate": 0.0765,
+          "opt_out_rate": 0.0037,
+          "harmful_contacts": 39,
+          "pct_contacts_that_are_harmful": 0.0545,
+          "value_destroyed_on_harmful_contacts": -11.9
+        },
+        {
+          "uncertainty_k": 1.0,
+          "contact_rate": 0.1082,
+          "contacts": 433,
+          "net_value_per_case": 159.37,
+          "net_value_per_contact": 1472.24,
+          "payment_rate": 0.0625,
+          "opt_out_rate": 0.0018,
+          "harmful_contacts": 17,
+          "pct_contacts_that_are_harmful": 0.0393,
+          "value_destroyed_on_harmful_contacts": -4.5
+        },
+        {
+          "uncertainty_k": 1.5,
+          "contact_rate": 0.0595,
+          "contacts": 238,
+          "net_value_per_case": 157.82,
+          "net_value_per_contact": 2652.47,
+          "payment_rate": 0.0568,
+          "opt_out_rate": 0.0008,
+          "harmful_contacts": 6,
+          "pct_contacts_that_are_harmful": 0.0252,
+          "value_destroyed_on_harmful_contacts": -1.8
+        },
+        {
+          "uncertainty_k": 2.0,
+          "contact_rate": 0.0238,
+          "contacts": 95,
+          "net_value_per_case": 152.42,
+          "net_value_per_contact": 6417.62,
+          "payment_rate": 0.0498,
+          "opt_out_rate": 0.0,
+          "harmful_contacts": 2,
+          "pct_contacts_that_are_harmful": 0.0211,
+          "value_destroyed_on_harmful_contacts": -0.6
+        }
+      ]
+    }
+  ]
+}

@@ -3,12 +3,19 @@
 **Status: Tier 1 validation passed. B1 headline: ₹272,281 incremental recovery
 per 1,000 cases (95% CI ₹103,930–₹433,387).** The decisive test: against a
 control contacting a comparable number of cases *at random*, the agent
-recovers **2.85x more incremental revenue with non-overlapping confidence
+recovers **2.51x more incremental revenue with non-overlapping confidence
 intervals** — so the targeting model, not merely contact volume, is doing the
 work. Against blind mass-contact it is **statistically indistinguishable on
 total recovery** (overlapping CIs — and the sign of the difference flips
-with the sample, so "beats" would be an overclaim) while using **48% fewer
-contacts** at 2x better cost per incremental rupee. The contact efficiency
+with the sample, so "beats" would be an overclaim) while using **70% fewer
+contacts** at 2.8x better cost per incremental rupee.
+
+These figures are the *deployed* policy — the lookahead EV policy with the
+churn term, which is what `make eval` runs and what the dashboard and live
+console show. An earlier version of this paragraph quoted the no-churn
+variant, which scores 2.85x against random on 48% fewer contacts. That
+variant is not what ships, and mixing the two is how a README ends up
+describing a system nobody can run. The contact efficiency
 is the robust claim; a higher headline total is not. Policy dominance under stated
 assumptions, in simulation — not a real-world claim. **Four revisions to
 these numbers** (three from real bugs, one from a methodology fix) are
@@ -66,8 +73,8 @@ evidence the problem is real; it is not something to claim credit for.
 | | Claim | Status |
 |---|---|---|
 | **N1** | **Incremental-first accounting.** Recovery vendors overwhelmingly report *gross* recovered revenue. This reports incremental ₹ against a randomised no-contact holdout, with confidence intervals. The holdout here recovers 15.47% unaided — that is the number gross reporting quietly takes credit for. | ✅ Built, measured |
-| **N2** | **Negative-uplift targeting ("do-not-disturbs").** Customers whose payment probability *falls* when contacted. Nobody in dunning models the downside of contact. | ✅ Built. A learned churn model gives the policy a signal independent of `τ̂_pay` (do-not-disturbs opt out **1.93x** more when contacted), cutting the do-not-disturb contact rate **20.1% → 13.6%** against untargeted policies' ~20.2%, at 49% better rupees-per-contact. Full λ_churn curve in [`RESULTS.md`](RESULTS.md); it is a stated trade, not a free win. |
-| **N3** | **A deterministic, machine-checkable India-regulatory compliance kernel** emitting a per-action certificate — TCCCPR/DLT, RBI recovery-agent norms, RBI e-mandate 2026, DPDPA. | ✅ Built: 12 rules, 100% red-team block rate, mutation-tested |
+| **N2** | **Negative-uplift targeting ("do-not-disturbs").** Customers whose payment probability *falls* when contacted. Nobody in dunning models the downside of contact. | ✅ Built. A learned churn model gives the policy a signal independent of `τ̂_pay` (do-not-disturbs opt out **1.29x** (95% CI 1.09–1.51) more when contacted), cutting the do-not-disturb contact rate **20.1% → 13.6%** against untargeted policies' ~20.2%, at 49% better rupees-per-contact. Full λ_churn curve in [`RESULTS.md`](RESULTS.md); it is a stated trade, not a free win. |
+| **N3** | **A deterministic, machine-checkable India-regulatory compliance kernel** emitting a per-action certificate — TCCCPR/DLT, RBI recovery-agent norms, RBI e-mandate 2026, DPDPA. | ✅ Built: 13 rules, 100% red-team block rate, mutation-tested |
 | **N4** | **Contact as a budget-constrained sequential decision problem**, not one-shot classification. | ⚠️ Partial: greedy EV under an explicit budget, plus a finite-horizon lookahead variant. Not a full constrained-MDP solver, and the spec explicitly permits the simplification — but it is a simplification, and the lookahead currently adds nothing measurable. |
 | **Bonus** | **Bounded-authority negotiation with the Section 43B(h) tax clock** (spec 9.4). Invokes the counterparty's *own* tax incentive rather than only chasing. | ✅ Built. NPV solver, kernel-enforced concession envelope, and a measured decision to keep an LLM *out* of the drafting. |
 | **N5** | **Two-tier validation** — causal machinery proven on real randomised public data *before* transfer to the simulator. Directly defeats "your synthetic number is circular". | ✅ Built (Criteo + Hillstrom) |
@@ -121,7 +128,7 @@ running.
       sensitivity sweep below).
 - [x] Compliance kernel — deny-by-default engine, per-action certificates,
       hash-chained into the ledger, no-LLM-import test that fails the build
-      (verified: mutation-tested, not just passing vacuously). 11 rules
+      (verified: mutation-tested, not just passing vacuously). 13 rules
       covering RBI recovery-agent norms, TRAI TCCCPR, the RBI e-mandate 2026
       framework, and DPDPA — see [`COMPLIANCE.md`](COMPLIANCE.md) for every
       rule, its source citation, and two ambiguities flagged rather than
@@ -152,7 +159,7 @@ running.
 - [x] **B3 — all 11 stopping rules, provably reachable.** `tests/test_all_stopping_rules.py`
       runs a crafted scenario suite and asserts **every one of the 11 reasons
       fires at least once** — B3 as an executable property, not a README claim.
-      A real 2,000-case batch now fires **7 of 11 naturally** (the other four
+      A real 2,000-case batch now fires **8 of 11 naturally** (the other three
       need operator action or an all-deny kernel). Promise-to-pay is a genuine
       **pause with scheduled resumption**, enforced as a compliance-kernel
       silence window; cases still paused at the horizon become the honest
@@ -254,6 +261,25 @@ running.
       hidden. The single-seed version of this experiment reported a clean pass
       on all of it — replication is what showed that was luck.
 
+- [x] **Acting on a lower bound, not a point estimate.** `make pessimism`.
+      The disparity audit found the policy contacting cases whose *true* value
+      of contact is negative, because `τ̂ = 0.02` from a model that understands
+      a segment and `τ̂ = 0.02` from a model that is guessing produce identical
+      decisions. A 20-model bootstrap ensemble reports a per-case standard
+      error and the policy acts on **τ̂ − k·se**; k = 0 is exactly the deployed
+      policy, so the sweep's origin is what ships.
+      Two results, over 3 evaluation draws. The ensemble improves the estimate
+      before any caution is applied — **corr 0.364 → 0.459** against true
+      persuadability, scored on the *same* populations, consistent in every
+      draw. And caution buys a lot of harm reduction for a little money: at
+      k = 0.5 the agent sends **32% fewer messages**, cuts contacts to
+      negative-value cases **79 → 34**, and lifts value per contact
+      **₹699 → ₹1,075** — while net value moves only ₹4–₹14/case.
+      Best k is **not stable** across draws, so it is reported as a range
+      (≈0.25–0.5) rather than a tuned value, and past k = 0.5 the curve turns
+      down while harm reduction keeps improving. A single draw would have
+      called this a clean +7.4% win; it is not.
+
 - [x] **Disparity audit of the policy.** `make fairness`. The compliance
       kernel checks whether an *action* is permitted; nothing checked whether
       the *policy* distributes its attention fairly, and an agent can refuse
@@ -312,6 +338,77 @@ running.
 
 - [ ] Video + submission
 
+## Architecture
+
+Every case travels the same loop, and **every step writes to the ledger** —
+the audit trail is not a report generated afterwards, it is the record the
+system makes as it runs.
+
+```mermaid
+flowchart TD
+    E["events/<br/>4 loss types"] --> D["detector/<br/>still at risk?"]
+    D -->|resolved| STOP1(["stop: resolved"])
+    D --> DX["diagnoser/<br/>taxonomy + root cause"]
+    DX --> P
+
+    subgraph P["policy/ — what to do"]
+        direction TB
+        U["uplift/<br/>S · T · X-learner, causal forest<br/>tau_hat, and how much to trust it"]
+        C["churn.py<br/>incremental opt-out risk"]
+        DEC["decision.py<br/>EV = tau x amount - cost<br/>- lambda_churn x P(churn) x LTV"]
+        U --> DEC
+        C --> DEC
+    end
+
+    FLEET["detector/fleet.py<br/>issuer degradation<br/>(contact-free recovery)"] -.->|"retry into a dead rail<br/>is worth zero"| DEC
+
+    DEC -->|"proposes an action"| K
+
+    subgraph K["kernel/ — may we?"]
+        direction TB
+        R["rules/ — 13 rules<br/>TCCCPR · RBI · DPDP · e-mandate · policy"]
+        ENG["engine.py<br/>DENY unless every rule passes"]
+        R --> ENG
+        PROV["provenance.py<br/>says who, and where we could not pin a clause"]
+        PROV -.-> R
+    end
+
+    K -->|"DENY"| RETRY["fall back to WAIT<br/>never silently drop the case"]
+    K -->|"ALLOW + certificate"| X["executor/<br/>channel adapters"]
+    X --> L["listener/<br/>reply -> intent<br/>(opt-out is deterministic, not the LLM)"]
+    L --> NEG["negotiation/<br/>43B(h) clock · NPV solver<br/>· kernel-enforced envelope"]
+    NEG --> SR{"11 stopping rules"}
+    L --> SR
+    RETRY --> SR
+    SR -->|"terminate or pause"| STOP2(["outcome + reason"])
+    SR -->|"keep working"| D
+
+    ENG -.->|"certificate per attempted action"| LED
+    DEC -.-> LED
+    L -.-> LED
+    STOP2 -.-> LED
+    LED[("ledger/<br/>append-only, hash-chained<br/>every entry commits to the one before")]
+
+    LED --> DASH["dashboard/ + frontend/<br/>browsable trail"]
+    LED --> LIVE["live/<br/>run it, attack it, break it"]
+
+    classDef kernel fill:#2f27ce22,stroke:#433bff,stroke-width:2px
+    classDef ledger fill:#433bff14,stroke:#433bff,stroke-width:2px
+    class K,R,ENG,PROV kernel
+    class LED ledger
+```
+
+**The two arrows that carry the argument.** The kernel sits *between* the
+policy and the executor — nothing reaches a customer without an `ALLOW`
+certificate, and a `DENY` falls back to `WAIT` rather than dropping the case.
+And everything is dashed into the ledger, because a decision that was not
+recorded did not happen.
+
+**Where the measurement lives.** `sim/` is the recovery gym the policy is
+evaluated in; `policy/ope/` estimates what a policy *would* have earned from
+logs of a different one. Neither is in the loop above — they are how the loop
+is judged, not part of it.
+
 ## Running this repo
 
 ```
@@ -341,6 +438,10 @@ make ope               # off-policy evaluation in the deployment loop: value a
                        # policy you never ran, then check it against the truth
 make fairness          # disparity audit of the policy: who does it decide not
                        # to help, and is the difference explained?
+make pessimism         # act on a lower confidence bound instead of a point
+                       # estimate, and measure what the caution buys
+make dnd-signal        # the statistic behind N2, at a sample size where it
+                       # actually converges
 make redteam          # 21 named attacks + hostile policy + 5,000-state fuzz —
                        # verified working, 100% block rate, mutation-tested
 ```

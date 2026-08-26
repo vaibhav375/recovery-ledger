@@ -75,3 +75,27 @@ def test_spot_check_known_citations(rule_name):
     c = citation_for(rule_name)
     assert c is not None and c.confidence == "primary"
     assert c.url
+
+
+def test_compliance_doc_documents_every_rule_in_the_kernel():
+    """COMPLIANCE.md claimed 13 rules and documented 12 — the negotiation
+    envelope was missing from the tables while being counted in the header.
+    A rule that is enforced but undocumented is one a compliance officer
+    cannot audit."""
+    import re
+    from pathlib import Path
+
+    doc = (Path(__file__).resolve().parents[1] / "COMPLIANCE.md").read_text()
+    named = set(re.findall(r"`([A-Z][A-Z0-9_.]+)`", doc))
+    missing = [n for n in _default_rule_names() if n not in named]
+    assert not missing, f"rules enforced but absent from COMPLIANCE.md: {missing}"
+
+
+def test_compliance_doc_states_the_right_rule_count():
+    from pathlib import Path
+
+    doc = (Path(__file__).resolve().parents[1] / "COMPLIANCE.md").read_text()
+    n = len(_default_rule_names())
+    assert f"{n} rules are implemented" in doc, (
+        f"COMPLIANCE.md does not state the current count of {n}"
+    )
