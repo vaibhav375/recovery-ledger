@@ -116,6 +116,7 @@ export default function App() {
           futileRetries={figures.futile}
           contactsSent={figures.contacts}
           totalCases={data.summary.cases}
+          scatter={data.fairness?.scatter_sample}
         />
         <Kernel data={data} />
         <Audit data={data} />

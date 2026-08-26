@@ -1129,3 +1129,109 @@ main, .rl-topline, .rl-footer { position: relative; z-index: 1; }
   .rl-chart-pt text { font-size: 13px; }
   .rl-chart-pt .rl-chart-sub { display: none; }
 }
+
+/* ── the caution curve ─────────────────────────────────────────────────
+ *
+ * Two series with different units, normalised to their own ranges so they
+ * share a plane. That is a fair way to show two quantities diverging and an
+ * unfair way to compare their sizes — so the y axis carries no numbers at
+ * all, and the only magnitudes shown are the annotated peak and the labelled
+ * endpoints.
+ */
+.rl-curve { margin: 4px 0 16px; }
+.rl-curve svg { width: 100%; height: auto; display: block; overflow: visible; }
+.rl-curve-value { fill: none; stroke: var(--accent); stroke-width: 2; }
+.rl-curve-harm { fill: none; stroke: var(--fg-faint); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.rl-curve-peak { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 2 4; opacity: 0.4; }
+.rl-curve-dot { fill: var(--accent); }
+.rl-curve-dot.is-peak { fill: var(--accent); }
+.rl-curve-dot.is-harm { fill: var(--fg-faint); }
+.rl-curve-anno { font-family: var(--mono); font-size: 9.5px; fill: var(--accent); }
+.rl-curve-tick { font-family: var(--mono); font-size: 9px; fill: var(--fg-faint); }
+.rl-curve figcaption {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin-top: 6px;
+  font-size: 10.5px;
+  color: var(--fg-faint);
+}
+.rl-curve-key::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.rl-curve-key.is-value::before { background: var(--accent); }
+.rl-curve-key.is-harm::before {
+  background: repeating-linear-gradient(90deg, var(--fg-faint) 0 4px, transparent 4px 7px);
+}
+.rl-curve-axis { margin-left: auto; font-family: var(--mono); }
+
+/* ── the negative-uplift quadrant ──────────────────────────────────────
+ *
+ * Drawn as a cloud, never a trend line. Predicted and true uplift correlate
+ * around 0.36; a fitted line would imply a precision the model does not have,
+ * and the width of the scatter IS part of what the section is admitting.
+ */
+.rl-silence-quad {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(24px, 3.5vw, 52px);
+  align-items: center;
+  margin: clamp(40px, 6vw, 72px) 0 0;
+  padding-top: clamp(30px, 4vw, 46px);
+  border-top: 1px solid var(--line);
+}
+.rl-silence-quad h3 {
+  margin: 0 0 14px;
+  font-size: clamp(17px, 1.9vw, 24px);
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.25;
+  max-width: 22ch;
+}
+.rl-silence-quad p { margin: 0 0 12px; font-size: 13.5px; font-weight: 300; line-height: 1.6; color: var(--fg-dim); }
+.rl-silence-quad p.rl-dim { font-size: 12.5px; color: var(--fg-faint); }
+.rl-silence-quad b { color: var(--fg); font-weight: 500; }
+
+.rl-quad svg { width: 100%; height: auto; display: block; overflow: visible; }
+/* The region where contact destroys value. Tinted, not outlined: it is a
+   condition of the world, not a boundary the agent drew. */
+.rl-quad-bad { fill: rgba(255, 107, 127, 0.055); }
+.rl-quad-zero { stroke: var(--line); stroke-width: 1; }
+.rl-quad-zero.is-v { stroke: var(--line-soft); }
+.rl-quad-pt { fill: var(--fg-faint); opacity: 0.42; }
+.rl-quad-pt.is-contacted { fill: var(--accent); opacity: 0.92; }
+.rl-quad-annobg { fill: var(--bg); opacity: 0.82; }
+.rl-quad-anno { font-size: 10px; fill: #ff8a9b; opacity: 0.9; }
+.rl-quad-axis { font-size: 10.5px; fill: var(--fg-dim); letter-spacing: 0.03em; }
+.rl-quad figcaption {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--fg-faint);
+}
+.rl-quad-key::before {
+  content: "";
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+  background: var(--fg-faint);
+  opacity: 0.5;
+}
+.rl-quad-key.is-contacted::before { background: var(--accent); opacity: 1; }
+.rl-quad-out { font-family: var(--mono); font-size: 10px; }
+.rl-quad-stat { margin-left: auto; color: var(--fg-dim); }
+
+@media (max-width: 900px) {
+  .rl-silence-quad { grid-template-columns: minmax(0, 1fr); }
+  .rl-quad-stat { margin-left: 0; }
+}

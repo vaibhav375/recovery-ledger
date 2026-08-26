@@ -3,9 +3,6012 @@
   "n_train": 5000,
   "seed": 20260823,
   "eval_seed": 20265823,
+  "scatter_sample": [
+    {
+      "tau_hat": 0.0328,
+      "tau_true": -0.0777,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1066,
+      "tau_true": 0.0986,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.114,
+      "tau_true": 0.1213,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.484,
+      "tau_true": 0.0091,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1188,
+      "tau_true": 0.0789,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0021,
+      "tau_true": 0.0025,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.067,
+      "tau_true": 0.0856,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0386,
+      "tau_true": 0.1932,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2115,
+      "tau_true": -0.0128,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.096,
+      "tau_true": 0.2167,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1199,
+      "tau_true": 0.1793,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0663,
+      "tau_true": -0.0034,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0707,
+      "tau_true": 0.3658,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.278,
+      "tau_true": 0.0652,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.1707,
+      "tau_true": 0.207,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0022,
+      "tau_true": -0.0797,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0524,
+      "tau_true": 0.1969,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1148,
+      "tau_true": 0.2819,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0715,
+      "tau_true": 0.0126,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.4724,
+      "tau_true": 0.1804,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1077,
+      "tau_true": 0.1642,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2162,
+      "tau_true": 0.2883,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0529,
+      "tau_true": 0.1567,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0083,
+      "tau_true": 0.0495,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0053,
+      "tau_true": 0.1922,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0577,
+      "tau_true": 0.0348,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0916,
+      "tau_true": 0.0698,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1342,
+      "tau_true": 0.1077,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1231,
+      "tau_true": 0.296,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1848,
+      "tau_true": 0.218,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0256,
+      "tau_true": 0.0611,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0099,
+      "tau_true": -0.0666,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0552,
+      "tau_true": 0.2687,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0612,
+      "tau_true": 0.099,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0445,
+      "tau_true": 0.2059,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1787,
+      "tau_true": 0.1779,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.029,
+      "tau_true": 0.2153,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1257,
+      "tau_true": 0.2017,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2078,
+      "tau_true": 0.1065,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1589,
+      "tau_true": 0.2083,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0566,
+      "tau_true": 0.056,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0079,
+      "tau_true": 0.3799,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.033,
+      "tau_true": 0.0008,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1816,
+      "tau_true": 0.157,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0165,
+      "tau_true": -0.0001,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1098,
+      "tau_true": 0.0298,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0084,
+      "tau_true": -0.2,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0122,
+      "tau_true": 0.1507,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1182,
+      "tau_true": 0.1644,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1049,
+      "tau_true": 0.2586,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.105,
+      "tau_true": 0.1369,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.166,
+      "tau_true": 0.1721,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.161,
+      "tau_true": 0.2644,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.136,
+      "tau_true": 0.0478,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0903,
+      "tau_true": 0.3741,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0338,
+      "tau_true": 0.0777,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.139,
+      "tau_true": 0.1168,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.004,
+      "tau_true": -0.0747,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.4535,
+      "tau_true": 0.0317,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0033,
+      "tau_true": 0.126,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1223,
+      "tau_true": 0.2005,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1663,
+      "tau_true": 0.0184,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0033,
+      "tau_true": 0.0341,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1529,
+      "tau_true": 0.2799,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0137,
+      "tau_true": 0.163,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0916,
+      "tau_true": 0.1577,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.4131,
+      "tau_true": 0.1348,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2234,
+      "tau_true": 0.3837,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.3427,
+      "tau_true": 0.0607,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0553,
+      "tau_true": -0.1304,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1331,
+      "tau_true": 0.1968,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0049,
+      "tau_true": -0.0335,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1089,
+      "tau_true": -0.1318,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1444,
+      "tau_true": 0.0916,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0823,
+      "tau_true": 0.0715,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1846,
+      "tau_true": 0.0997,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0156,
+      "tau_true": -0.0438,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0933,
+      "tau_true": 0.2754,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0558,
+      "tau_true": 0.2324,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1505,
+      "tau_true": 0.1644,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1637,
+      "tau_true": 0.18,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.095,
+      "tau_true": 0.0897,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0707,
+      "tau_true": 0.1655,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0809,
+      "tau_true": 0.012,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0958,
+      "tau_true": 0.2038,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1645,
+      "tau_true": 0.1893,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.102,
+      "tau_true": 0.0786,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0068,
+      "tau_true": 0.128,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0537,
+      "tau_true": 0.1447,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0447,
+      "tau_true": 0.199,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0535,
+      "tau_true": 0.104,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0614,
+      "tau_true": 0.0057,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1343,
+      "tau_true": 0.0955,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1192,
+      "tau_true": 0.0924,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0827,
+      "tau_true": -0.1082,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1097,
+      "tau_true": 0.0562,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0872,
+      "tau_true": 0.0204,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0687,
+      "tau_true": -0.0034,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.109,
+      "tau_true": 0.2451,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0331,
+      "tau_true": 0.0521,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2817,
+      "tau_true": 0.2659,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.03,
+      "tau_true": 0.0219,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1536,
+      "tau_true": 0.1635,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1628,
+      "tau_true": 0.1844,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0504,
+      "tau_true": 0.1064,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1353,
+      "tau_true": 0.2855,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0048,
+      "tau_true": -0.0232,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2022,
+      "tau_true": 0.0896,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0671,
+      "tau_true": 0.153,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0497,
+      "tau_true": 0.2586,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.057,
+      "tau_true": 0.2794,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0661,
+      "tau_true": 0.2087,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0571,
+      "tau_true": 0.1129,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.3359,
+      "tau_true": 0.1288,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1055,
+      "tau_true": 0.2914,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0051,
+      "tau_true": -0.1674,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0878,
+      "tau_true": 0.2353,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1278,
+      "tau_true": 0.0976,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1836,
+      "tau_true": 0.076,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0297,
+      "tau_true": -0.0859,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0084,
+      "tau_true": 0.0066,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0308,
+      "tau_true": 0.0464,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0259,
+      "tau_true": 0.2746,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1623,
+      "tau_true": 0.2823,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1962,
+      "tau_true": 0.3637,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0593,
+      "tau_true": 0.1805,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1127,
+      "tau_true": -0.0773,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1559,
+      "tau_true": -0.0359,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1147,
+      "tau_true": -0.1419,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2315,
+      "tau_true": 0.2704,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1242,
+      "tau_true": 0.2254,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0882,
+      "tau_true": 0.2789,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1037,
+      "tau_true": 0.0987,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1823,
+      "tau_true": 0.2301,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1478,
+      "tau_true": 0.1051,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1389,
+      "tau_true": 0.2462,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0613,
+      "tau_true": 0.1186,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0485,
+      "tau_true": -0.1306,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0451,
+      "tau_true": 0.2527,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0409,
+      "tau_true": 0.0058,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0749,
+      "tau_true": 0.1586,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0881,
+      "tau_true": 0.2012,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0577,
+      "tau_true": 0.1359,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0375,
+      "tau_true": 0.0226,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1116,
+      "tau_true": 0.0579,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0585,
+      "tau_true": 0.2889,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1233,
+      "tau_true": 0.2667,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2078,
+      "tau_true": 0.1352,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1341,
+      "tau_true": 0.3147,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.204,
+      "tau_true": 0.2199,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1177,
+      "tau_true": 0.2332,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0138,
+      "tau_true": -0.0592,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.3005,
+      "tau_true": 0.2332,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0375,
+      "tau_true": 0.1051,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0117,
+      "tau_true": 0.1965,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0937,
+      "tau_true": 0.0796,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0527,
+      "tau_true": 0.2168,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0383,
+      "tau_true": 0.0753,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0552,
+      "tau_true": 0.2031,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0751,
+      "tau_true": 0.2378,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0085,
+      "tau_true": -0.0178,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0705,
+      "tau_true": 0.1798,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1061,
+      "tau_true": 0.248,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1125,
+      "tau_true": 0.1639,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1069,
+      "tau_true": 0.3094,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.3041,
+      "tau_true": 0.1268,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0612,
+      "tau_true": 0.2341,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2102,
+      "tau_true": 0.1824,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1201,
+      "tau_true": 0.2571,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0648,
+      "tau_true": 0.1461,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0471,
+      "tau_true": 0.3072,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0071,
+      "tau_true": -0.1679,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0888,
+      "tau_true": 0.2954,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.027,
+      "tau_true": 0.0223,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2195,
+      "tau_true": 0.1728,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0706,
+      "tau_true": 0.1265,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0664,
+      "tau_true": -0.026,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0654,
+      "tau_true": 0.0139,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0683,
+      "tau_true": 0.1608,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0404,
+      "tau_true": -0.0326,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1358,
+      "tau_true": 0.1141,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0117,
+      "tau_true": -0.1895,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0883,
+      "tau_true": 0.0913,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0804,
+      "tau_true": 0.119,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0909,
+      "tau_true": 0.2477,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0432,
+      "tau_true": -0.0128,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.125,
+      "tau_true": 0.2145,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0476,
+      "tau_true": 0.2073,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0509,
+      "tau_true": 0.0937,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.087,
+      "tau_true": 0.2277,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.112,
+      "tau_true": 0.1383,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0609,
+      "tau_true": 0.1689,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1833,
+      "tau_true": 0.3529,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.211,
+      "tau_true": 0.3098,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0038,
+      "tau_true": 0.2466,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.3076,
+      "tau_true": 0.1306,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1067,
+      "tau_true": 0.1211,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.027,
+      "tau_true": 0.0935,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0622,
+      "tau_true": 0.3013,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0047,
+      "tau_true": -0.0838,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0209,
+      "tau_true": -0.0467,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1408,
+      "tau_true": 0.2892,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0638,
+      "tau_true": 0.1933,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0092,
+      "tau_true": -0.1183,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0535,
+      "tau_true": 0.2235,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0925,
+      "tau_true": 0.2778,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1573,
+      "tau_true": 0.1831,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0202,
+      "tau_true": -0.1842,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0466,
+      "tau_true": 0.1434,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0312,
+      "tau_true": 0.1054,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1135,
+      "tau_true": 0.1122,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.095,
+      "tau_true": 0.2562,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0129,
+      "tau_true": -0.0729,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0423,
+      "tau_true": 0.0218,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1272,
+      "tau_true": 0.2336,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1509,
+      "tau_true": 0.2393,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.4408,
+      "tau_true": 0.1767,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1106,
+      "tau_true": 0.0588,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.001,
+      "tau_true": -0.0997,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0702,
+      "tau_true": 0.2473,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0363,
+      "tau_true": 0.2314,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0328,
+      "tau_true": -0.0077,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0912,
+      "tau_true": 0.184,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0253,
+      "tau_true": 0.1216,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0204,
+      "tau_true": 0.2854,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1689,
+      "tau_true": 0.3645,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0022,
+      "tau_true": -0.1011,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.026,
+      "tau_true": 0.2774,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2846,
+      "tau_true": 0.2061,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0547,
+      "tau_true": -0.0482,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.148,
+      "tau_true": -0.0255,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0413,
+      "tau_true": 0.1653,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2026,
+      "tau_true": 0.27,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0028,
+      "tau_true": 0.0815,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2504,
+      "tau_true": 0.3381,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0031,
+      "tau_true": -0.0087,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0906,
+      "tau_true": 0.0461,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.5649,
+      "tau_true": 0.3001,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1133,
+      "tau_true": 0.2329,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0516,
+      "tau_true": 0.0421,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0482,
+      "tau_true": 0.376,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0652,
+      "tau_true": 0.1783,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0291,
+      "tau_true": 0.0175,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0291,
+      "tau_true": 0.0452,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.116,
+      "tau_true": 0.132,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1971,
+      "tau_true": 0.2296,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2321,
+      "tau_true": 0.3416,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1066,
+      "tau_true": 0.2436,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2052,
+      "tau_true": 0.2727,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0209,
+      "tau_true": 0.125,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.3108,
+      "tau_true": 0.0391,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0297,
+      "tau_true": -0.0141,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.035,
+      "tau_true": 0.0795,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1378,
+      "tau_true": 0.0279,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1556,
+      "tau_true": 0.1496,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0914,
+      "tau_true": 0.1685,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0664,
+      "tau_true": 0.077,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1216,
+      "tau_true": -0.054,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0392,
+      "tau_true": 0.1215,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1269,
+      "tau_true": 0.1901,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0855,
+      "tau_true": 0.1853,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1337,
+      "tau_true": 0.1676,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0084,
+      "tau_true": -0.1548,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0052,
+      "tau_true": -0.2,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0203,
+      "tau_true": -0.0238,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0864,
+      "tau_true": 0.2297,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1764,
+      "tau_true": 0.2181,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1763,
+      "tau_true": 0.2194,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1368,
+      "tau_true": 0.2129,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0761,
+      "tau_true": 0.2544,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0129,
+      "tau_true": 0.0729,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1468,
+      "tau_true": 0.2047,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0158,
+      "tau_true": -0.0879,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.4407,
+      "tau_true": -0.1036,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1139,
+      "tau_true": 0.179,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.109,
+      "tau_true": 0.1498,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0404,
+      "tau_true": 0.0141,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1463,
+      "tau_true": 0.3202,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.124,
+      "tau_true": 0.1929,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1513,
+      "tau_true": 0.2686,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1125,
+      "tau_true": 0.2299,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2195,
+      "tau_true": 0.2779,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0581,
+      "tau_true": 0.131,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1823,
+      "tau_true": 0.3241,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.027,
+      "tau_true": -0.0991,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0842,
+      "tau_true": 0.3171,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0852,
+      "tau_true": 0.2437,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1695,
+      "tau_true": 0.2278,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0523,
+      "tau_true": 0.13,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1364,
+      "tau_true": 0.1457,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.094,
+      "tau_true": 0.1236,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0547,
+      "tau_true": 0.1383,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0622,
+      "tau_true": 0.0319,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1694,
+      "tau_true": -0.0189,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0847,
+      "tau_true": 0.1505,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0057,
+      "tau_true": 0.1754,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1338,
+      "tau_true": 0.2178,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0432,
+      "tau_true": 0.1415,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0337,
+      "tau_true": 0.0821,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1991,
+      "tau_true": 0.2069,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0408,
+      "tau_true": -0.1892,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0802,
+      "tau_true": 0.0632,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1689,
+      "tau_true": 0.2063,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.3622,
+      "tau_true": 0.1726,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0943,
+      "tau_true": 0.0705,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1682,
+      "tau_true": 0.1308,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1661,
+      "tau_true": 0.096,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0693,
+      "tau_true": 0.2235,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0332,
+      "tau_true": 0.2273,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0801,
+      "tau_true": 0.2061,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1007,
+      "tau_true": 0.1662,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0611,
+      "tau_true": 0.2274,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0184,
+      "tau_true": -0.0029,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.4845,
+      "tau_true": 0.154,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1147,
+      "tau_true": 0.3311,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1702,
+      "tau_true": 0.2619,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.103,
+      "tau_true": 0.0557,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.519,
+      "tau_true": 0.0832,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0491,
+      "tau_true": -0.0273,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0966,
+      "tau_true": -0.0257,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0597,
+      "tau_true": -0.0028,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0942,
+      "tau_true": 0.1221,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1932,
+      "tau_true": 0.193,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0392,
+      "tau_true": 0.1563,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0405,
+      "tau_true": -0.0474,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0291,
+      "tau_true": 0.1886,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1158,
+      "tau_true": 0.0978,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.091,
+      "tau_true": 0.2642,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1884,
+      "tau_true": 0.1826,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0441,
+      "tau_true": 0.314,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0012,
+      "tau_true": 0.2471,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0375,
+      "tau_true": 0.0632,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2681,
+      "tau_true": 0.3201,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0799,
+      "tau_true": 0.0402,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0018,
+      "tau_true": -0.0178,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0766,
+      "tau_true": 0.0244,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0848,
+      "tau_true": 0.2121,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0782,
+      "tau_true": 0.0434,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0093,
+      "tau_true": -0.1448,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1878,
+      "tau_true": 0.0656,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0022,
+      "tau_true": -0.0885,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0889,
+      "tau_true": 0.0786,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1009,
+      "tau_true": 0.1708,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1378,
+      "tau_true": 0.2823,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1417,
+      "tau_true": 0.3708,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0365,
+      "tau_true": 0.0962,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1513,
+      "tau_true": 0.2535,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0818,
+      "tau_true": 0.3114,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2221,
+      "tau_true": 0.282,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2258,
+      "tau_true": 0.125,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0287,
+      "tau_true": 0.0522,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1474,
+      "tau_true": 0.1549,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.083,
+      "tau_true": 0.2684,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.082,
+      "tau_true": 0.2356,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0264,
+      "tau_true": 0.0133,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0214,
+      "tau_true": 0.206,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0711,
+      "tau_true": 0.1366,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0518,
+      "tau_true": 0.1859,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.201,
+      "tau_true": 0.2823,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0337,
+      "tau_true": 0.2804,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0214,
+      "tau_true": 0.1176,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1237,
+      "tau_true": 0.2378,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0697,
+      "tau_true": 0.2139,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1204,
+      "tau_true": 0.04,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0675,
+      "tau_true": 0.2124,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1217,
+      "tau_true": 0.2825,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0296,
+      "tau_true": 0.0201,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1341,
+      "tau_true": 0.2603,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1094,
+      "tau_true": -0.0132,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0372,
+      "tau_true": 0.2839,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0607,
+      "tau_true": -0.0656,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.404,
+      "tau_true": 0.2063,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.111,
+      "tau_true": 0.1128,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0534,
+      "tau_true": 0.123,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0915,
+      "tau_true": 0.264,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0405,
+      "tau_true": 0.0776,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0734,
+      "tau_true": 0.2467,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1272,
+      "tau_true": 0.2004,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0027,
+      "tau_true": 0.0382,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.531,
+      "tau_true": 0.2391,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1474,
+      "tau_true": 0.276,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2353,
+      "tau_true": 0.3022,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0658,
+      "tau_true": 0.0322,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2717,
+      "tau_true": 0.2193,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0861,
+      "tau_true": 0.2542,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1242,
+      "tau_true": 0.2806,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.3535,
+      "tau_true": 0.2902,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0034,
+      "tau_true": 0.2189,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0055,
+      "tau_true": 0.0543,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2022,
+      "tau_true": 0.2908,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1397,
+      "tau_true": 0.2858,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0537,
+      "tau_true": 0.149,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1971,
+      "tau_true": 0.2845,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.113,
+      "tau_true": 0.3794,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1063,
+      "tau_true": 0.1768,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1173,
+      "tau_true": 0.1494,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0055,
+      "tau_true": -0.0837,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.115,
+      "tau_true": 0.1005,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0938,
+      "tau_true": 0.1997,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0644,
+      "tau_true": 0.1895,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0761,
+      "tau_true": 0.199,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0529,
+      "tau_true": 0.2422,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0802,
+      "tau_true": 0.1609,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0748,
+      "tau_true": 0.2469,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2289,
+      "tau_true": 0.1005,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0564,
+      "tau_true": 0.1134,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0308,
+      "tau_true": 0.0516,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1171,
+      "tau_true": 0.066,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2331,
+      "tau_true": 0.2975,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1489,
+      "tau_true": -0.0268,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0472,
+      "tau_true": 0.3284,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1395,
+      "tau_true": 0.0828,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.3209,
+      "tau_true": 0.299,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2503,
+      "tau_true": 0.1146,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1358,
+      "tau_true": 0.182,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0654,
+      "tau_true": 0.1194,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1949,
+      "tau_true": 0.138,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0055,
+      "tau_true": 0.0152,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0022,
+      "tau_true": 0.3343,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0436,
+      "tau_true": -0.0509,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1182,
+      "tau_true": 0.351,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0777,
+      "tau_true": -0.0685,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0069,
+      "tau_true": -0.0998,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0658,
+      "tau_true": 0.0213,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0075,
+      "tau_true": -0.0461,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0805,
+      "tau_true": 0.0972,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0708,
+      "tau_true": 0.3575,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0214,
+      "tau_true": 0.0864,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0897,
+      "tau_true": 0.0405,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.016,
+      "tau_true": 0.0253,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0281,
+      "tau_true": -0.005,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1131,
+      "tau_true": 0.2693,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1251,
+      "tau_true": 0.2034,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0643,
+      "tau_true": 0.1218,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.194,
+      "tau_true": 0.0423,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.5329,
+      "tau_true": 0.2727,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0625,
+      "tau_true": 0.1837,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0335,
+      "tau_true": 0.1801,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1281,
+      "tau_true": 0.369,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0894,
+      "tau_true": 0.2214,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0511,
+      "tau_true": 0.2343,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.2956,
+      "tau_true": 0.2446,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0377,
+      "tau_true": 0.1237,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.054,
+      "tau_true": 0.025,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0373,
+      "tau_true": 0.0124,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1683,
+      "tau_true": 0.279,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1295,
+      "tau_true": 0.2582,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0288,
+      "tau_true": 0.2946,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1151,
+      "tau_true": 0.0242,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2134,
+      "tau_true": 0.2377,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0622,
+      "tau_true": 0.2726,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1114,
+      "tau_true": 0.0123,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1752,
+      "tau_true": 0.2285,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0997,
+      "tau_true": 0.3406,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0022,
+      "tau_true": -0.1376,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.023,
+      "tau_true": 0.2063,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0231,
+      "tau_true": 0.0928,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1182,
+      "tau_true": 0.0809,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.241,
+      "tau_true": 0.3884,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1167,
+      "tau_true": -0.0122,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0065,
+      "tau_true": 0.0064,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1339,
+      "tau_true": -0.1303,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.1268,
+      "tau_true": 0.151,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0007,
+      "tau_true": -0.1595,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0654,
+      "tau_true": 0.1877,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0238,
+      "tau_true": 0.1827,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.299,
+      "tau_true": 0.1696,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0327,
+      "tau_true": 0.3287,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.5712,
+      "tau_true": 0.167,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1693,
+      "tau_true": 0.0864,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1978,
+      "tau_true": 0.2192,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1505,
+      "tau_true": 0.3122,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2038,
+      "tau_true": 0.174,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0338,
+      "tau_true": -0.0811,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1046,
+      "tau_true": 0.142,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0214,
+      "tau_true": 0.0526,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0328,
+      "tau_true": 0.1801,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0666,
+      "tau_true": 0.1096,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1034,
+      "tau_true": 0.3122,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1388,
+      "tau_true": 0.1963,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0621,
+      "tau_true": 0.2664,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0997,
+      "tau_true": 0.0423,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0342,
+      "tau_true": 0.163,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.034,
+      "tau_true": 0.0906,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.151,
+      "tau_true": 0.2181,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0226,
+      "tau_true": 0.325,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0568,
+      "tau_true": 0.0206,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.103,
+      "tau_true": 0.3985,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.023,
+      "tau_true": 0.2401,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1353,
+      "tau_true": 0.1539,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1358,
+      "tau_true": 0.0434,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1455,
+      "tau_true": 0.2311,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1695,
+      "tau_true": 0.3049,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.095,
+      "tau_true": 0.1392,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0626,
+      "tau_true": 0.2856,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0209,
+      "tau_true": 0.1371,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0331,
+      "tau_true": 0.1336,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1021,
+      "tau_true": 0.2232,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0387,
+      "tau_true": 0.0614,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2017,
+      "tau_true": 0.2068,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1283,
+      "tau_true": 0.2797,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0768,
+      "tau_true": 0.1808,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1846,
+      "tau_true": 0.2811,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0684,
+      "tau_true": 0.3918,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0164,
+      "tau_true": -0.1028,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0351,
+      "tau_true": -0.1135,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0295,
+      "tau_true": -0.0212,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1833,
+      "tau_true": 0.1579,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.2149,
+      "tau_true": 0.2824,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1488,
+      "tau_true": 0.358,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1436,
+      "tau_true": 0.1473,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0338,
+      "tau_true": 0.0242,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0047,
+      "tau_true": 0.1408,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1061,
+      "tau_true": 0.187,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0577,
+      "tau_true": 0.1758,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0914,
+      "tau_true": 0.3428,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0272,
+      "tau_true": 0.074,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.001,
+      "tau_true": -0.0587,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0351,
+      "tau_true": 0.0536,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0906,
+      "tau_true": 0.2471,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.015,
+      "tau_true": 0.0444,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0974,
+      "tau_true": 0.1369,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1492,
+      "tau_true": 0.1898,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0964,
+      "tau_true": 0.1371,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0098,
+      "tau_true": 0.2367,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.1095,
+      "tau_true": 0.1776,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0558,
+      "tau_true": 0.032,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0093,
+      "tau_true": -0.1434,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0524,
+      "tau_true": -0.0643,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0639,
+      "tau_true": 0.1664,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1417,
+      "tau_true": 0.3572,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1066,
+      "tau_true": 0.1604,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0012,
+      "tau_true": 0.0431,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.023,
+      "tau_true": 0.0368,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.032,
+      "tau_true": -0.1684,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1344,
+      "tau_true": 0.1685,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0644,
+      "tau_true": 0.2226,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2792,
+      "tau_true": 0.3067,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0356,
+      "tau_true": 0.1144,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1084,
+      "tau_true": 0.2185,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1661,
+      "tau_true": 0.1851,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1479,
+      "tau_true": 0.1232,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0046,
+      "tau_true": -0.1163,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.048,
+      "tau_true": 0.0793,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1393,
+      "tau_true": 0.1517,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0718,
+      "tau_true": 0.2545,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2373,
+      "tau_true": -0.0994,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.2029,
+      "tau_true": 0.1689,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.4375,
+      "tau_true": 0.2693,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0253,
+      "tau_true": 0.1568,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0676,
+      "tau_true": 0.1725,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1573,
+      "tau_true": 0.0982,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0253,
+      "tau_true": -0.0606,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0788,
+      "tau_true": 0.0787,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0209,
+      "tau_true": 0.0753,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0407,
+      "tau_true": 0.1772,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1231,
+      "tau_true": 0.0571,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1281,
+      "tau_true": 0.1195,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1103,
+      "tau_true": 0.0624,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.103,
+      "tau_true": 0.1152,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.1349,
+      "tau_true": 0.1815,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0188,
+      "tau_true": 0.0268,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0868,
+      "tau_true": 0.1702,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0549,
+      "tau_true": 0.3195,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0595,
+      "tau_true": 0.0217,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0051,
+      "tau_true": -0.1183,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.103,
+      "tau_true": 0.1861,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0779,
+      "tau_true": 0.1845,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0555,
+      "tau_true": 0.1387,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0351,
+      "tau_true": 0.174,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0419,
+      "tau_true": 0.2851,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0569,
+      "tau_true": 0.1463,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0228,
+      "tau_true": -0.0101,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0051,
+      "tau_true": -0.1426,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2149,
+      "tau_true": 0.2139,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0912,
+      "tau_true": 0.1029,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0156,
+      "tau_true": -0.1887,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0209,
+      "tau_true": 0.0371,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.1804,
+      "tau_true": 0.3285,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0305,
+      "tau_true": 0.3451,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2185,
+      "tau_true": 0.4082,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0947,
+      "tau_true": 0.1461,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1067,
+      "tau_true": 0.1515,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1251,
+      "tau_true": 0.1647,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0391,
+      "tau_true": 0.0077,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0842,
+      "tau_true": -0.0115,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1984,
+      "tau_true": 0.3188,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1506,
+      "tau_true": -0.1181,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0386,
+      "tau_true": 0.0847,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0899,
+      "tau_true": 0.3562,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0555,
+      "tau_true": 0.0741,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0648,
+      "tau_true": 0.261,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0776,
+      "tau_true": 0.1572,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1096,
+      "tau_true": 0.0981,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0156,
+      "tau_true": 0.0241,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0187,
+      "tau_true": 0.2823,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1915,
+      "tau_true": 0.2183,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0581,
+      "tau_true": 0.0552,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1432,
+      "tau_true": 0.203,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0824,
+      "tau_true": 0.2068,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0138,
+      "tau_true": -0.0963,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0682,
+      "tau_true": 0.0519,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2554,
+      "tau_true": 0.3099,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0878,
+      "tau_true": 0.1175,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.03,
+      "tau_true": 0.0297,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0191,
+      "tau_true": 0.1588,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0413,
+      "tau_true": 0.1262,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0249,
+      "tau_true": 0.0024,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1473,
+      "tau_true": -0.0759,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0065,
+      "tau_true": -0.0733,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1303,
+      "tau_true": 0.2929,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0111,
+      "tau_true": -0.1044,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1066,
+      "tau_true": 0.1685,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1829,
+      "tau_true": 0.2711,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1231,
+      "tau_true": 0.0694,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0071,
+      "tau_true": -0.0698,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0571,
+      "tau_true": 0.082,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0753,
+      "tau_true": 0.1785,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0812,
+      "tau_true": 0.4216,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0291,
+      "tau_true": 0.088,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1497,
+      "tau_true": 0.1686,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0877,
+      "tau_true": 0.1987,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1358,
+      "tau_true": 0.2979,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.4129,
+      "tau_true": 0.2019,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0346,
+      "tau_true": 0.2824,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1848,
+      "tau_true": 0.1299,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.162,
+      "tau_true": 0.2144,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0024,
+      "tau_true": 0.1016,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0888,
+      "tau_true": 0.2129,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1049,
+      "tau_true": 0.2892,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0512,
+      "tau_true": 0.1258,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0462,
+      "tau_true": 0.1118,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.004,
+      "tau_true": 0.149,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0771,
+      "tau_true": 0.2019,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2108,
+      "tau_true": 0.2645,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1823,
+      "tau_true": 0.4175,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0554,
+      "tau_true": 0.331,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1344,
+      "tau_true": 0.0361,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.085,
+      "tau_true": 0.068,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0626,
+      "tau_true": 0.1624,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0568,
+      "tau_true": 0.2351,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0526,
+      "tau_true": 0.2465,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1538,
+      "tau_true": 0.0848,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1003,
+      "tau_true": 0.0729,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0776,
+      "tau_true": 0.0986,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1805,
+      "tau_true": 0.0817,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0915,
+      "tau_true": 0.3014,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.004,
+      "tau_true": -0.0352,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0351,
+      "tau_true": -0.1143,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1511,
+      "tau_true": 0.4052,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1707,
+      "tau_true": 0.1513,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.111,
+      "tau_true": 0.1021,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0722,
+      "tau_true": 0.236,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0189,
+      "tau_true": 0.0778,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0929,
+      "tau_true": 0.0245,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0978,
+      "tau_true": 0.1427,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0547,
+      "tau_true": -0.0703,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0443,
+      "tau_true": 0.2828,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1216,
+      "tau_true": -0.0358,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1089,
+      "tau_true": 0.099,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1689,
+      "tau_true": 0.1042,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1056,
+      "tau_true": 0.2597,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1061,
+      "tau_true": 0.207,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0924,
+      "tau_true": 0.3529,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0024,
+      "tau_true": 0.146,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1242,
+      "tau_true": 0.1833,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0692,
+      "tau_true": 0.1287,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1411,
+      "tau_true": 0.2336,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0061,
+      "tau_true": 0.0721,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0963,
+      "tau_true": 0.2778,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0223,
+      "tau_true": -0.1906,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.144,
+      "tau_true": 0.0555,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.6685,
+      "tau_true": 0.1192,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1554,
+      "tau_true": 0.3287,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1843,
+      "tau_true": 0.1441,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1714,
+      "tau_true": 0.1219,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0563,
+      "tau_true": 0.0565,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2192,
+      "tau_true": 0.2037,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1491,
+      "tau_true": 0.2759,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.3509,
+      "tau_true": 0.3339,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1874,
+      "tau_true": 0.274,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1062,
+      "tau_true": 0.2105,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2026,
+      "tau_true": 0.1905,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0547,
+      "tau_true": 0.1194,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.118,
+      "tau_true": 0.1559,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0338,
+      "tau_true": 0.2502,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0169,
+      "tau_true": 0.2334,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.111,
+      "tau_true": 0.1627,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1151,
+      "tau_true": 0.0664,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1269,
+      "tau_true": 0.2897,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1636,
+      "tau_true": 0.1832,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2155,
+      "tau_true": 0.2067,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1272,
+      "tau_true": 0.0193,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0256,
+      "tau_true": -0.0697,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0277,
+      "tau_true": 0.1419,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0461,
+      "tau_true": 0.0244,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0732,
+      "tau_true": 0.0633,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0519,
+      "tau_true": 0.1593,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.111,
+      "tau_true": 0.205,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0253,
+      "tau_true": -0.1229,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1647,
+      "tau_true": 0.2081,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2737,
+      "tau_true": 0.2379,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0079,
+      "tau_true": 0.2273,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0034,
+      "tau_true": 0.0417,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0602,
+      "tau_true": 0.2523,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0471,
+      "tau_true": -0.0895,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0124,
+      "tau_true": -0.0605,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1046,
+      "tau_true": 0.2515,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.102,
+      "tau_true": 0.1207,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0499,
+      "tau_true": -0.0149,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0581,
+      "tau_true": -0.1283,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0312,
+      "tau_true": 0.0302,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0117,
+      "tau_true": -0.1335,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1522,
+      "tau_true": 0.0795,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0794,
+      "tau_true": 0.1207,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1832,
+      "tau_true": 0.3982,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2375,
+      "tau_true": 0.3629,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0761,
+      "tau_true": 0.2074,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1275,
+      "tau_true": 0.3526,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1055,
+      "tau_true": 0.1262,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0742,
+      "tau_true": 0.1732,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1283,
+      "tau_true": 0.2788,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1467,
+      "tau_true": 0.1927,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1671,
+      "tau_true": 0.0772,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.027,
+      "tau_true": -0.0467,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0599,
+      "tau_true": 0.3223,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1457,
+      "tau_true": 0.1888,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0901,
+      "tau_true": -0.1022,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1385,
+      "tau_true": 0.3616,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1702,
+      "tau_true": 0.3292,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.053,
+      "tau_true": 0.0817,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1281,
+      "tau_true": 0.2313,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1562,
+      "tau_true": 0.1214,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0022,
+      "tau_true": -0.2,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1284,
+      "tau_true": 0.2111,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1118,
+      "tau_true": -0.0625,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0781,
+      "tau_true": 0.1687,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0477,
+      "tau_true": -0.0314,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0647,
+      "tau_true": 0.0499,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1408,
+      "tau_true": 0.3694,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1251,
+      "tau_true": 0.3956,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0397,
+      "tau_true": 0.1871,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0328,
+      "tau_true": -0.1677,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0843,
+      "tau_true": 0.2109,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2115,
+      "tau_true": 0.312,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0708,
+      "tau_true": 0.163,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0499,
+      "tau_true": 0.1076,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2558,
+      "tau_true": 0.0719,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0446,
+      "tau_true": 0.4041,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1447,
+      "tau_true": 0.0541,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0688,
+      "tau_true": 0.0063,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.5459,
+      "tau_true": 0.1317,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.3582,
+      "tau_true": 0.3555,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.3764,
+      "tau_true": 0.2121,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0097,
+      "tau_true": 0.2175,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0755,
+      "tau_true": 0.3651,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0089,
+      "tau_true": -0.2,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0535,
+      "tau_true": 0.1845,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.111,
+      "tau_true": 0.218,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1231,
+      "tau_true": -0.0307,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0714,
+      "tau_true": 0.1333,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1119,
+      "tau_true": 0.1393,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1682,
+      "tau_true": 0.3246,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0204,
+      "tau_true": 0.2079,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0749,
+      "tau_true": 0.1337,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2315,
+      "tau_true": 0.2509,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0334,
+      "tau_true": 0.1849,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1081,
+      "tau_true": 0.2701,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.3518,
+      "tau_true": 0.2402,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1199,
+      "tau_true": 0.224,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1455,
+      "tau_true": 0.072,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0022,
+      "tau_true": -0.1952,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2013,
+      "tau_true": 0.232,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.001,
+      "tau_true": -0.1779,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0256,
+      "tau_true": 0.1828,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1124,
+      "tau_true": 0.2659,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1059,
+      "tau_true": 0.2422,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1385,
+      "tau_true": 0.3756,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0849,
+      "tau_true": 0.2898,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0904,
+      "tau_true": 0.2196,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0165,
+      "tau_true": 0.0514,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0214,
+      "tau_true": 0.1715,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1034,
+      "tau_true": 0.2166,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0654,
+      "tau_true": 0.0518,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0196,
+      "tau_true": -0.1382,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0519,
+      "tau_true": -0.0084,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.173,
+      "tau_true": 0.116,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0564,
+      "tau_true": 0.132,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1259,
+      "tau_true": 0.018,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0835,
+      "tau_true": 0.2639,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0165,
+      "tau_true": -0.0056,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2173,
+      "tau_true": 0.2588,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0719,
+      "tau_true": 0.1194,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1334,
+      "tau_true": 0.1159,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.3294,
+      "tau_true": 0.3568,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0067,
+      "tau_true": 0.0693,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0721,
+      "tau_true": 0.0229,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0997,
+      "tau_true": 0.1282,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.018,
+      "tau_true": 0.0423,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0489,
+      "tau_true": 0.0577,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0022,
+      "tau_true": -0.1071,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0545,
+      "tau_true": 0.1917,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0632,
+      "tau_true": -0.0739,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0915,
+      "tau_true": 0.1231,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2131,
+      "tau_true": 0.2915,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0547,
+      "tau_true": 0.0808,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.2873,
+      "tau_true": -0.0719,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1398,
+      "tau_true": 0.1256,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1658,
+      "tau_true": 0.2282,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1582,
+      "tau_true": 0.2076,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1269,
+      "tau_true": 0.3256,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0099,
+      "tau_true": 0.176,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0091,
+      "tau_true": -0.0201,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0923,
+      "tau_true": 0.0791,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0089,
+      "tau_true": -0.2,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1403,
+      "tau_true": 0.3866,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0488,
+      "tau_true": 0.1501,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0158,
+      "tau_true": 0.0331,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0253,
+      "tau_true": 0.091,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2254,
+      "tau_true": 0.4173,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0762,
+      "tau_true": 0.0056,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.4176,
+      "tau_true": 0.2001,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2091,
+      "tau_true": 0.1809,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1351,
+      "tau_true": 0.1561,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0749,
+      "tau_true": 0.3568,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0974,
+      "tau_true": 0.2701,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1184,
+      "tau_true": 0.1292,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0963,
+      "tau_true": 0.1289,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.163,
+      "tau_true": 0.1982,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0754,
+      "tau_true": 0.1095,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1652,
+      "tau_true": 0.1794,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.4244,
+      "tau_true": 0.2608,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0534,
+      "tau_true": 0.1303,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.123,
+      "tau_true": 0.0977,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0022,
+      "tau_true": -0.0465,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1417,
+      "tau_true": 0.2614,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1052,
+      "tau_true": 0.165,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.047,
+      "tau_true": 0.0922,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0262,
+      "tau_true": 0.134,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0079,
+      "tau_true": 0.092,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1998,
+      "tau_true": 0.4107,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0466,
+      "tau_true": 0.1961,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0598,
+      "tau_true": 0.025,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0678,
+      "tau_true": 0.1414,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0547,
+      "tau_true": 0.1242,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.114,
+      "tau_true": 0.0691,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0897,
+      "tau_true": 0.3222,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0998,
+      "tau_true": -0.1005,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1179,
+      "tau_true": 0.299,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1067,
+      "tau_true": 0.2572,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1362,
+      "tau_true": 0.1362,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0733,
+      "tau_true": 0.1766,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0169,
+      "tau_true": 0.2047,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0779,
+      "tau_true": 0.1645,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1225,
+      "tau_true": 0.2224,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0424,
+      "tau_true": -0.0939,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.004,
+      "tau_true": -0.0778,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1161,
+      "tau_true": 0.1968,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.12,
+      "tau_true": 0.4216,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0672,
+      "tau_true": 0.1341,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0381,
+      "tau_true": -0.121,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0249,
+      "tau_true": -0.0661,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0768,
+      "tau_true": 0.1938,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.055,
+      "tau_true": -0.0837,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0852,
+      "tau_true": 0.0677,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1369,
+      "tau_true": -0.0422,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0096,
+      "tau_true": 0.1495,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.016,
+      "tau_true": 0.2394,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0158,
+      "tau_true": -0.0396,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1943,
+      "tau_true": 0.2578,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0752,
+      "tau_true": 0.1302,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0715,
+      "tau_true": 0.306,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0793,
+      "tau_true": 0.0574,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0741,
+      "tau_true": 0.0524,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0952,
+      "tau_true": 0.1974,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0884,
+      "tau_true": 0.1977,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0666,
+      "tau_true": 0.1297,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0884,
+      "tau_true": -0.0864,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1353,
+      "tau_true": 0.254,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0055,
+      "tau_true": -0.1496,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1036,
+      "tau_true": 0.106,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1353,
+      "tau_true": 0.3117,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0242,
+      "tau_true": -0.033,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0997,
+      "tau_true": 0.1472,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1319,
+      "tau_true": 0.2192,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0671,
+      "tau_true": 0.1631,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0143,
+      "tau_true": 0.385,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1714,
+      "tau_true": 0.2596,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1136,
+      "tau_true": 0.2936,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1432,
+      "tau_true": 0.2909,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0296,
+      "tau_true": 0.0038,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.3202,
+      "tau_true": 0.1898,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2085,
+      "tau_true": 0.1186,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0046,
+      "tau_true": 0.0665,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.111,
+      "tau_true": 0.3235,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.1331,
+      "tau_true": 0.0388,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.08,
+      "tau_true": 0.0794,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0022,
+      "tau_true": -0.1735,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0291,
+      "tau_true": -0.0718,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0823,
+      "tau_true": 0.0278,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1175,
+      "tau_true": 0.0858,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2753,
+      "tau_true": 0.3412,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0429,
+      "tau_true": 0.0711,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0848,
+      "tau_true": 0.1839,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0056,
+      "tau_true": 0.198,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.027,
+      "tau_true": 0.0865,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1197,
+      "tau_true": 0.1997,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.022,
+      "tau_true": -0.1243,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0033,
+      "tau_true": -0.0616,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0355,
+      "tau_true": 0.1221,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1314,
+      "tau_true": 0.0279,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0065,
+      "tau_true": -0.0114,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1304,
+      "tau_true": 0.0655,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0031,
+      "tau_true": -0.0321,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0761,
+      "tau_true": 0.0673,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.287,
+      "tau_true": 0.1491,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0604,
+      "tau_true": 0.2942,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0466,
+      "tau_true": 0.0422,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0791,
+      "tau_true": 0.3945,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0351,
+      "tau_true": 0.0613,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.084,
+      "tau_true": 0.1624,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1018,
+      "tau_true": 0.0635,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1472,
+      "tau_true": 0.1733,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1238,
+      "tau_true": 0.1062,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0327,
+      "tau_true": -0.0472,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0237,
+      "tau_true": -0.076,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1823,
+      "tau_true": 0.3596,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1942,
+      "tau_true": 0.3817,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1559,
+      "tau_true": 0.3276,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0488,
+      "tau_true": 0.048,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1261,
+      "tau_true": 0.0389,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1001,
+      "tau_true": 0.1121,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0375,
+      "tau_true": 0.2221,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0628,
+      "tau_true": 0.2837,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1468,
+      "tau_true": 0.0717,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.039,
+      "tau_true": 0.1921,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1595,
+      "tau_true": 0.2064,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0138,
+      "tau_true": 0.1314,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1481,
+      "tau_true": 0.3323,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0176,
+      "tau_true": 0.0101,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0566,
+      "tau_true": 0.1807,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1034,
+      "tau_true": 0.2748,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0831,
+      "tau_true": 0.0609,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0563,
+      "tau_true": 0.0312,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1288,
+      "tau_true": 0.3356,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1364,
+      "tau_true": 0.1683,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0472,
+      "tau_true": 0.0661,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0569,
+      "tau_true": 0.2681,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0338,
+      "tau_true": -0.128,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.075,
+      "tau_true": 0.1381,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0458,
+      "tau_true": -0.0649,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0353,
+      "tau_true": 0.2191,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0942,
+      "tau_true": 0.0873,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0345,
+      "tau_true": -0.0605,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1398,
+      "tau_true": 0.1795,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0344,
+      "tau_true": -0.2,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0287,
+      "tau_true": 0.1342,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0598,
+      "tau_true": -0.015,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0238,
+      "tau_true": 0.0444,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0013,
+      "tau_true": 0.0076,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0326,
+      "tau_true": 0.0439,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.3454,
+      "tau_true": 0.2096,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0703,
+      "tau_true": 0.2534,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0464,
+      "tau_true": -0.0856,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.3532,
+      "tau_true": 0.2388,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1162,
+      "tau_true": 0.1972,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.4797,
+      "tau_true": 0.2286,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0631,
+      "tau_true": 0.0444,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1123,
+      "tau_true": 0.3831,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0375,
+      "tau_true": 0.1088,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2234,
+      "tau_true": 0.2955,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1797,
+      "tau_true": 0.0514,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0364,
+      "tau_true": -0.0346,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0386,
+      "tau_true": 0.1077,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0669,
+      "tau_true": 0.2303,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0818,
+      "tau_true": 0.1523,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0997,
+      "tau_true": 0.2652,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1932,
+      "tau_true": 0.2897,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0103,
+      "tau_true": 0.0088,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1506,
+      "tau_true": 0.0295,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.103,
+      "tau_true": 0.2251,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1056,
+      "tau_true": 0.0417,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0814,
+      "tau_true": 0.1636,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0562,
+      "tau_true": 0.2212,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1052,
+      "tau_true": 0.1678,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.026,
+      "tau_true": 0.257,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0909,
+      "tau_true": 0.0666,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0842,
+      "tau_true": 0.2217,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0606,
+      "tau_true": 0.2294,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1862,
+      "tau_true": 0.2767,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0749,
+      "tau_true": 0.1794,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0567,
+      "tau_true": 0.3373,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1007,
+      "tau_true": 0.1567,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0022,
+      "tau_true": 0.0577,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0002,
+      "tau_true": -0.1724,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0805,
+      "tau_true": 0.1838,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0793,
+      "tau_true": 0.3113,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0929,
+      "tau_true": 0.1933,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1838,
+      "tau_true": 0.3768,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.167,
+      "tau_true": 0.1654,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1415,
+      "tau_true": 0.2369,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.006,
+      "tau_true": -0.1374,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0912,
+      "tau_true": 0.1056,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0911,
+      "tau_true": 0.3672,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0472,
+      "tau_true": 0.1613,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.3147,
+      "tau_true": 0.1838,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0197,
+      "tau_true": 0.14,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0524,
+      "tau_true": 0.3281,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1299,
+      "tau_true": 0.0943,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0589,
+      "tau_true": 0.0794,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0938,
+      "tau_true": 0.2914,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0546,
+      "tau_true": 0.324,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1085,
+      "tau_true": 0.017,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0263,
+      "tau_true": 0.1602,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0466,
+      "tau_true": 0.1089,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0014,
+      "tau_true": -0.198,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0938,
+      "tau_true": 0.1402,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0683,
+      "tau_true": 0.1297,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0731,
+      "tau_true": 0.1559,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.056,
+      "tau_true": 0.1929,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0054,
+      "tau_true": 0.1504,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0412,
+      "tau_true": -0.0362,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1077,
+      "tau_true": 0.0778,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.031,
+      "tau_true": 0.0751,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0875,
+      "tau_true": 0.2376,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0253,
+      "tau_true": 0.0926,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0651,
+      "tau_true": 0.1854,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.6174,
+      "tau_true": 0.3253,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1582,
+      "tau_true": 0.2625,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1506,
+      "tau_true": 0.171,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.027,
+      "tau_true": 0.1364,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0065,
+      "tau_true": -0.06,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.5982,
+      "tau_true": 0.2534,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0242,
+      "tau_true": 0.1949,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.132,
+      "tau_true": 0.1979,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0128,
+      "tau_true": 0.1375,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0297,
+      "tau_true": 0.2562,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1702,
+      "tau_true": 0.1887,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.3354,
+      "tau_true": 0.0778,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0375,
+      "tau_true": 0.0404,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0588,
+      "tau_true": 0.1547,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0431,
+      "tau_true": 0.049,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0998,
+      "tau_true": 0.1562,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0113,
+      "tau_true": -0.0111,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1471,
+      "tau_true": 0.1065,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1081,
+      "tau_true": 0.1759,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1609,
+      "tau_true": 0.3642,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0961,
+      "tau_true": 0.1695,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1384,
+      "tau_true": 0.1815,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.5869,
+      "tau_true": 0.1264,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.2097,
+      "tau_true": 0.2095,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.132,
+      "tau_true": 0.382,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0702,
+      "tau_true": 0.3381,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2492,
+      "tau_true": 0.1181,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1009,
+      "tau_true": 0.0916,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1147,
+      "tau_true": 0.1844,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.1623,
+      "tau_true": 0.0483,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0255,
+      "tau_true": 0.1879,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1866,
+      "tau_true": 0.224,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0993,
+      "tau_true": -0.0174,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1504,
+      "tau_true": 0.2835,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0768,
+      "tau_true": 0.2112,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0031,
+      "tau_true": -0.0863,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0687,
+      "tau_true": 0.2879,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0386,
+      "tau_true": -0.0555,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0939,
+      "tau_true": 0.0642,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1573,
+      "tau_true": 0.2215,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1573,
+      "tau_true": 0.3724,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0944,
+      "tau_true": 0.1727,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0165,
+      "tau_true": -0.0689,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1474,
+      "tau_true": 0.2672,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2159,
+      "tau_true": 0.4339,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0533,
+      "tau_true": 0.1018,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1236,
+      "tau_true": 0.1049,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0071,
+      "tau_true": -0.0783,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0338,
+      "tau_true": 0.0819,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1505,
+      "tau_true": 0.0927,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0117,
+      "tau_true": 0.2219,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1106,
+      "tau_true": 0.0446,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0876,
+      "tau_true": 0.3516,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1362,
+      "tau_true": 0.0503,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1457,
+      "tau_true": 0.2846,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1184,
+      "tau_true": 0.2355,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0268,
+      "tau_true": 0.0417,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0713,
+      "tau_true": 0.2125,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0158,
+      "tau_true": -0.051,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0065,
+      "tau_true": -0.0344,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0976,
+      "tau_true": 0.0517,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0051,
+      "tau_true": -0.1806,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.092,
+      "tau_true": 0.2583,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0415,
+      "tau_true": 0.1547,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0143,
+      "tau_true": 0.2028,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0191,
+      "tau_true": 0.0849,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1056,
+      "tau_true": 0.1855,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0337,
+      "tau_true": 0.0384,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1679,
+      "tau_true": 0.2054,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0835,
+      "tau_true": 0.0093,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0046,
+      "tau_true": 0.2058,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1605,
+      "tau_true": 0.1994,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0561,
+      "tau_true": 0.1486,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0986,
+      "tau_true": 0.0379,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0588,
+      "tau_true": 0.055,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0729,
+      "tau_true": 0.1665,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0825,
+      "tau_true": 0.3513,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1089,
+      "tau_true": 0.0033,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.082,
+      "tau_true": 0.359,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0696,
+      "tau_true": 0.1664,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0412,
+      "tau_true": 0.0387,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1108,
+      "tau_true": 0.042,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0909,
+      "tau_true": 0.1754,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0419,
+      "tau_true": 0.0945,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0949,
+      "tau_true": -0.0583,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0055,
+      "tau_true": -0.0588,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0172,
+      "tau_true": 0.3418,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1565,
+      "tau_true": 0.2564,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0138,
+      "tau_true": 0.0135,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2966,
+      "tau_true": 0.1682,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1571,
+      "tau_true": 0.1369,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1309,
+      "tau_true": 0.2628,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.102,
+      "tau_true": 0.1656,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.048,
+      "tau_true": 0.1283,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0442,
+      "tau_true": 0.21,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0159,
+      "tau_true": 0.0629,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1588,
+      "tau_true": 0.0321,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0022,
+      "tau_true": -0.1389,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1262,
+      "tau_true": 0.1414,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.138,
+      "tau_true": 0.1492,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1003,
+      "tau_true": 0.3662,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1228,
+      "tau_true": -0.0106,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0055,
+      "tau_true": 0.0655,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.079,
+      "tau_true": 0.0875,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0188,
+      "tau_true": -0.127,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0973,
+      "tau_true": 0.2276,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0239,
+      "tau_true": -0.0951,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1395,
+      "tau_true": 0.2181,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1742,
+      "tau_true": 0.2565,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2061,
+      "tau_true": 0.1988,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0818,
+      "tau_true": 0.2339,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0528,
+      "tau_true": 0.4439,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1701,
+      "tau_true": 0.1085,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.095,
+      "tau_true": 0.1164,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.2757,
+      "tau_true": 0.2805,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0063,
+      "tau_true": 0.203,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1152,
+      "tau_true": 0.3239,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0844,
+      "tau_true": 0.3743,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0138,
+      "tau_true": -0.0349,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0534,
+      "tau_true": 0.0639,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.027,
+      "tau_true": -0.092,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1069,
+      "tau_true": 0.372,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0648,
+      "tau_true": 0.1749,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1106,
+      "tau_true": -0.0413,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.088,
+      "tau_true": 0.1343,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.1657,
+      "tau_true": 0.3886,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0165,
+      "tau_true": 0.0179,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1062,
+      "tau_true": 0.2277,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.079,
+      "tau_true": 0.2877,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0979,
+      "tau_true": 0.1197,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.4707,
+      "tau_true": -0.0806,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1457,
+      "tau_true": 0.1771,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0675,
+      "tau_true": 0.3325,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1172,
+      "tau_true": 0.1616,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.2488,
+      "tau_true": 0.3298,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1397,
+      "tau_true": 0.2391,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0905,
+      "tau_true": 0.1383,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.3116,
+      "tau_true": 0.1908,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0538,
+      "tau_true": 0.1314,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0253,
+      "tau_true": 0.0781,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1066,
+      "tau_true": 0.1204,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0566,
+      "tau_true": 0.2414,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.4099,
+      "tau_true": 0.316,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0998,
+      "tau_true": 0.1504,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0338,
+      "tau_true": 0.0228,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1037,
+      "tau_true": 0.069,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1013,
+      "tau_true": 0.3515,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0247,
+      "tau_true": 0.3382,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1677,
+      "tau_true": 0.1696,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1528,
+      "tau_true": 0.1809,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0392,
+      "tau_true": 0.1598,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.001,
+      "tau_true": -0.147,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0351,
+      "tau_true": -0.1428,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1026,
+      "tau_true": 0.1871,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0948,
+      "tau_true": -0.0768,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0377,
+      "tau_true": 0.0954,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0111,
+      "tau_true": 0.1197,
+      "contacted": 0
+    },
+    {
+      "tau_hat": -0.0022,
+      "tau_true": -0.2,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0433,
+      "tau_true": 0.0623,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1352,
+      "tau_true": 0.1074,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0638,
+      "tau_true": 0.2359,
+      "contacted": 1
+    },
+    {
+      "tau_hat": -0.0267,
+      "tau_true": 0.0036,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1575,
+      "tau_true": 0.1363,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0585,
+      "tau_true": 0.1352,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0683,
+      "tau_true": 0.335,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0219,
+      "tau_true": 0.3119,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1292,
+      "tau_true": 0.229,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1129,
+      "tau_true": 0.1883,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.3167,
+      "tau_true": 0.2706,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.171,
+      "tau_true": 0.1507,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.1714,
+      "tau_true": -0.053,
+      "contacted": 0
+    },
+    {
+      "tau_hat": 0.0588,
+      "tau_true": 0.0652,
+      "contacted": 1
+    },
+    {
+      "tau_hat": 0.0338,
+      "tau_true": -0.1596,
+      "contacted": 1
+    }
+  ],
+  "scatter_note": "a random sample of the evaluation batch; tau_hat is the model's predicted uplift, tau_true the simulator's hidden persuadability, contacted the decision the policy actually took",
   "overall_contact_rate": 0.2522,
   "uplift_correlation": 0.3324,
-  "n_permutations": 2000,
+  "n_permutations": 400,
   "n_hypotheses_tested": 16,
   "bonferroni_alpha": 0.00313,
   "segments": {
@@ -68,31 +6071,31 @@
       "contact_rate_ratio_min_over_max": 0.7754,
       "conditional_on_predicted_uplift": {
         "observed": 0.1198,
-        "null_mean": 0.0786,
-        "excess": 0.0412,
-        "p": 0.0005,
-        "p_exact": 0.0004997501249375312
+        "null_mean": 0.0784,
+        "excess": 0.0414,
+        "p": 0.0025,
+        "p_exact": 0.0024937655860349127
       },
       "conditional_on_uplift_and_amount": {
         "observed": 0.0946,
-        "null_mean": 0.078,
-        "excess": 0.0166,
-        "p": 0.08,
-        "p_exact": 0.079960019990005
+        "null_mean": 0.0777,
+        "excess": 0.0168,
+        "p": 0.0798,
+        "p_exact": 0.0798004987531172
       },
       "worked_at_all_conditional_on_uplift_and_amount": {
         "observed": 0.1002,
-        "null_mean": 0.0679,
-        "excess": 0.0323,
-        "p": 0.001,
-        "p_exact": 0.0009995002498750624
+        "null_mean": 0.0689,
+        "excess": 0.0313,
+        "p": 0.0025,
+        "p_exact": 0.0024937655860349127
       },
       "true_benefit_gap_in_same_cells": {
         "observed": 121.5326,
-        "null_mean": 91.4672,
-        "excess": 30.0654,
-        "p": 0.0465,
-        "p_exact": 0.046476761619190406
+        "null_mean": 91.8572,
+        "excess": 29.6754,
+        "p": 0.0399,
+        "p_exact": 0.0399002493765586
       },
       "attention_aligned_with_true_value": -0.6,
       "attention_alignment_is_descriptive_only": true,
@@ -132,31 +6135,31 @@
       "contact_rate_ratio_min_over_max": 0.7763,
       "conditional_on_predicted_uplift": {
         "observed": 0.1151,
-        "null_mean": 0.042,
-        "excess": 0.0731,
-        "p": 0.0005,
-        "p_exact": 0.0004997501249375312
+        "null_mean": 0.0411,
+        "excess": 0.074,
+        "p": 0.0025,
+        "p_exact": 0.0024937655860349127
       },
       "conditional_on_uplift_and_amount": {
         "observed": 0.0973,
-        "null_mean": 0.0417,
-        "excess": 0.0556,
-        "p": 0.0005,
-        "p_exact": 0.0004997501249375312
+        "null_mean": 0.0418,
+        "excess": 0.0555,
+        "p": 0.0025,
+        "p_exact": 0.0024937655860349127
       },
       "worked_at_all_conditional_on_uplift_and_amount": {
         "observed": 0.0869,
-        "null_mean": 0.038,
-        "excess": 0.049,
-        "p": 0.001,
-        "p_exact": 0.0009995002498750624
+        "null_mean": 0.0383,
+        "excess": 0.0486,
+        "p": 0.005,
+        "p_exact": 0.004987531172069825
       },
       "true_benefit_gap_in_same_cells": {
         "observed": 143.9991,
-        "null_mean": 57.2583,
-        "excess": 86.7408,
-        "p": 0.0005,
-        "p_exact": 0.0004997501249375312
+        "null_mean": 56.037,
+        "excess": 87.9622,
+        "p": 0.0025,
+        "p_exact": 0.0024937655860349127
       },
       "attention_aligned_with_true_value": 1.0,
       "attention_alignment_is_descriptive_only": true,
@@ -222,31 +6225,31 @@
       "contact_rate_ratio_min_over_max": 0.3793,
       "conditional_on_predicted_uplift": {
         "observed": 0.2941,
-        "null_mean": 0.0901,
-        "excess": 0.2039,
-        "p": 0.0005,
-        "p_exact": 0.0004997501249375312
+        "null_mean": 0.0906,
+        "excess": 0.2035,
+        "p": 0.0025,
+        "p_exact": 0.0024937655860349127
       },
       "conditional_on_uplift_and_amount": {
         "observed": 0.178,
-        "null_mean": 0.0315,
-        "excess": 0.1465,
-        "p": 0.0005,
-        "p_exact": 0.0004997501249375312
+        "null_mean": 0.0318,
+        "excess": 0.1462,
+        "p": 0.0025,
+        "p_exact": 0.0024937655860349127
       },
       "worked_at_all_conditional_on_uplift_and_amount": {
         "observed": 0.1116,
-        "null_mean": 0.0278,
-        "excess": 0.0838,
-        "p": 0.0005,
-        "p_exact": 0.0004997501249375312
+        "null_mean": 0.028,
+        "excess": 0.0835,
+        "p": 0.0025,
+        "p_exact": 0.0024937655860349127
       },
       "true_benefit_gap_in_same_cells": {
         "observed": 246.0417,
-        "null_mean": 37.4366,
-        "excess": 208.605,
-        "p": 0.0005,
-        "p_exact": 0.0004997501249375312
+        "null_mean": 37.9532,
+        "excess": 208.0884,
+        "p": 0.0025,
+        "p_exact": 0.0024937655860349127
       },
       "attention_aligned_with_true_value": -0.2,
       "attention_alignment_is_descriptive_only": true,
@@ -312,31 +6315,31 @@
       "contact_rate_ratio_min_over_max": 0.0152,
       "conditional_on_predicted_uplift": {
         "observed": 0.5785,
-        "null_mean": 0.0898,
-        "excess": 0.4887,
-        "p": 0.0005,
-        "p_exact": 0.0004997501249375312
+        "null_mean": 0.09,
+        "excess": 0.4884,
+        "p": 0.0025,
+        "p_exact": 0.0024937655860349127
       },
       "conditional_on_uplift_and_amount": {
         "observed": 0.5789,
         "null_mean": 0.1026,
         "excess": 0.4763,
-        "p": 0.0005,
-        "p_exact": 0.0004997501249375312
+        "p": 0.0025,
+        "p_exact": 0.0024937655860349127
       },
       "worked_at_all_conditional_on_uplift_and_amount": {
         "observed": 0.5042,
-        "null_mean": 0.0979,
-        "excess": 0.4064,
-        "p": 0.0005,
-        "p_exact": 0.0004997501249375312
+        "null_mean": 0.0977,
+        "excess": 0.4065,
+        "p": 0.0025,
+        "p_exact": 0.0024937655860349127
       },
       "true_benefit_gap_in_same_cells": {
         "observed": 316.9787,
-        "null_mean": 144.9095,
-        "excess": 172.0693,
-        "p": 0.0035,
-        "p_exact": 0.0034982508745627187
+        "null_mean": 143.3868,
+        "excess": 173.5919,
+        "p": 0.005,
+        "p_exact": 0.004987531172069825
       },
       "attention_aligned_with_true_value": 0.2,
       "attention_alignment_is_descriptive_only": true,

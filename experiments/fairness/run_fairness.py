@@ -102,6 +102,7 @@ EVAL_SEED = SEED + 5000  # disjoint from every other experiment's eval seed
 LAMBDA_CHURN = 4.0
 # Reaches the customer.
 CONTACT_ACTIONS = {ActionType.NUDGE, ActionType.NEGOTIATE}
+SCATTER_POINTS = 1200  # enough to show the cloud, small enough for data.json
 # The agent did *something* for this case. The distinction matters: a failed
 # subscription is worked by a silent RETRY 80% of the time, so measuring only
 # customer contact reports those customers as neglected when the agent is in
@@ -283,7 +284,30 @@ def audit(n_train: int, n_eval: int, n_perm: int) -> dict:
     n_tests = 4 * len(seg_map)
     alpha = 0.05 / n_tests  # kept unrounded for the comparisons below
 
+    # A downsampled scatter of what the model predicted against what was
+    # true, with the decision it drove. This is the only place the project
+    # publishes per-case predictions, and it is the frame the spec asks for at
+    # 3:45 of the video: the negative-uplift quadrant. Deliberately a sample
+    # rather than all 4,000 rows — the shape is the argument, and shipping the
+    # full set would add a megabyte to data.json to draw the same cloud.
+    rng_s = np.random.default_rng(SEED)
+    take = rng_s.permutation(n_eval)[: min(SCATTER_POINTS, n_eval)]
+    scatter = [
+        {
+            "tau_hat": round(float(tau_hat[i]), 4),
+            "tau_true": round(float(tau_true[i]), 4),
+            "contacted": int(contacted[i]),
+        }
+        for i in sorted(take.tolist())
+    ]
+
     out = {"n_eval": n_eval, "n_train": n_train, "seed": SEED, "eval_seed": EVAL_SEED,
+           "scatter_sample": scatter,
+           "scatter_note": (
+               "a random sample of the evaluation batch; tau_hat is the model's "
+               "predicted uplift, tau_true the simulator's hidden persuadability, "
+               "contacted the decision the policy actually took"
+           ),
            "overall_contact_rate": round(float(contacted.mean()), 4),
            "uplift_correlation": round(float(np.corrcoef(tau_hat, tau_true)[0, 1]), 4),
            "n_permutations": n_perm,

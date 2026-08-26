@@ -1,6 +1,7 @@
 import InView from "../motion/InView";
 import type { Dashboard } from "../types";
 import { money } from "../format";
+import CautionCurve from "../components/CautionCurve";
 
 /** The four experiments in which this project is the thing under test.
  *
@@ -166,34 +167,13 @@ function Pessimism({ p }: { p: any }) {
         ensemble reports a per-case standard error, and the policy acts on{" "}
         <code>τ̂ − k·se</code>.
       </p>
-      <table className="rl-audit-table">
-        <thead>
-          <tr>
-            <th />
-            <th className="rl-num">k = 0 (deployed)</th>
-            <th className="rl-num">k = 0.5</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>messages sent</td>
-            <td className="rl-num">{mean(i0, "contacts").toFixed(0)}</td>
-            <td className="rl-num rl-pass">{mean(ib, "contacts").toFixed(0)}</td>
-          </tr>
-          <tr>
-            <td>contacts to negative-value cases</td>
-            <td className="rl-num">{mean(i0, "harmful_contacts").toFixed(0)}</td>
-            <td className="rl-num rl-pass">{mean(ib, "harmful_contacts").toFixed(0)}</td>
-          </tr>
-          <tr>
-            <td>value per contact</td>
-            <td className="rl-num">{money(mean(i0, "net_value_per_contact"))}</td>
-            <td className="rl-num rl-pass">{money(mean(ib, "net_value_per_contact"))}</td>
-          </tr>
-        </tbody>
-      </table>
+      <CautionCurve draws={draws} />
       <p className="rl-audit-note">
-        Net value moves only {money(Math.min(...gains))}–{money(Math.max(...gains))} per case, and
+        At k = 0.5 the agent sends <b>{mean(ib, "contacts").toFixed(0)}</b> messages instead of{" "}
+        <b>{mean(i0, "contacts").toFixed(0)}</b> and lifts value per contact from{" "}
+        {money(mean(i0, "net_value_per_contact"))} to{" "}
+        <b>{money(mean(ib, "net_value_per_contact"))}</b>. But net value moves only{" "}
+        {money(Math.min(...gains))}–{money(Math.max(...gains))} per case, and
         the best k is <b>not stable</b> across draws ({p.best_k_per_draw.join(", ")}), so it is
         reported as a range rather than a tuned value. A single draw called
         this a clean +7.4% win. Caution keeps buying harm reduction long after

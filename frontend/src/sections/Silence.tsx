@@ -1,4 +1,5 @@
 import InView from "../motion/InView";
+import UpliftQuadrant from "../components/UpliftQuadrant";
 
 /** The agent's most interesting decisions are the ones where it does nothing.
  *
@@ -6,13 +7,14 @@ import InView from "../motion/InView";
  * assumed to be. Three different mechanisms all produce the same outcome —
  * no message sent — for three genuinely different reasons. */
 export default function Silence({
-  dndCases, promiseWindows, futileRetries, contactsSent, totalCases,
+  dndCases, promiseWindows, futileRetries, contactsSent, totalCases, scatter,
 }: {
   dndCases: number;
   promiseWindows: number;
   futileRetries: number;
   contactsSent: number;
   totalCases: number;
+  scatter?: { tau_hat: number; tau_true: number; contacted: number }[];
 }) {
   const items = [
     {
@@ -55,7 +57,32 @@ export default function Silence({
           ))}
         </div>
 
-        <InView index={3}>
+        {scatter && scatter.length > 0 && (
+          <InView index={3}>
+            <div className="rl-silence-quad">
+              <div>
+                <h3>The quadrant conventional dunning cannot represent.</h3>
+                <p>
+                  Every case, plotted as what the model predicted against what
+                  was actually true. Below the line, contacting a customer
+                  makes them <b>less</b> likely to pay — and a system built to
+                  maximise contact has no way to express a customer it should
+                  not contact.
+                </p>
+                <p className="rl-dim">
+                  The cloud is wide on purpose: predicted and true uplift
+                  correlate around 0.36, so the bottom-right is not empty.
+                  Every point there is a case the model recommended and was
+                  wrong about. A fitted line through this would imply a
+                  precision the model does not have.
+                </p>
+              </div>
+              <UpliftQuadrant points={scatter} />
+            </div>
+          </InView>
+        )}
+
+        <InView index={4}>
           <p className="rl-silence-foot">
             {contactsSent.toLocaleString("en-IN")} messages sent across{" "}
             {totalCases.toLocaleString("en-IN")} cases.
