@@ -14,6 +14,7 @@ import { useLenis } from "./motion/useLenis";
 import Scene from "./components/Scene";
 import Opening from "./sections/Opening";
 import Subtraction from "./sections/Subtraction";
+import Frontier from "./sections/Frontier";
 import Silence from "./sections/Silence";
 import Kernel from "./sections/Kernel";
 import Audit from "./sections/Audit";
@@ -108,6 +109,7 @@ export default function App() {
           ciHigh={figures.ciHigh}
           holdoutRate={figures.holdoutRate}
         />
+        <Frontier data={data} />
         <Silence
           dndCases={figures.dnd}
           promiseWindows={figures.promises}
