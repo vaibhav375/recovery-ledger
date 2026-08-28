@@ -292,10 +292,17 @@ def audit(n_train: int, n_eval: int, n_perm: int) -> dict:
     # full set would add a megabyte to data.json to draw the same cloud.
     rng_s = np.random.default_rng(SEED)
     take = rng_s.permutation(n_eval)[: min(SCATTER_POINTS, n_eval)]
+    # `amount` is the third axis of the decision, not decoration. The policy
+    # contacts on expected value, which is uplift TIMES amount at risk, so the
+    # boundary between contacting and waiting is a surface over (tau_hat,
+    # amount) — and a two-dimensional chart of tau_hat against tau_true cannot
+    # show why a low-uplift case was contacted anyway. It was a large invoice.
     scatter = [
         {
             "tau_hat": round(float(tau_hat[i]), 4),
             "tau_true": round(float(tau_true[i]), 4),
+            "amount": round(float(cases[i].amount_at_risk), 2),
+            "loss_type": type(cases[i]).__name__.replace("Case", ""),
             "contacted": int(contacted[i]),
         }
         for i in sorted(take.tolist())
@@ -306,7 +313,8 @@ def audit(n_train: int, n_eval: int, n_perm: int) -> dict:
            "scatter_note": (
                "a random sample of the evaluation batch; tau_hat is the model's "
                "predicted uplift, tau_true the simulator's hidden persuadability, "
-               "contacted the decision the policy actually took"
+               "amount the rupees at risk, contacted the decision the policy "
+               "actually took"
            ),
            "overall_contact_rate": round(float(contacted.mean()), 4),
            "uplift_correlation": round(float(np.corrcoef(tau_hat, tau_true)[0, 1]), 4),

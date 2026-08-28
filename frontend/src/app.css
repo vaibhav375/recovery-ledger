@@ -1235,3 +1235,79 @@ main, .rl-topline, .rl-footer { position: relative; z-index: 1; }
   .rl-silence-quad { grid-template-columns: minmax(0, 1fr); }
   .rl-quad-stat { margin-left: 0; }
 }
+
+/* ── the policy space, in three dimensions ─────────────────────────────
+ *
+ * Three axes have to be earned. They are here because the decision genuinely
+ * depends on two inputs (predicted uplift and amount at risk) and is judged
+ * against a third (true uplift) — and because you can drag it, which is what
+ * makes occlusion recoverable rather than disqualifying.
+ */
+.rl-space-block {
+  display: grid;
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+  gap: clamp(24px, 3.5vw, 52px);
+  align-items: center;
+  margin: clamp(36px, 5vw, 64px) 0 0;
+  padding-top: clamp(30px, 4vw, 46px);
+  border-top: 1px solid var(--line-soft);
+}
+.rl-space-copy h3 {
+  margin: 0 0 14px;
+  font-size: clamp(17px, 1.9vw, 24px);
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.25;
+  max-width: 24ch;
+}
+.rl-space-copy p { margin: 0 0 12px; font-size: 13.5px; font-weight: 300; line-height: 1.6; color: var(--fg-dim); }
+.rl-space-copy p.rl-dim { font-size: 12.5px; color: var(--fg-faint); }
+.rl-space-copy b { color: var(--fg); font-weight: 500; }
+
+.rl-space { position: relative; }
+.rl-space-canvas {
+  width: 100%;
+  height: clamp(340px, 42vw, 480px);
+  cursor: grab;
+  touch-action: none;
+}
+.rl-space-canvas:active { cursor: grabbing; }
+.rl-space-canvas canvas { display: block; width: 100% !important; height: 100% !important; }
+.rl-space.is-loading { height: clamp(340px, 42vw, 480px); }
+
+.rl-space-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  font-size: 11px;
+  color: var(--fg-faint);
+  margin-top: 4px;
+}
+.rl-space-key::before {
+  content: "";
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+  background: var(--fg-faint);
+  opacity: 0.55;
+}
+.rl-space-key.is-hit::before { background: var(--accent); opacity: 1; }
+.rl-space-key.is-plane::before { background: #ff6b7f; opacity: 0.55; border-radius: 1px; }
+.rl-space-hint { margin-left: auto; font-family: var(--mono); font-size: 10px; }
+.rl-space-axes {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--fg-faint);
+}
+.rl-space-note { margin: 10px 0 0; font-size: 11.5px; color: var(--fg-faint); }
+
+@media (max-width: 900px) {
+  .rl-space-block { grid-template-columns: minmax(0, 1fr); }
+  .rl-space-hint { margin-left: 0; }
+}

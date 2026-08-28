@@ -1,5 +1,6 @@
 import InView from "../motion/InView";
 import UpliftQuadrant from "../components/UpliftQuadrant";
+import PolicySpaceGuard from "../components/PolicySpaceGuard";
 
 /** The agent's most interesting decisions are the ones where it does nothing.
  *
@@ -14,7 +15,10 @@ export default function Silence({
   futileRetries: number;
   contactsSent: number;
   totalCases: number;
-  scatter?: { tau_hat: number; tau_true: number; contacted: number }[];
+  scatter?: {
+    tau_hat: number; tau_true: number; contacted: number;
+    amount?: number; loss_type?: string;
+  }[];
 }) {
   const items = [
     {
@@ -82,7 +86,33 @@ export default function Silence({
           </InView>
         )}
 
-        <InView index={4}>
+        {scatter && scatter.some((p) => p.amount != null) && (
+          <InView index={4}>
+            <div className="rl-space-block">
+              <div className="rl-space-copy">
+                <h3>The same decision, with the axis the flat chart had to drop.</h3>
+                <p>
+                  The agent contacts on expected value, and expected value is
+                  predicted uplift <b>times rupees at risk</b> — so the
+                  boundary between contacting and waiting is a surface over two
+                  inputs, not a line over one. The chart above cannot answer
+                  why a case with almost no predicted uplift was contacted
+                  anyway. This one can: it was a large invoice.
+                </p>
+                <p className="rl-dim">
+                  Height is what contact was really worth, which the model
+                  never sees. Below the plane it destroys value. Drag to
+                  rotate — a static 3D projection would be strictly worse than
+                  a flat chart, and points hiding behind other points is only
+                  acceptable because you can move them.
+                </p>
+              </div>
+              <PolicySpaceGuard points={scatter as any} />
+            </div>
+          </InView>
+        )}
+
+        <InView index={5}>
           <p className="rl-silence-foot">
             {contactsSent.toLocaleString("en-IN")} messages sent across{" "}
             {totalCases.toLocaleString("en-IN")} cases.
