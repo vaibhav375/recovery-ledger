@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page
 
 # `uv pip install` honours an ambient VIRTUAL_ENV over the venv it was just
 # told to create. Anyone who runs `make setup` with another virtualenv active
@@ -105,6 +105,14 @@ dashboard-serve:
 
 frontend-dev:
 	npm --prefix frontend run dev
+
+# Does the rendered page actually say what the artifacts support? The build
+# passing proves the page compiles, not that it says anything: a lookup
+# regression once removed three headline figures from under the baselines
+# chart with no error at all — TypeScript satisfied, build clean, section
+# simply gone. Needs a server running (`make live` or `make dashboard-serve`).
+verify-page:
+	@.venv/bin/python3 dashboard/verify_page.py $${URL:-http://localhost:5175/}
 
 # The live console: the same static dashboard, plus a backend that drives the
 # real agent. Start a run and watch the loop write the ledger, engage the kill

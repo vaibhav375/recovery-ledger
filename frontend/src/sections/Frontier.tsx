@@ -40,6 +40,11 @@ const SHOWN = [
 
 type Point = {
   key: string;
+  // Every policy this point represents. Merging coincident points used to
+  // drop the absorbed policy's key, which silently broke every lookup for it —
+  // `blast_everyone` vanished into `rules_based_dunning` and the three
+  // headline reads below the chart stopped rendering entirely, with no error.
+  keys: string[];
   label: string;
   kind: string;
   contacts: number;
@@ -65,6 +70,7 @@ export default function Frontier({ data }: { data: Dashboard }) {
     const inc = p.incremental_per_1000_cases;
     pts.push({
       key: s.key,
+      keys: [s.key],
       label: s.label,
       kind: s.kind,
       contacts: p.contacts_sent,
@@ -93,8 +99,9 @@ export default function Frontier({ data }: { data: Dashboard }) {
       if (group) group.push(p.label);
       else coincident.push([twin.label, p.label]);
       twin.label = `${twin.label} = ${p.label}`;
+      twin.keys = [...twin.keys, ...p.keys];
     } else {
-      merged.push({ ...p });
+      merged.push({ ...p, keys: [...p.keys] });
     }
   }
   pts.length = 0;
@@ -105,9 +112,12 @@ export default function Frontier({ data }: { data: Dashboard }) {
   const x = (v: number) => PAD.l + (v / maxX) * (W - PAD.l - PAD.r);
   const y = (v: number) => H - PAD.b - (v / maxY) * (H - PAD.t - PAD.b);
 
+  // Look up by membership, not by the surviving key: after a merge a point
+  // stands for several policies at once.
+  const find = (key: string) => pts.find((p) => p.keys.includes(key));
   const ours = pts.find((p) => p.kind === "ours");
-  const blast = pts.find((p) => p.key === "blast_everyone");
-  const rand = pts.find((p) => p.key === "random_targeting");
+  const blast = find("blast_everyone");
+  const rand = find("random_targeting");
   const overlapsBlast =
     ours && blast && !(ours.hi < blast.lo || blast.hi < ours.lo);
   const overlapsRandom =
