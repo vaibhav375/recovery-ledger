@@ -74,14 +74,27 @@ Planning ahead pays when the per-attempt annoyance penalty is small and the
 attempt budget is long, and the effect is real enough to survive three
 independent populations. It stops paying as soon as λ rises: at λ ≥ 30 the
 penalty dominates the continuation value, every future attempt is worth less
-than it costs, and the optimal plan collapses to the greedy one. Since the
-calibrated deployment sits at λ = 30 with a 3-attempt budget, **greedy is within
-noise of optimal there, and that is why the shipped policy is greedy.**
+than it costs, and the optimal plan collapses to the greedy one.
+
+The calibrated deployment sits at λ = 30 with a 3-attempt budget, so **at the
+shipped parameters the lookahead and greedy are indistinguishable** (−₹0.12 per
+case, sign flipping across draws). What ships is `LookaheadEVDecisionPolicy` —
+in `run_batch.py`, in the live console, and in the baselines table where it is
+the row labelled deployed. It is not being kept because it wins here; it does
+not win here. It is kept because it is the general solver, greedy is the case
+of it with the horizon set to 1, and the same machinery does earn its keep
+elsewhere on the grid.
+
+An earlier version of this section concluded that this was "why the shipped
+policy is greedy", which was simply false about this repo — the lookahead is
+wired in everywhere. The measurement was right and the sentence describing the
+system was wrong, which is its own kind of error and worth leaving on the
+record.
 
 This is a narrower claim than "sequential decision-making beats classification",
 and a more useful one: the sequential machinery is correct, it is measurably
 doing something, and there is now a stated condition under which it earns its
-complexity — which the deployment does not meet.
+complexity — which the deployment's own parameters do not meet.
 
 ## What this does not license saying
 
