@@ -108,8 +108,22 @@ loop visible.
 ### Frontend
 React + TypeScript + Vite, three.js 3D policy-space, inline SVG charts
 generated from `data.json` (never embedded images, so charts cannot drift from
-artifacts). `make dashboard` builds it; `make verify-page` asserts 9 sections
-and 5 artifact-backed claims render on both the React and fallback paths.
+artifacts). `make dashboard` builds it; `make verify-page` asserts 10 sections
+and 6 artifact-backed claims render with WebGL both on and off.
+
+The calibration section is the newest and the only one that argues against the
+system it documents: a two-panel chart — the ranking above, the residual at its
+own zoom below — plus the three pre-registered rules printed with their
+outcomes, one of which reads FAILED.
+
+Drawing the residual caught a wrong sentence before it shipped. The first draft
+of the section's copy said the predictions "cross the measurements once and are
+wrong on both sides of the crossing", which is the tidy story an over-spread
+model is supposed to tell. The residual panel showed five sign changes: the
+error is concentrated at the two ends (-0.082 on the bottom bin, +0.059 on the
+top) and is small and unsigned across the middle. The chart was rendered from
+the artifact, so it disagreed with the prose immediately. RESULTS.md and the
+commit never carried the claim — the picture caught it first.
 
 ---
 

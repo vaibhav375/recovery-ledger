@@ -16,6 +16,7 @@ import Opening from "./sections/Opening";
 import Subtraction from "./sections/Subtraction";
 import Frontier from "./sections/Frontier";
 import Silence from "./sections/Silence";
+import Calibration from "./sections/Calibration";
 import Kernel from "./sections/Kernel";
 import Audit from "./sections/Audit";
 import Live from "./sections/Live";
@@ -119,6 +120,7 @@ export default function App() {
           scatter={data.fairness?.scatter_sample}
           scatterCorrelation={data.fairness?.uplift_correlation}
         />
+        <Calibration cal={data.calibration} />
         <Kernel data={data} />
         <Audit data={data} />
         <Live data={data} />

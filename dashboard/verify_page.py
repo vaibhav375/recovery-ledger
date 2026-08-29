@@ -51,11 +51,12 @@ expected = {
     # Checking the baselines figure here was an error in this script, not on
     # the page: it expected ₹300,677 where the page correctly says ₹272,281.
     f"₹{inr(d['batch']['incremental_per_1000_cases']['point'])}": "headline incremental (run_batch)",
+    f"{d['calibration']['verdict']['mean_calibration_slope']:.3f} mean": "calibration: slope",
 }
 required_sections = {
     ".rl-subtraction": "subtraction", ".rl-chart svg": "baselines chart",
     ".rl-frontier-reads": "baselines reads", ".rl-quad svg": "uplift quadrant",
-    ".rl-curve svg": "caution curve", ".rl-audit-card": "audit cards",
+    ".rl-curve svg": "caution curve", ".rl-scissor svg": "decile scissor", ".rl-audit-card": "audit cards",
     ".rl-kernel": "kernel", ".rl-livesection": "live console", ".rl-explorer": "explorer",
 }
 

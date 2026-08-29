@@ -441,6 +441,10 @@ def build_data(ledger_path: Path, max_cases: int) -> dict:
         "fairness": load_optional(ROOT / "experiments" / "fairness" / "results_fairness.json"),
         "pessimism": load_optional(ROOT / "experiments" / "pessimism" / "results_pessimism.json"),
         "dnd_signal": load_optional(ROOT / "experiments" / "dnd_signal" / "results_dnd_signal.json"),
+        # Uplift by decile. Serialised into data.json rather than shipped as
+        # the matplotlib PNG next to it, so the chart on the page cannot drift
+        # away from the artifact the doc tests pin.
+        "calibration": load_optional(ROOT / "experiments" / "uplift_calibration" / "results_uplift_calibration.json"),
         # Where each rule comes from. Embedded rather than fetched, so the
         # static dashboard can answer "says who?" with no server running —
         # the live console gets the same registry from /api/provenance.

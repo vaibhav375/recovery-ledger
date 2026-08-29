@@ -1311,3 +1311,162 @@ main, .rl-topline, .rl-footer { position: relative; z-index: 1; }
   .rl-space-block { grid-template-columns: minmax(0, 1fr); }
   .rl-space-hint { margin-left: 0; }
 }
+
+/* ── calibration: the model cross-examined ─────────────────────────── */
+/* Every mark in here is one of two things — a claim or a measurement — and
+   the palette holds that line: graphite for what the model said, the live
+   accent for what actually happened. Nothing else gets a colour, so the one
+   failed rule below can borrow the deny red and mean it. */
+.rl-cal {
+  padding: clamp(90px, 14vh, 180px) var(--gut);
+  border-top: 1px solid var(--line-soft);
+}
+.rl-cal-inner { max-width: 1160px; margin: 0 auto; }
+.rl-cal-body {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  gap: clamp(28px, 4.4vw, 68px);
+  align-items: start;
+}
+.rl-cal-copy p {
+  margin: 0 0 18px;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.72;
+  color: var(--fg-dim);
+  max-width: 46ch;
+}
+.rl-cal-copy p:last-child { margin-bottom: 0; }
+.rl-cal-note {
+  border-left: 1px solid var(--line);
+  padding-left: 18px;
+  color: var(--fg-dim);
+}
+.rl-cal-note b { color: var(--foreground); font-weight: 600; }
+
+.rl-scissor { margin: 0; }
+.rl-scissor svg { width: 100%; height: auto; display: block; overflow: visible; }
+.rl-scissor-zero { stroke: var(--line); stroke-width: 1; }
+.rl-scissor-err {
+  stroke: var(--fg-faint);
+  stroke-width: 1.25;
+}
+/* Above the crossing the model is overclaiming, and the join is drawn in the
+   accent it is wrong about rather than in neutral grey. */
+/* The residual panel carries the sign. Under-priced bins stay graphite —
+   the model being shy is not the interesting failure; over-priced bins take
+   the accent, because that is where the contact threshold gets mis-set. */
+.rl-scissor-res { stroke: var(--fg-faint); stroke-width: 1.25; }
+.rl-scissor-res.is-over { stroke: var(--accent); }
+.rl-scissor-resdot { fill: var(--fg-faint); }
+.rl-scissor-resdot.is-over { fill: var(--accent); }
+.rl-scissor-panel {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  fill: var(--fg-faint);
+  opacity: 0.75;
+}
+.rl-scissor-claim {
+  fill: none;
+  stroke: var(--fg-dim);
+  stroke-width: 1.2;
+}
+.rl-scissor-measured { fill: var(--accent); }
+.rl-scissor-draw { stroke: var(--accent); stroke-width: 1; opacity: 0.22; }
+.rl-scissor-tick,
+.rl-scissor-axis,
+.rl-scissor-anno {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  fill: var(--fg-faint);
+}
+.rl-scissor-tick { font-size: 10px; }
+.rl-scissor-axis { font-size: 9.5px; }
+.rl-scissor-anno { font-size: 9.5px; letter-spacing: 0.04em; }
+.rl-scissor figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin-top: 16px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--fg-faint);
+}
+.rl-scissor-key { display: inline-flex; align-items: center; gap: 7px; }
+.rl-scissor-key::before {
+  content: "";
+  width: 7px; height: 7px;
+  flex: none;
+}
+.rl-scissor-key.is-claim::before { border: 1.2px solid var(--fg-dim); }
+.rl-scissor-key.is-measured::before { border-radius: 50%; background: var(--accent); }
+.rl-scissor-key.is-draw::before { height: 1px; width: 11px; background: var(--accent); opacity: 0.4; }
+
+/* The pre-registration, printed with its outcomes. Two rules held and one did
+   not; they are set at the same weight so the failure cannot be skimmed past. */
+.rl-cal-rules { margin-top: clamp(44px, 6vw, 78px); }
+.rl-cal-ruleshead {
+  margin: 0 0 14px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+}
+.rl-cal-rules ul { list-style: none; margin: 0; padding: 0; }
+.rl-cal-rule {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 84px;
+  gap: 18px;
+  align-items: baseline;
+  padding: 13px 0;
+  border-top: 1px solid var(--line-soft);
+}
+.rl-cal-rule:last-child { border-bottom: 1px solid var(--line-soft); }
+.rl-cal-rulename { font-size: 13.5px; font-weight: 400; color: var(--foreground); }
+.rl-cal-ruleread {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--fg-dim);
+  white-space: nowrap;
+}
+.rl-cal-rulestate {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: right;
+  color: var(--fg-faint);
+}
+.rl-cal-rule.is-held .rl-cal-rulestate { color: var(--rl-ok); }
+.rl-cal-rule.is-failed .rl-cal-rulestate { color: var(--rl-deny); }
+.rl-cal-foot {
+  margin: 22px 0 0;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--fg-faint);
+  max-width: 74ch;
+}
+
+/* The chart is drawn in a 620-unit viewBox. Below roughly 720px it renders at
+   half scale or less, so every label in it has to be sized in viewBox units
+   that survive the reduction — and the two annotation clauses are dropped,
+   because there is no width for a sentence at that size. */
+@media (max-width: 720px) {
+  .rl-scissor-tick { font-size: 17px; }
+  .rl-scissor-axis { font-size: 14px; }
+  .rl-scissor-anno { font-size: 16px; }
+  .rl-scissor-panel { font-size: 14px; letter-spacing: 0.08em; }
+  .rl-scissor-annolong { display: none; }
+}
+
+@media (max-width: 860px) {
+  .rl-cal-body { grid-template-columns: minmax(0, 1fr); }
+  .rl-cal-rule { grid-template-columns: minmax(0, 1fr) auto; }
+  .rl-cal-rulestate { grid-column: 2; text-align: right; }
+  .rl-cal-ruleread { grid-column: 1 / -1; }
+}
