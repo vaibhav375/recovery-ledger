@@ -45,6 +45,7 @@ EVAL_SEED_SOURCES = {
     "dnd_signal/run_dnd_signal.py": EVAL_SEED_PATTERN,
     "horizon/run_horizon.py": EVAL_SEED_PATTERN,
     "uplift_ab/run_uplift_ab.py": EVAL_SEED_PATTERN,
+    "uplift_calibration/run_calibration.py": EVAL_SEED_PATTERN,
 }
 
 

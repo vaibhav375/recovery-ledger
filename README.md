@@ -192,6 +192,20 @@ running.
       incremental recovery there swings from -Rs 10,734 to Rs 88,486 across
       draws. Best finding, unchanged: the *harder* the do-not-disturb problem,
       the more targeting is worth.
+- [x] **Uplift by decile — the spec's required calibration artifact (§8.1,
+      §11.2).** `make calibration`: 4,000 randomised cases per draw, three
+      draws, ranked by predicted uplift and cut into ten bins, each bin scored
+      against its own not-contacted rows. **The ranking is real** — top decile
+      minus bottom is +0.2360, +0.1546, +0.2321 across the draws, Qini 0.258.
+      **It is not monotone**: Spearman 0.879, 0.903, 0.952 against a bar of
+      0.9 fixed before the run, reported as failed rather than rounded up.
+      **Calibration slope 0.758** — the predictions are about a third
+      too spread out, which is the mechanism behind a better-correlated
+      ensemble recovering no more money, and the reason N2 was built on a
+      second signal instead of on τ̂ alone. The bottom decile is 43.8%
+      true do-not-disturbs against 17.3% of the population, but its
+      realised uplift is not negative — it locates them without measuring
+      them. Published as such.
 - [x] **LLM reply-intent listener, validated (spec 8.5).** `make listener-eval`:
       **95.2% accuracy** on a hand-authored 42-example gold set (100% English,
       92% Hinglish, 92% Hindi), with promise-to-pay precision 0.88 / recall
@@ -427,6 +441,8 @@ make baselines         # runs all 5 spec-required baselines + a matched-volume
                        # random-targeting control + both EV variants against the
                        # same eval batch — verified working, deterministic
 make sensitivity       # 5-parameter ranking-stability sweep — verified working
+make calibration       # uplift by decile + calibration slope on a randomised
+                       # holdout — the spec's required evaluation artifact
 make negotiate         # Section 43B(h) negotiation showpiece
 make fleet             # contact-free recovery: issuer degradation detection
 make listener-eval     # reply-intent accuracy vs the gold set (needs Ollama)

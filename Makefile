@@ -47,6 +47,10 @@ uplift-ab:
 	PYTHONPATH=src .venv/bin/python3 experiments/uplift_ab/run_uplift_ab.py \
 		--n-eval 2000 --eval-draws 5
 
+calibration:
+	PYTHONPATH=src .venv/bin/python3 experiments/uplift_calibration/run_calibration.py \
+		--n-train 5000 --n-eval 4000 --eval-draws 3
+
 lambda-sweep:
 	PYTHONPATH=src .venv/bin/python3 experiments/churn_lambda/run_lambda_sweep.py \
 		--n-eval 2000

@@ -60,6 +60,9 @@ All from committed artifacts, all reproducible from the listed target.
 | vs blind mass-contact | indistinguishable on total, **80% fewer contacts**, 5.0x better cost per incremental rupee, 1.9x fewer do-not-disturbs | `make baselines` |
 | Deployed policy (`LookaheadEVDecisionPolicy`) | ₹317,168/1,000, 883 contacts, 11.55% to do-not-disturbs | `make baselines` |
 | Uplift model correlation with truth | 0.347 (single T-learner, the shipped model) | `make eval` |
+| Uplift by decile — ranking | top decile beats bottom **3/3 draws** (+0.2360, +0.1546, +0.2321), Qini 0.258 | `make calibration` |
+| Uplift by decile — monotonicity | Spearman 0.879, 0.903, 0.952 — **fails** the pre-registered 0.9, near-monotone 3/3 | `make calibration` |
+| Uplift calibration slope | **0.758** (predictions ~a third too spread) | `make calibration` |
 | Tier 1 — Criteo | direct ATE +0.00938, IPS +0.00938, SNIPS +0.00938, DR +0.00671 | `make tier1-criteo` |
 | Tier 1 — Hillstrom | direct +0.04511, IPS +0.04511, DR +0.04622 | `make tier1-hillstrom` |
 | Sensitivity C1 (EV beats random) | **75/75** settings across 3 draws | `make sensitivity` |
@@ -70,7 +73,7 @@ All from committed artifacts, all reproducible from the listed target.
 | Stopping rules | **11 defined, 8 fired** in the headline batch | `make eval` |
 | Compliance kernel | **13 rules**, all with provenance citations | `make redteam` |
 | Ledger | 34,304 entries, chain valid | `make eval` |
-| Tests | **396 passing** across 39 files | `make test` |
+| Tests | **412 passing** across 40 files | `make test` |
 
 ---
 
@@ -91,16 +94,16 @@ loop visible.
 | # | Claim | Status |
 |---|---|---|
 | N1 | Incremental-first accounting | **Held.** ₹272,281 with CI vs randomised holdout. |
-| N2 | Negative-uplift targeting (do-not-disturbs) | **Held.** DND opt-out ratio 1.29x [1.09, 1.51]; deployed policy contacts 11.53% DND vs mass-contact's 21.98%. |
+| N2 | Negative-uplift targeting (do-not-disturbs) | **Held, and now qualified.** DND opt-out ratio 1.29x [1.09, 1.51]; deployed policy contacts 11.53% DND vs mass-contact's 21.98%. The decile chart shows τ̂'s bottom decile is 43.8% true do-not-disturbs against 17.3% of the population, but does *not* realise negative uplift — it locates them without measuring them. The claim survives because it runs through the churn model as a second signal, not through τ̂ alone. |
 | N3 | Deterministic India-regulatory compliance kernel | **Held.** 13 rules with provenance, per-action certificates, 100% block rate. |
 | N4 | Contact as budget-constrained sequential decision | **Held, bounded.** The lookahead beats greedy by +₹6–7/case at λ=0 with a 5–8 attempt budget, replicated 3/3 draws. At the deployed λ=30 with a 3-attempt budget the two are indistinguishable (−₹0.12/case, sign flips). `LookaheadEVDecisionPolicy` is what ships; the honest statement is that it does not win *at these parameters*, and there is now a measured condition under which it does. |
 | N5 | Two-tier validation | **Held.** Criteo + Hillstrom before simulator transfer. |
 | N6 | Contact-free recovery | **Held.** Issuer-outage detection suppresses futile retries; no customer messaged. |
 
-### Experiments (13, each with an artifact and a make target)
+### Experiments (14, each with an artifact and a make target)
 `tier1_criteo` · `tier2_simulation` · `sensitivity` · `fleet` · `negotiation` ·
 `listener_eval` · `ope_deployment` · `fairness` · `pessimism` · `dnd_signal` ·
-`horizon` · `uplift_ab` · `churn_lambda`
+`horizon` · `uplift_ab` · `churn_lambda` · `uplift_calibration`
 
 ### Frontend
 React + TypeScript + Vite, three.js 3D policy-space, inline SVG charts
@@ -150,11 +153,18 @@ buys credibility; the spec says so explicitly.
    leaning bias* under a pre-registered rule. Ruled out variance (DR's interval
    is 0.82× IPS's). Mechanism named — cross-fitting on a 15% minority arm — and
    **not tested**. Use IPS on this dataset.
-2. **Uplift correlation is 0.347.** This is the weakest component. A bootstrap
-   ensemble raises it to 0.445 (replicated 5/5) but did **not** improve
-   recovered value (4 of 5 draws negative). Not shipped. The reason
-   generalises: the policy thresholds `τ̂ × amount`, so calibration near the
-   boundary matters, not global rank agreement.
+2. **Uplift correlation is 0.347, and the predictions are ~a third too spread
+   out.** This is the weakest component. A bootstrap ensemble raises the
+   correlation to 0.445 (replicated 5/5) but did **not** improve recovered
+   value (4 of 5 draws negative). Not shipped. `make calibration` now shows the
+   mechanism rather than asserting it: the decile chart's calibration slope is
+   0.758, so τ̂ spans -0.064 to +0.285 where the truth spans +0.041 to
+   +0.206. The policy thresholds `τ̂ × amount`, so an over-spread τ̂ mis-places
+   that threshold in both directions even with the ranking intact — global rank
+   agreement was never the objective. The deciles are near-monotone but fail a
+   pre-registered Spearman bar of 0.9 (0.879, 0.903, 0.952). **Not corrected**:
+   isotonic recalibration would change the deployed threshold and needs its own
+   replicated A/B, not a patch.
 3. **λ_churn = 4.0 is a judgement call, not an optimum.** It costs 9.1% of
    incremental recovery to buy 27% fewer contacts and 2.3 points less
    do-not-disturb exposure. The curve is monotone; no setting is free.
@@ -172,12 +182,19 @@ Ordered by what most improves the submission. Nothing here is required for the
 definition of done — that is §7.
 
 ### Tier A — the remaining spec gap
-- [ ] **Uplift calibration / decile chart.** The spec's evaluation protocol
-      (§11) asks for it and it is the one required artifact absent. Plot
-      predicted uplift decile against realised uplift on the holdout.
-      *Expected validation:* monotone or near-monotone deciles; if not, that is
-      itself the honest finding and belongs in RESULTS.md. Add a doc test
-      pinning the decile figures.
+- [x] **Uplift calibration / decile chart.** Done — `make calibration`,
+      `experiments/uplift_calibration/`. The expected validation was
+      "monotone or near-monotone deciles, and if not, that is the finding":
+      **near-monotone, not monotone.** Spearman 0.879, 0.903, 0.952 against a bar of
+      0.9 fixed before the run; the ranking itself holds 3/3 draws. Two
+      findings came out of it that the correlation number could not have
+      produced: the calibration slope is 0.758, which is the mechanism
+      `uplift_ab` suspected and could not show; and τ̂'s bottom decile locates
+      do-not-disturbs (43.8% vs 17.3% of the population) without realising
+      negative uplift. Both published in RESULTS.md, both pinned by doc tests.
+      *Left open deliberately:* the slope is not corrected. Isotonic
+      recalibration or shrinkage on τ̂ would move the policy's threshold and so
+      needs its own A/B under the replication rule — see Tier B.
 
 ### Tier B — strengthens the strongest claims
 - [ ] **Test the DR cross-fitting hypothesis.** The mechanism is named but
@@ -186,6 +203,16 @@ definition of done — that is §7.
       *Expected validation:* either coverage rises to 3/3 (hypothesis confirmed,
       weak spot closed) or it does not (hypothesis refuted, still progress).
       Either outcome is publishable; do not tune until it passes.
+- [ ] **Recalibrate τ̂ and A/B it.** New, and now the best-supported item here:
+      the decile chart measured the over-spread (0.758) rather than inferring
+      it, so the fix is a known quantity. Fit isotonic regression (or a single
+      shrinkage factor) on a holdout, re-run `make calibration` to confirm the
+      slope moves toward 1.0, then A/B recovered value under the same rule as
+      `experiments/uplift_ab`: claimable only if every draw agrees on sign.
+      *Expected validation:* slope → 1.0 is near-certain and is not the result;
+      the result is whether the money follows. It may not — that is the whole
+      lesson of `uplift_ab`, and a slope fix that does not pay is still worth
+      publishing.
 - [ ] **Decide the ensemble on harm-reduction grounds.** Do-not-disturb rate
       fell in 5/5 draws (−1.76pp) at the cost of ~37 more contacts and
       unmeasured revenue. This is a judgement about what the system is *for*.
@@ -249,10 +276,11 @@ and a frontend build that deleted the page's data with no error anywhere.
 Run in this order. Every one must pass.
 
 ```bash
-make test          # 396 tests
+make test          # 412 tests
 make eval          # B1 headline
 make baselines     # 8-policy comparison
 make sensitivity   # 75/75 both criteria across 3 draws
+make calibration   # uplift by decile: ranking 3/3, near-monotone, slope 0.758
 make redteam       # 100% block rate, 0 leaks
 make tier1-criteo  # IPS/SNIPS recover the arm-mean ATE
 make dashboard     # rebuild page from artifacts

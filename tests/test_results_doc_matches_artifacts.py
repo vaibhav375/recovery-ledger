@@ -40,6 +40,7 @@ OPE = ROOT / "experiments" / "ope_deployment" / "results_ope_deployment.json"
 FAIRNESS = ROOT / "experiments" / "fairness" / "results_fairness.json"
 DND = ROOT / "experiments" / "dnd_signal" / "results_dnd_signal.json"
 PESSIMISM = ROOT / "experiments" / "pessimism" / "results_pessimism.json"
+CALIBRATION = ROOT / "experiments" / "uplift_calibration" / "results_uplift_calibration.json"
 TIER1 = {
     "hillstrom": ROOT / "experiments" / "tier1_criteo" / "results_hillstrom.json",
     "criteo": ROOT / "experiments" / "tier1_criteo" / "results_criteo.json",
@@ -522,3 +523,71 @@ def test_readme_does_not_quote_a_stale_headline():
         if token in readme and token != current
     ]
     assert not stale, f"README.md still quotes superseded figures: {stale}"
+
+
+# ── Uplift by decile ─────────────────────────────────────────────────────
+#
+# The decile chart is the spec's required evaluation artifact and it reports
+# two results that are not flattering: the ranking misses the pre-registered
+# monotonicity bar, and the bottom decile's realised uplift is not negative.
+# Unflattering numbers are the ones a document drifts away from, so they are
+# pinned the same way the headline is.
+
+
+def test_decile_table_matches_the_calibration_artifact(results_md):
+    d = _load(CALIBRATION)
+    for i in range(d["n_bins"]):
+        rows = [dr["deciles"][i] for dr in d["draws"]]
+        mean = lambda k: sum(r[k] for r in rows) / len(rows)
+        row = (
+            f"| {i + 1} | {mean('mean_predicted_uplift'):+.4f} "
+            f"| {mean('realised_uplift'):+.4f} "
+            f"| {mean('mean_true_persuadability'):+.4f} "
+            f"| {mean('true_do_not_disturb_share') * 100:.1f}% |"
+        )
+        assert row in results_md, f"decile {i + 1} in RESULTS.md does not match the artifact: expected {row!r}"
+
+
+def test_the_monotonicity_verdict_is_reported_at_the_threshold_it_was_judged_against(results_md):
+    """Spearman 0.879 fails a bar of 0.9. The document must carry both numbers,
+    so the failing draw cannot quietly become 'monotone'."""
+    v = _load(CALIBRATION)["verdict"]
+    assert ", ".join(f"{s:.3f}" for s in v["spearman_by_draw"]) in results_md
+    assert f"against a pre-registered {v['monotone_threshold']}" in results_md
+    assert v["monotone_all_draws"] is False, (
+        "the deciles now pass the 0.9 bar — RESULTS.md still says they do not"
+    )
+    assert v["near_monotone_all_draws"] is True
+
+
+def test_ranking_and_calibration_figures_match_the_artifact(results_md):
+    v = _load(CALIBRATION)["verdict"]
+    assert ", ".join(f"{t:+.4f}" for t in v["top_minus_bottom_by_draw"]) in results_md
+    assert ", ".join(f"{s:.3f}" for s in v["calibration_slope_by_draw"]) in results_md
+    assert f"mean **{v['mean_calibration_slope']:.3f}**" in results_md
+    assert f"Qini {v['mean_qini']:.3f}" in results_md
+    assert v["ranking_holds"] is True
+
+
+def test_the_bottom_decile_claim_matches_the_artifact(results_md):
+    """The load-bearing cell: the decile the policy declines to contact. The
+    document says it is enriched in do-not-disturbs but does NOT realise
+    negative uplift. Both halves are checked, because reporting only the first
+    would turn a calibration failure into a targeting success."""
+    v = _load(CALIBRATION)["verdict"]
+    assert f"{v['bottom_decile_true_dnd_share'] * 100:.1f}% of that decile" in results_md
+    assert f"{v['population_true_dnd_share'] * 100:.1f}% of the\npopulation" in results_md
+    assert f"{v['top_decile_true_dnd_share'] * 100:.1f}% of the top decile" in results_md
+    assert f"realises {v['bottom_decile_realised_uplift']:+.4f}" in results_md
+    assert f"calls it {v['bottom_decile_predicted_uplift']:+.4f}" in results_md
+    assert v["bottom_decile_realised_negative_in_every_draw"] is False, (
+        "the bottom decile now realises negative uplift in every draw — that is "
+        "a stronger N2 result than RESULTS.md claims, and the document should "
+        "be updated to claim it"
+    )
+
+
+def test_the_calibration_run_used_the_shipped_model_not_the_ensemble():
+    """The chart is evidence about the model that ships. An artifact produced
+    by the ensemble arm would describe a model no document quotes."""
+    assert _load(CALIBRATION)["uplift_model"] == "single"

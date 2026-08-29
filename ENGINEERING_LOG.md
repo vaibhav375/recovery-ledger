@@ -1398,3 +1398,81 @@ test.
 Same lesson as the sensitivity sweep, the off-policy evaluation, the DND
 signal, and the uplift A/B run this week: a number measured once is not a
 measurement — and a test that can only pass is not a test.
+
+## 2026-08-30 (cont.) — The decile chart: my fixture could not see the bug it was built to catch
+
+The last required spec artifact was the uplift-by-decile chart (§8.1, §11.2).
+It closed a gap I had been describing wrongly to myself for weeks. Everything
+this repo says about the CATE model runs through one number — correlation
+0.347 with the simulator's hidden `persuadability` trait — and I had been
+treating that as *the* model diagnostic. It is not a diagnostic a deployment
+can compute at all. Nothing outside a simulator knows the trait. A decile chart
+needs only randomised assignment, which any deployment with a holdout already
+has.
+
+Before pointing anything at the simulator I wrote the arithmetic against a
+constructed population whose realised uplift per decile is exact — a staircase,
+decile d realising exactly d/10. Ten tests, all green.
+
+Then I mutated the implementation to the classic wrong version of this chart —
+scoring each decile's contacted rows against the *whole population's* control
+mean instead of its own — and only two of the ten tests noticed, neither of
+them the staircase test that exists precisely to check the arithmetic.
+
+The fixture was the problem. My controls never paid, in any decile. With a flat
+zero baseline, the population control mean and every decile's control mean are
+the same number, so the bug was arithmetically invisible. I had built a test
+that could not fail in the direction that mattered — the same shape of error as
+the λ_churn interval check eight days ago, made while consciously trying not to
+repeat it. Knowing the lesson is not the same as applying it, and what caught
+it was mutation, not care.
+
+Rebuilt with the baseline payment rate *falling* across the deciles (0.45 → 0)
+while uplift rises, which is what a real ranking looks like and what punishes
+borrowing the global control mean. Same mutation now fails seven of eleven
+tests.
+
+The chart itself, three draws of 4,000 randomised cases:
+
+| | draw 1 | draw 2 | draw 3 |
+|---|---|---|---|
+| top − bottom decile | +0.2360 | +0.1546 | +0.2321 |
+| Spearman | 0.879 | 0.903 | 0.952 |
+| calibration slope | 0.799 | 0.656 | 0.819 |
+
+The ranking is real and replicates. The monotonicity bar I had set at 0.9
+before the run fails on draw 1 at 0.879, and it is reported as failed;
+"near-monotone" is a separate and weaker claim, recorded separately so it
+cannot be quoted as the stronger one.
+
+Two things came out that the correlation number could not have produced.
+
+**The slope is 0.758.** τ̂ spans -0.064 to +0.285 where the truth spans
++0.041 to +0.206 — predictions about a third too spread out. That is the
+mechanism `uplift_ab` suspected and could not demonstrate: the policy contacts
+when `τ̂ × amount` clears the message cost, a threshold on a *product*, so an
+over-spread τ̂ mis-places that threshold in both directions while ranking
+perfectly. It is also why bagging raised correlation to 0.445 and recovered no
+extra money — shrinking extremes moves cases across the threshold both ways.
+
+**The bottom decile locates do-not-disturbs without measuring them.** 43.8% of
+it is truly negative-uplift against 17.3% of the population — a 2.5x
+enrichment, and exactly the targeting signal N2 needs. But it still averages
++0.0411 true persuadability and realises +0.0179, interval covering zero in
+all three draws, while τ̂ calls it -0.0642. A bin that is 44%
+do-not-disturb and 56% ordinary customer nets out slightly positive; the model
+reports it as confidently negative.
+
+I expected that cell to be the chart's good news and it is the chart's
+sharpest criticism of the shipped model. N2 survives it only because the claim
+was deliberately built on the churn model as an independently identified second
+signal rather than on τ̂'s negative predictions. Had I taken the cheaper route
+there — one model, negative τ̂ means do-not-disturb — this chart would have
+found it out, and it would have found it out after the submission rather than
+before it.
+
+Not corrected. Isotonic recalibration would move the deployed policy's
+threshold, so it needs its own replicated A/B rather than a patch and a
+re-quoted headline. Logged in PROJECT_STATE §6 Tier B as the best-supported
+follow-up in the file, because for once the fix is aimed at a measured quantity
+instead of a suspected one.

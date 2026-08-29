@@ -234,6 +234,85 @@ than an assertion.
 
 ---
 
+## Uplift by decile — is the ranking real?
+
+```
+make calibration
+```
+
+The τ̂ model has been reported through one number all project: correlation
+**0.347** with the simulator's hidden `persuadability` trait. No deployment can
+compute that — nothing outside a simulator knows the trait — so it validates
+the simulator's bookkeeping and nothing else. The spec asks for the version a
+deployment *can* compute (§8.1, §11.2), and it was the last required artifact
+missing here.
+
+4,000 fresh cases per draw, contact assigned by coin flip, ranked by τ̂ and cut
+into ten bins. Each bin's uplift is the contrast between its **own** contacted
+and not-contacted rows — a bin scored against the population's control mean
+comes out monotone for a model that predicts nothing. The deployed policy is
+deliberately absent: it declines to contact the low deciles, which would drive
+their realised uplift to zero because nobody was contacted. This measures the
+model; `make eval` measures the policy.
+
+| decile | predicted τ̂ | realised uplift | true persuadability | true do-not-disturbs |
+|---:|---:|---:|---:|---:|
+| 1 | -0.0642 | +0.0179 | +0.0411 | 43.8% |
+| 2 | +0.0098 | -0.0162 | +0.0365 | 40.2% |
+| 3 | +0.0305 | +0.0223 | +0.0564 | 34.3% |
+| 4 | +0.0469 | +0.0483 | +0.1036 | 16.2% |
+| 5 | +0.0659 | +0.0888 | +0.1364 | 12.3% |
+| 6 | +0.0863 | +0.1034 | +0.1664 | 6.6% |
+| 7 | +0.1066 | +0.0896 | +0.1658 | 7.3% |
+| 8 | +0.1289 | +0.1750 | +0.1831 | 4.4% |
+| 9 | +0.1623 | +0.1730 | +0.1872 | 4.8% |
+| 10 | +0.2850 | +0.2255 | +0.2061 | 2.8% |
+
+Three rules were fixed before the run. Two of the three answers are not the
+flattering one.
+
+**The ranking is real.** Top decile minus bottom is +0.2360, +0.1546, +0.2321 across
+the three draws — positive in every one, with non-overlapping intervals at the
+two ends. Qini 0.258. The model is not sorting noise.
+
+**It is not monotone, and it misses the bar that was set for it.** Spearman
+0.879, 0.903, 0.952, against a pre-registered 0.9. It clears the weaker
+near-monotone threshold of 0.7 in all three draws, and that is
+reported as the weaker claim it is rather than rounded up to the stronger one.
+Which deciles invert moves between draws; the ordering is right in the large
+and unreliable step by step.
+
+**The predictions are about a third too spread out.** Calibration slope
+0.799, 0.656, 0.819, mean **0.758** — τ̂ ranges -0.064 to +0.285 where the truth
+ranges +0.041 to +0.206. This is the mechanism `experiments/uplift_ab`
+suspected and could not show. The policy contacts when `τ̂ × amount` clears the
+message cost, a threshold on a product, so an over-spread τ̂ mis-places that
+threshold in both directions even with the ranking intact — and it explains why
+a bootstrap ensemble that raised correlation to 0.445 recovered no more money.
+Bagging shrinks extremes, which moves cases across the threshold both ways.
+
+**The bottom decile locates do-not-disturbs; it does not measure them.**
+43.8% of that decile is truly negative-uplift, against 17.3% of the
+population and 2.8% of the top decile — a 2.5x enrichment, and that
+enrichment is the targeting signal N2 needs. But the decile still averages
++0.0411 true persuadability and realises +0.0179, with an interval covering
+zero in every draw, while τ̂ calls it -0.0642. A bin that is 44%
+do-not-disturb and 56% ordinary customer nets out slightly positive, and the
+model reports it as clearly negative.
+
+That is a calibration failure in precisely the region N2 cares about most, and
+it is the strongest argument in this repo for why N2 was built not to rest on
+τ̂ alone. The deployed policy's do-not-disturb avoidance (11.5% against
+mass-contact's 22.0%) runs through the churn model as a second, independently
+identified signal. Had that design leaned on τ̂'s negative predictions being
+right, this chart would have found it out.
+
+The slope is **not corrected**. Isotonic recalibration or a shrinkage factor on
+τ̂ is the obvious next move, it would change the policy's threshold behaviour,
+and it therefore needs its own A/B under the same replication rule as
+`experiments/uplift_ab` — not a patch applied here and quoted into the
+headline. See `experiments/uplift_calibration/REPORT.md`.
+
 ## Do-not-disturbs — novelty claim N2
 
 The agent's do-not-disturb contact rate was, for most of this project's
@@ -752,6 +831,7 @@ make demo         # agent loop, 20 cases, no external services needed
 make eval         # B1 headline
 make baselines    # policy comparison
 make sensitivity  # ranking stability
+make calibration  # uplift by decile
 make redteam      # adversarial suite
 ```
 
