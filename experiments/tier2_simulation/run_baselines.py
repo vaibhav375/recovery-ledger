@@ -127,10 +127,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--n-train", type=int, default=5000)
     parser.add_argument("--n-eval", type=int, default=2000)
+    parser.add_argument(
+        "--uplift", choices=["ensemble", "single"], default="single",
+        help="the deployed CATE model. 'ensemble' swaps in the 20-member "
+             "bootstrap ensemble, which correlates better with truth but has "
+             "not been shown to recover more money; see experiments/uplift_ab.")
     args = parser.parse_args()
 
     print(f"Training uplift + churn models on {args.n_train} randomised-contact cases...")
-    uplift_model, churn_model = train_models(args.n_train, seed=SEED)
+    ensemble = args.uplift == "ensemble"
+    uplift_model, churn_model = train_models(args.n_train, seed=SEED, ensemble=ensemble)
 
     eval_seed = SEED + 2000  # disjoint from run_batch.py's own eval seed (SEED+1000)
     cases = generate_cases(args.n_eval, seed=eval_seed, now=NOW)
@@ -194,7 +200,8 @@ def main() -> None:
             ),
         })
 
-    out = {"n_train": args.n_train, "n_eval": args.n_eval, "eval_seed": eval_seed, "policies": comparison}
+    out = {"n_train": args.n_train, "n_eval": args.n_eval, "eval_seed": eval_seed,
+           "uplift_model": args.uplift, "policies": comparison}
     (HERE / "results_baselines.json").write_text(json.dumps(out, indent=2))
     print(f"\nWrote {HERE / 'results_baselines.json'}")
 

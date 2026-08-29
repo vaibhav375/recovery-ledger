@@ -28,5 +28,7 @@
   "distinct_stop_reasons_fired": 8,
   "unresolved_exceptions": 690,
   "ledger_entries": 34304,
-  "ledger_chain_valid": true
+  "ledger_chain_valid": true,
+  "uplift_model": "single",
+  "uplift_ensemble_size": 1
 }

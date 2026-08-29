@@ -68,7 +68,7 @@ from recovery_ledger.ledger.ledger import Ledger
 from recovery_ledger.policy.churn import ChurnRiskModel
 from recovery_ledger.policy.decision import DoNothingPolicy, LookaheadEVDecisionPolicy
 from recovery_ledger.policy.features import cases_to_feature_matrix
-from recovery_ledger.policy.uplift.learners import TLearnerModel
+from recovery_ledger.policy.uplift.learners import BootstrapEnsembleModel, TLearnerModel, UpliftModel
 from recovery_ledger.sim.environment import EnvironmentListener, SimulationEnvironment, generate_population, persuadability
 from recovery_ledger.sim.generator import generate_cases
 
@@ -87,7 +87,38 @@ def build_kernel() -> KernelEngine:
     ])
 
 
-def train_models(n_train: int, seed: int) -> tuple[TLearnerModel, ChurnRiskModel]:
+# The deployed CATE model, and why it is still the single T-learner.
+#
+# A 20-member bootstrap ensemble of the same learner correlates better with true
+# persuadability than one T-learner does: 0.347 -> 0.445, replicated at +0.091,
+# +0.096 and +0.097 across three independent draws. That is the strongest
+# diagnostic improvement available in this repo, and it looked like an obvious
+# thing to ship.
+#
+# It is not, because correlation is not the objective. The policy contacts when
+# tau_hat * amount_at_risk clears the cost of a message, so what matters is
+# calibration near that threshold, not global rank agreement. Measured on two
+# evaluation populations the ensemble moved recovered value in opposite
+# directions (+7.1% on the batch seed, -8.4% on the baselines seed) with heavily
+# overlapping intervals - which is this project's recurring lesson about single
+# draws, arriving for the fifth time.
+#
+# So the arm is a recorded flag rather than a silent default, and
+# `experiments/uplift_ab` decides it on several populations under a rule fixed
+# before the run. Until that says otherwise, the shipped model is the one whose
+# numbers the documents already quote.
+UPLIFT_ENSEMBLE_SIZE = 20
+
+
+def build_uplift(seed: int, *, ensemble: bool = True):
+    if not ensemble:
+        return TLearnerModel(random_state=seed)
+    return BootstrapEnsembleModel(
+        base=TLearnerModel, n_models=UPLIFT_ENSEMBLE_SIZE, random_state=seed
+    )
+
+
+def train_models(n_train: int, seed: int, *, ensemble: bool = True) -> tuple[UpliftModel, ChurnRiskModel]:
     """Fit BOTH causal models on the same randomised assignment: the effect of
     contact on payment, and the effect of contact on churn. Same data, same
     learner class, two different outcomes — the churn model costs nothing
@@ -110,13 +141,13 @@ def train_models(n_train: int, seed: int) -> tuple[TLearnerModel, ChurnRiskModel
         churned[i] = float(result.reply == ReplyIntent.OPT_OUT)
 
     X = cases_to_feature_matrix(cases)
-    uplift = TLearnerModel(random_state=seed)
+    uplift = build_uplift(seed, ensemble=ensemble)
     uplift.fit(X, treatment, paid)
     churn = ChurnRiskModel().fit(X, treatment, churned, random_state=seed)
     return uplift, churn
 
 
-def train_uplift_model(n_train: int, seed: int) -> TLearnerModel:
+def train_uplift_model(n_train: int, seed: int, *, ensemble: bool = True) -> UpliftModel:
     cases = generate_cases(n_train, seed=seed, now=NOW)
     traits = generate_population(cases, seed=seed)
     env = SimulationEnvironment(traits, seed=seed)
@@ -131,7 +162,7 @@ def train_uplift_model(n_train: int, seed: int) -> TLearnerModel:
         outcomes[i] = float(result.paid)
 
     X = cases_to_feature_matrix(cases)
-    model = TLearnerModel(random_state=seed)
+    model = build_uplift(seed, ensemble=ensemble)
     model.fit(X, treatment, outcomes)
     return model
 
@@ -148,7 +179,7 @@ def _bootstrap_ci(treated_values: np.ndarray, control_values: np.ndarray, *, n_b
     return point, float(lo), float(hi)
 
 
-def run_eval(n_eval: int, uplift_model: TLearnerModel, *, seed: int, churn_model=None) -> dict:
+def run_eval(n_eval: int, uplift_model: UpliftModel, *, seed: int, churn_model=None) -> dict:
     cases = generate_cases(n_eval, seed=seed, now=NOW)
     traits = generate_population(cases, seed=seed)
 
@@ -239,13 +270,25 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--n-train", type=int, default=5000)
     parser.add_argument("--n-eval", type=int, default=1000)
+    parser.add_argument(
+        "--uplift", choices=["ensemble", "single"], default="single",
+        help="the deployed CATE model. 'ensemble' swaps in the 20-member "
+             "bootstrap ensemble, which correlates better with truth but has "
+             "not been shown to recover more money; see experiments/uplift_ab.")
     args = parser.parse_args()
 
     print(f"Training uplift + churn models on {args.n_train} randomised-contact cases...")
-    model, churn_model = train_models(args.n_train, seed=SEED)
+    ensemble = args.uplift == "ensemble"
+    model, churn_model = train_models(args.n_train, seed=SEED, ensemble=ensemble)
 
     print(f"Running eval batch: {args.n_eval} cases split into treatment/holdout arms...")
     results, ledger = run_eval(args.n_eval, model, seed=SEED + 1000, churn_model=churn_model)
+
+    # Recorded so an artifact can never be silently attributed to a model it
+    # was not produced by. The committed baselines table was found to predate
+    # a behavioural change in the repo, and nothing in the file said so.
+    results["uplift_model"] = args.uplift
+    results["uplift_ensemble_size"] = UPLIFT_ENSEMBLE_SIZE if ensemble else 1
 
     print(json.dumps(results, indent=2))
 

@@ -130,17 +130,18 @@ Common random numbers across policies, paired bootstrap, same 2,000 cases.
 | Policy | Incremental ₹/1000 | Contacts | ₹ per contact | % to do-not-disturbs |
 |---|---:|---:|---:|---:|
 | do_nothing | — (reference) | 0 | — | — |
-| blast_everyone | 330,108 | 4,339 | 152.2 | 20.19% |
-| rules_based_dunning | 330,108 | 4,339 | 152.2 | 20.19% |
-| razorpay_current | 86,648 (**CI includes 0**) | 0 | — | — |
-| random_targeting | 119,671 | 2,021 | 118.4 | 20.39% |
-| ev_policy_no_churn | 340,988 | 2,257 | 302.2 | 20.12% |
-| **ev_policy_greedy** | 301,018 | **1,339** | **449.6** | **13.59%** |
-| ev_policy_lookahead | 300,677 | 1,318 | 456.3 | 13.81% |
+| blast_everyone | 354,371 | 4,340 | 163.3 | 21.98% |
+| rules_based_dunning | 354,371 | 4,340 | 163.3 | 21.98% |
+| razorpay_current | 66,905 (**CI includes 0**) | 0 | — | — |
+| random_targeting | 135,730 | 2,014 | 134.8 | 22.84% |
+| ev_policy_no_churn | 372,590 | 2,051 | 363.3 | 22.48% |
+| **ev_policy_greedy** | 317,168 | **885** | **716.8** | **11.53%** |
+| ev_policy_lookahead | 317,168 | 883 | 718.4 | 11.55% |
 
-**The result that matters: 2.85x more incremental recovery than random
+**The result that matters: 2.34x more incremental recovery than random
 targeting at comparable contact volume, with non-overlapping confidence
-intervals.** Without this control the headline would be uninterpretable —
+intervals.** (The deployed policy is `ev_policy_greedy`; an earlier version of
+this line quoted `ev_policy_no_churn`'s multiple instead.) Without this control the headline would be uninterpretable —
 "fewer contacts, same money" could just be diminishing returns to volume and
 would say nothing about the uplift model. This is what makes it a claim
 about *targeting*.

@@ -3,12 +3,13 @@
 **Status: Tier 1 validation passed. B1 headline: ₹272,281 incremental recovery
 per 1,000 cases (95% CI ₹103,930–₹433,387).** The decisive test: against a
 control contacting a comparable number of cases *at random*, the agent
-recovers **2.51x more incremental revenue with non-overlapping confidence
+recovers **2.34x more incremental revenue with non-overlapping confidence
 intervals** — so the targeting model, not merely contact volume, is doing the
 work. Against blind mass-contact it is **statistically indistinguishable on
 total recovery** (overlapping CIs — and the sign of the difference flips
-with the sample, so "beats" would be an overclaim) while using **70% fewer
-contacts** at 2.8x better cost per incremental rupee.
+with the sample, so "beats" would be an overclaim) while using **80% fewer
+contacts** at 5.0x better cost per incremental rupee and reaching 1.9x fewer
+do-not-disturbs.
 
 These figures are the *deployed* policy — the lookahead EV policy with the
 churn term, which is what `make eval` runs and what the dashboard and live
