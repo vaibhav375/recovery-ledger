@@ -117,6 +117,7 @@ export default function App() {
           contactsSent={figures.contacts}
           totalCases={data.summary.cases}
           scatter={data.fairness?.scatter_sample}
+          scatterCorrelation={data.fairness?.uplift_correlation}
         />
         <Kernel data={data} />
         <Audit data={data} />

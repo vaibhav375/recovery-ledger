@@ -37,7 +37,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
  * Contacted points sit high and to the right: the agent is spending its
  * messages where predicted uplift and amount are both large. Below the grey
  * plane is where contact destroys value. Contacted points down there are the
- * agent's real mistakes, and there are fewer than the model's 0.36 correlation
+ * agent's real mistakes, and there are fewer than the model's ~0.33 correlation
  * with truth would lead you to expect — because the churn term has to agree
  * before a contact happens, so two models must both be wrong.
  */

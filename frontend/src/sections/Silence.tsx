@@ -9,6 +9,7 @@ import PolicySpaceGuard from "../components/PolicySpaceGuard";
  * no message sent — for three genuinely different reasons. */
 export default function Silence({
   dndCases, promiseWindows, futileRetries, contactsSent, totalCases, scatter,
+  scatterCorrelation,
 }: {
   dndCases: number;
   promiseWindows: number;
@@ -19,6 +20,12 @@ export default function Silence({
     tau_hat: number; tau_true: number; contacted: number;
     amount?: number; loss_type?: string;
   }[];
+  /** Correlation for the population the scatter is drawn from — not the batch
+   * model's, which is measured on a different one. Passed in rather than
+   * written into the prose: the sentence exists to explain how wide the cloud
+   * is, so quoting a number from a different population would be describing
+   * some other chart. */
+  scatterCorrelation?: number;
 }) {
   const items = [
     {
@@ -75,7 +82,11 @@ export default function Silence({
                 </p>
                 <p className="rl-dim">
                   The cloud is wide on purpose: predicted and true uplift
-                  correlate around 0.36, so the bottom-right is not empty.
+                  correlate{" "}
+                  {scatterCorrelation != null
+                    ? `at ${scatterCorrelation.toFixed(2)} on these cases`
+                    : "weakly"}
+                  , so the bottom-right is not empty.
                   Every point there is a case the model recommended and was
                   wrong about. A fitted line through this would imply a
                   precision the model does not have.

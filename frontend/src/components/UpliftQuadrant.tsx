@@ -16,7 +16,8 @@ import { motion } from "motion/react";
  * to work cases that a volume-maximising policy would treat as inventory.
  *
  * The second is the honest limit, and it is why this is drawn as a cloud
- * rather than a trend line. Predicted and true uplift correlate around 0.36.
+ * rather than a trend line. Predicted and true uplift correlate around 0.33
+ * on the population this scatter is drawn from.
  * The scatter is wide, the bottom-right quadrant is not empty, and every
  * point in it is a case the model recommended contacting and was wrong about.
  * Drawing a fitted line through this would imply a precision the model does
