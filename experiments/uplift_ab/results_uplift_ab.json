@@ -1,0 +1,135 @@
+{
+  "n_train": 5000,
+  "n_eval": 2000,
+  "eval_draws": 5,
+  "eval_seed": 20270823,
+  "correlation_gain_consistent": true,
+  "mean_correlation_gain": 0.09926642580436103,
+  "value_effect_consistent": false,
+  "mean_value_delta_per_1000": -8181.931357804662,
+  "value_delta_per_draw": [
+    -8274.373069764057,
+    -13653.327895979106,
+    -13490.178921792016,
+    10505.849741697719,
+    -15997.626643185853
+  ],
+  "dnd_rate_effect_consistent": true,
+  "per_draw": [
+    {
+      "eval_seed": 20270823,
+      "single": {
+        "incremental_per_1000_cases": 461615.66747009906,
+        "ci_low": 309884.0287169211,
+        "ci_high": 626860.7696981549,
+        "correlation": 0.33835831988718107,
+        "treatment_recovery_rate": 0.35343035343035345,
+        "contacts": 448,
+        "pct_contacts_to_do_not_disturbs": 0.10491071428571429
+      },
+      "ensemble": {
+        "incremental_per_1000_cases": 453341.294400335,
+        "ci_low": 304437.190151552,
+        "ci_high": 615788.9773605944,
+        "correlation": 0.4488889506128792,
+        "treatment_recovery_rate": 0.3575883575883576,
+        "contacts": 472,
+        "pct_contacts_to_do_not_disturbs": 0.1016949152542373
+      },
+      "value_delta": -8274.373069764057,
+      "corr_delta": 0.11053063072569813
+    },
+    {
+      "eval_seed": 20270923,
+      "single": {
+        "incremental_per_1000_cases": 370526.95699653524,
+        "ci_low": 213715.8945811597,
+        "ci_high": 527068.7268445855,
+        "correlation": 0.37314912075963863,
+        "treatment_recovery_rate": 0.3387096774193548,
+        "contacts": 535,
+        "pct_contacts_to_do_not_disturbs": 0.09719626168224299
+      },
+      "ensemble": {
+        "incremental_per_1000_cases": 356873.62910055614,
+        "ci_low": 202701.63928192505,
+        "ci_high": 509298.94010204304,
+        "correlation": 0.4531976118349352,
+        "treatment_recovery_rate": 0.3407258064516129,
+        "contacts": 597,
+        "pct_contacts_to_do_not_disturbs": 0.08710217755443886
+      },
+      "value_delta": -13653.327895979106,
+      "corr_delta": 0.08004849107529655
+    },
+    {
+      "eval_seed": 20271023,
+      "single": {
+        "incremental_per_1000_cases": 341751.1486029814,
+        "ci_low": 160505.49442857594,
+        "ci_high": 506451.9621787125,
+        "correlation": 0.3397628779453261,
+        "treatment_recovery_rate": 0.34215686274509804,
+        "contacts": 527,
+        "pct_contacts_to_do_not_disturbs": 0.1461100569259962
+      },
+      "ensemble": {
+        "incremental_per_1000_cases": 328260.9696811894,
+        "ci_low": 143740.5973300153,
+        "ci_high": 492077.51898670924,
+        "correlation": 0.46067535203723176,
+        "treatment_recovery_rate": 0.3480392156862745,
+        "contacts": 561,
+        "pct_contacts_to_do_not_disturbs": 0.11229946524064172
+      },
+      "value_delta": -13490.178921792016,
+      "corr_delta": 0.12091247409190564
+    },
+    {
+      "eval_seed": 20271123,
+      "single": {
+        "incremental_per_1000_cases": 345386.81726571306,
+        "ci_low": 178585.73058488432,
+        "ci_high": 517108.2628042634,
+        "correlation": 0.359936640374094,
+        "treatment_recovery_rate": 0.3350253807106599,
+        "contacts": 493,
+        "pct_contacts_to_do_not_disturbs": 0.11967545638945233
+      },
+      "ensemble": {
+        "incremental_per_1000_cases": 355892.6670074108,
+        "ci_low": 188248.96249794782,
+        "ci_high": 525426.9034123548,
+        "correlation": 0.4529015760202427,
+        "treatment_recovery_rate": 0.34213197969543147,
+        "contacts": 530,
+        "pct_contacts_to_do_not_disturbs": 0.08490566037735849
+      },
+      "value_delta": 10505.849741697719,
+      "corr_delta": 0.09296493564614872
+    },
+    {
+      "eval_seed": 20271223,
+      "single": {
+        "incremental_per_1000_cases": 257399.50016583508,
+        "ci_low": 61949.60579088571,
+        "ci_high": 437969.60711035726,
+        "correlation": 0.35098661520404145,
+        "treatment_recovery_rate": 0.35294117647058826,
+        "contacts": 510,
+        "pct_contacts_to_do_not_disturbs": 0.08627450980392157
+      },
+      "ensemble": {
+        "incremental_per_1000_cases": 241401.87352264923,
+        "ci_low": 51325.85390270931,
+        "ci_high": 420106.4078743627,
+        "correlation": 0.44286221268679754,
+        "treatment_recovery_rate": 0.35500515995872034,
+        "contacts": 537,
+        "pct_contacts_to_do_not_disturbs": 0.08007448789571694
+      },
+      "value_delta": -15997.626643185853,
+      "corr_delta": 0.09187559748275609
+    }
+  ]
+}

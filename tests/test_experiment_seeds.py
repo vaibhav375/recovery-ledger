@@ -44,6 +44,7 @@ EVAL_SEED_SOURCES = {
     "pessimism/run_pessimism.py": EVAL_SEED_PATTERN,
     "dnd_signal/run_dnd_signal.py": EVAL_SEED_PATTERN,
     "horizon/run_horizon.py": EVAL_SEED_PATTERN,
+    "uplift_ab/run_uplift_ab.py": EVAL_SEED_PATTERN,
 }
 
 

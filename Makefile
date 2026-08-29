@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis uplift-ab lambda-sweep
 
 # `uv pip install` honours an ambient VIRTUAL_ENV over the venv it was just
 # told to create. Anyone who runs `make setup` with another virtualenv active
@@ -42,6 +42,14 @@ tier1-hillstrom:
 tier1-criteo:
 	PYTHONPATH=src .venv/bin/python3 experiments/tier1_criteo/run_validation.py \
 		--dataset criteo --sample-frac 0.02 --target-col visit
+
+uplift-ab:
+	PYTHONPATH=src .venv/bin/python3 experiments/uplift_ab/run_uplift_ab.py \
+		--n-eval 2000 --eval-draws 5
+
+lambda-sweep:
+	PYTHONPATH=src .venv/bin/python3 experiments/churn_lambda/run_lambda_sweep.py \
+		--n-eval 2000
 
 horizon:
 	PYTHONPATH=src .venv/bin/python3 experiments/horizon/run_horizon.py \
