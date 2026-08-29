@@ -1,0 +1,72 @@
+{
+  "n_train": 5000,
+  "n_eval": 2000,
+  "eval_seed": 20262823,
+  "uplift_model": "single",
+  "dominance_4_over_2": {
+    "claim": "lambda_churn=4.0 strictly dominates 2.0",
+    "value_point_not_worse": false,
+    "value_indistinguishable_at_95": true,
+    "value_delta_per_1000": -31879.6772941213,
+    "fewer_contacts": true,
+    "lower_dnd_exposure": true,
+    "holds": false
+  },
+  "sweep": [
+    {
+      "lambda_churn": 0.0,
+      "incremental_per_1000_cases": {
+        "point": 372589.69807098014,
+        "ci_low": 283923.5048145895,
+        "ci_high": 458391.3252742265
+      },
+      "contacts": 2051,
+      "pct_contacts_to_do_not_disturbs": 0.22476840565577766,
+      "incremental_rupees_per_contact": 363.3249127947149
+    },
+    {
+      "lambda_churn": 1.0,
+      "incremental_per_1000_cases": {
+        "point": 363648.0758525621,
+        "ci_low": 288033.7774454311,
+        "ci_high": 441019.43235255417
+      },
+      "contacts": 1533,
+      "pct_contacts_to_do_not_disturbs": 0.17286366601435094,
+      "incremental_rupees_per_contact": 474.42671344104645
+    },
+    {
+      "lambda_churn": 2.0,
+      "incremental_per_1000_cases": {
+        "point": 349048.1652145953,
+        "ci_low": 279146.3259892759,
+        "ci_high": 417893.2331707283
+      },
+      "contacts": 1219,
+      "pct_contacts_to_do_not_disturbs": 0.13781788351107466,
+      "incremental_rupees_per_contact": 572.6795163488028
+    },
+    {
+      "lambda_churn": 4.0,
+      "incremental_per_1000_cases": {
+        "point": 317168.487920474,
+        "ci_low": 251395.74255063222,
+        "ci_high": 382350.4481411389
+      },
+      "contacts": 885,
+      "pct_contacts_to_do_not_disturbs": 0.1152542372881356,
+      "incremental_rupees_per_contact": 716.7649444530487
+    },
+    {
+      "lambda_churn": 8.0,
+      "incremental_per_1000_cases": {
+        "point": 268071.2901157241,
+        "ci_low": 210170.97105167698,
+        "ci_high": 323571.644771575
+      },
+      "contacts": 535,
+      "pct_contacts_to_do_not_disturbs": 0.08224299065420561,
+      "incremental_rupees_per_contact": 1002.1356639840153
+    }
+  ]
+}

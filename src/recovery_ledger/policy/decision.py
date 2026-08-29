@@ -283,11 +283,18 @@ class EVDecisionPolicy:
     uncertainty_k: float = 0.0
     churn_model: ChurnRiskModel | None = None
     # Chosen from a measured sweep, not picked by feel. Against lambda_churn=0
-    # this cuts do-not-disturb contacts 20.1% -> 13.6% and raises incremental
-    # rupees per contact 302 -> 450, for a 12% reduction in total incremental
-    # recovery. It also strictly dominates lambda_churn=2.0, which reached the
-    # same total recovery using 21% MORE contacts. Full curve in
-    # experiments/tier2_simulation/REPORT.md.
+    # this cuts do-not-disturb contacts 22.5% -> 11.5% and raises incremental
+    # rupees per contact 363 -> 717, for a 15% reduction in total incremental
+    # recovery.
+    #
+    # It does NOT dominate lambda_churn=2.0. An earlier version of this comment
+    # said it did, citing the same recovery at 21% fewer contacts; that came
+    # from a run the repo no longer reproduces. Re-measured, 4.0 costs
+    # Rs 31,880 per 1,000 cases against 2.0 -- 9.1% of incremental recovery --
+    # to buy 27% fewer contacts and 2.3 points less do-not-disturb exposure.
+    # The intervals overlap, so the loss is not resolved at this sample size,
+    # but it is a trade and is described as one. Regenerate with
+    # `make lambda-sweep`; curve in experiments/churn_lambda/.
     #
     # This is a stated policy choice, not an optimum: a merchant who prices
     # customer goodwill differently should set it differently, which is why it

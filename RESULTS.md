@@ -258,18 +258,26 @@ gets contacted.
 
 Measured sweep of the parameter (from `λ_churn = 0`):
 
-| λ_churn | Incremental ₹ (2,000-case batch) | Contacts | Do-not-disturb % | ₹/contact |
+| λ_churn | Incremental ₹/1000 | Contacts | Do-not-disturb % | ₹/contact |
 |---:|---:|---:|---:|---:|
-| 0 (term off) | 681,976 | 2,257 | 20.1% | 302 |
-| 1.0 | 647,098 | 1,938 | 18.1% | 334 |
-| 2.0 | 603,882 | 1,705 | 16.5% | 354 |
-| **4.0 (default)** | 602,036 | 1,339 | **13.6%** | **450** |
-| 8.0 | 517,442 | 899 | 10.8% | 576 |
+| 0.0 (term off) | 372,590 | 2,051 | 22.5% | 363 |
+| 1.0 | 363,648 | 1,533 | 17.3% | 474 |
+| 2.0 | 349,048 | 1,219 | 13.8% | 573 |
+| **4.0 (default)** | 317,168 | 885 | **11.5**% | **717** |
+| 8.0 | 268,071 | 535 | 8.2% | 1,002 |
 
-**λ = 4.0 is the default because it strictly dominates λ = 2.0** — the same
-total recovery using 21% fewer contacts and reaching meaningfully fewer
-do-not-disturbs. Beyond it the trade turns real: λ = 8.0 buys another 2.8
-points of do-not-disturb avoidance for 14% of incremental recovery.
+**λ = 4.0 does not dominate λ = 2.0 — it trades.** An earlier version of this
+section said it "strictly dominates", on the strength of a run this repo no
+longer reproduces. Re-measured (`make lambda-sweep`), moving from 2.0 to 4.0
+costs ₹31,880 per 1,000 cases (9.1% of incremental recovery) and buys
+27% fewer contacts and 2.3 points less do-not-disturb exposure. The
+two intervals overlap, so the revenue difference is not resolved at this sample
+size — but unresolved is not the same as absent, and the script records both
+tests separately so the weaker one cannot be quoted as the stronger.
+
+The curve is monotone in both directions across the whole grid: every increase
+in λ buys less contact and less do-not-disturb exposure for less money. There
+is no free point on it.
 
 **This is a policy choice, not an optimum.** A merchant who prices customer
 goodwill differently should set it differently, which is exactly why the

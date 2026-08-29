@@ -1345,3 +1345,56 @@ a doc test that fails the build if the prose and the artifact disagree. The
 generalisable lesson is the same one the sensitivity sweep and the off-policy
 evaluation experiment each taught this month: a number measured once, at
 whatever n was convenient, is not a measurement.
+
+---
+
+## 2026-08-30 — "Strictly dominates" was a claim about a run that no longer exists
+
+The 2.85x entry above set `lambda_churn = 4.0` on the grounds that it
+**strictly dominates 2.0**: the same total recovery at 21% fewer contacts, and
+so "not a judgement call, it is a dominated option being discarded". Two things
+were wrong with that, and neither was visible at the time.
+
+**The numbers had no artifact.** The sweep existed as a table in this log, a
+table in RESULTS.md, and a comment in `decision.py`. Nothing regenerated it and
+nothing checked it — in a repo whose first rule is that every published number
+comes from re-runnable code. It went unnoticed because the table looked exactly
+like the ones that *are* backed.
+
+**They were derived from a stale baselines run.** Found separately while
+A/B-testing an uplift model: `blast_everyone` — a policy that consults no model
+and is provably deterministic — changed between two runs. The committed
+`results_baselines.json` had drifted out of sync with the code, and the λ curve
+was a decomposition of it. (`results.json` was checked the same way and
+reproduces bit-exactly, so the B1 headline was never affected.)
+
+Regenerated as `make lambda-sweep` with an artifact:
+
+| λ_churn | incremental/1000 | contacts | dnd% | ₹/contact |
+|---|---|---|---|---|
+| 0 | 372,590 | 2,051 | 22.5% | 363 |
+| 1.0 | 363,648 | 1,533 | 17.3% | 474 |
+| 2.0 | 349,048 | 1,219 | 13.8% | 573 |
+| 4.0 | 317,168 | 885 | 11.5% | 717 |
+| 8.0 | 268,071 | 535 | 8.2% | 1,002 |
+
+**4.0 does not dominate 2.0.** It costs ₹31,880 per 1,000 cases — 9.1% of
+incremental recovery — to buy 27% fewer contacts and 2.3 points less
+do-not-disturb exposure. The curve is monotone throughout: every increase in λ
+buys less contact and less exposure for less money. There is no free point on
+it, and the default is a judgement call after all.
+
+The subtler error is the one worth keeping. The first re-run *did* report
+dominance holding, because the check asked whether the confidence intervals
+overlapped. They do. But overlapping intervals say the difference is
+unresolved at this sample size, which is a statement about power — not a
+statement that the point estimate is no worse. Writing the check that way would
+have let a 9% drop in recovered value be published as "dominates" with an
+artifact behind it, which is worse than having no artifact at all: it is the
+appearance of rigour pointed at the wrong question. The script now records the
+point test and the interval test separately, and `holds` requires the point
+test.
+
+Same lesson as the sensitivity sweep, the off-policy evaluation, the DND
+signal, and the uplift A/B run this week: a number measured once is not a
+measurement — and a test that can only pass is not a test.
