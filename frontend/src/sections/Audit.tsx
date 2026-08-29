@@ -63,9 +63,8 @@ function OffPolicy({ ope }: { ope: any }) {
       finding="found a limit"
     >
       <p>
-        Value a targeting rule you never deployed, from the logs of the one you
-        did — then check the answer against the truth, over {reps} independent
-        logging draws.
+        Value a rule you never deployed from the logs of the one you did, then
+        check it against the truth. {reps} logging draws.
       </p>
       <table className="rl-audit-table">
         <thead>
@@ -94,11 +93,9 @@ function OffPolicy({ ope }: { ope: any }) {
       </table>
       <p className="rl-audit-note">
         Nominal coverage is 95%. One opt-out on a large subscription outweighs
-        the gap between two policies, so the rupee estimate has no coverage
-        guarantee — choose policies on the bounded outcome. Without any
-        exploration the logs describe only themselves: at ε = 0 exactly one of
-        six policies is even identified, while effective sample size still
-        looks healthy.
+        the gap between two policies, so the rupee estimate carries no coverage
+        guarantee — choose policies on the bounded outcome. Without exploration
+        the logs describe only themselves: one policy of six is identified.
       </p>
     </Card>
   );
@@ -115,9 +112,9 @@ function DndSignal({ dnd }: { dnd: any }) {
       finding="corrected our own claim"
     >
       <p>
-        Do-not-disturbs opt out more when contacted — the evidence that churn
-        risk is a signal independent of predicted uplift. It was published as{" "}
-        <span className="rl-audit-was">1.93x</span>, measured once at n = 5,000.
+        How much more do-not-disturbs opt out when contacted — the signal N2
+        rests on. Published as{" "}
+        <span className="rl-audit-was">1.93x</span> from one n = 5,000 draw.
       </p>
       <div className="rl-audit-figure">
         <span className="rl-audit-value">{dnd.ratio.toFixed(2)}x</span>
@@ -133,10 +130,10 @@ function DndSignal({ dnd }: { dnd: any }) {
             {Math.min(...small.ratios).toFixed(2)}x–
             {Math.max(...small.ratios).toFixed(2)}x
           </b>{" "}
-          across seeds — a spread wider than the effect, with draws landing on
-          both sides of 1.0. The claim survives in direction and not in
-          magnitude: the interval excludes 1.0, and opt-out without contact is
-          exactly {dnd.opt_out_rate_without_contact.toFixed(4)}.
+          across seeds — wider than the effect, landing on both sides of 1.0.
+          The claim survives in direction, not magnitude: the interval excludes
+          1.0, and opt-out without contact is exactly{" "}
+          {dnd.opt_out_rate_without_contact.toFixed(4)}.
         </p>
       )}
     </Card>
@@ -162,10 +159,9 @@ function Pessimism({ p }: { p: any }) {
       finding="fixed what the audit found"
     >
       <p>
-        τ̂ = 0.02 from a model that understands a segment and τ̂ = 0.02 from a
-        model that is guessing produce identical decisions. A bootstrap
-        ensemble reports a per-case standard error, and the policy acts on{" "}
-        <code>τ̂ − k·se</code>.
+        τ̂ = 0.02 from a model that understands a segment and τ̂ = 0.02 from one
+        that is guessing decide identically. So the policy acts on{" "}
+        <code>τ̂ − k·se</code> instead.
       </p>
       <CautionCurve draws={draws} />
       <p className="rl-audit-note">
@@ -174,10 +170,9 @@ function Pessimism({ p }: { p: any }) {
         {money(mean(i0, "net_value_per_contact"))} to{" "}
         <b>{money(mean(ib, "net_value_per_contact"))}</b>. But net value moves only{" "}
         {money(Math.min(...gains))}–{money(Math.max(...gains))} per case, and
-        the best k is <b>not stable</b> across draws ({p.best_k_per_draw.join(", ")}), so it is
-        reported as a range rather than a tuned value. A single draw called
-        this a clean +7.4% win. Caution keeps buying harm reduction long after
-        it stops buying money.
+        the best k is <b>not stable</b> across draws ({p.best_k_per_draw.join(", ")}) — a single
+        draw called this a clean +7.4% win. Caution keeps buying harm reduction
+        long after it stops buying money.
       </p>
     </Card>
   );
@@ -202,10 +197,8 @@ function Fairness({ f }: { f: any }) {
       finding="found what rates cannot see"
     >
       <p>
-        Contact rates by language, B2B status, amount and loss type,
-        conditioned on the two things the objective is entitled to use, over{" "}
-        {f.n_permutations?.toLocaleString("en-IN")} label permutations across{" "}
-        {f.n_hypotheses_tested} hypotheses.
+        Contact rates by language, B2B status, amount and loss type, over{" "}
+        {f.n_permutations?.toLocaleString("en-IN")} label permutations.
       </p>
       <table className="rl-audit-table">
         <thead>
@@ -240,13 +233,12 @@ function Fairness({ f }: { f: any }) {
         </tbody>
       </table>
       <p className="rl-audit-note">
-        Language is even and no gap survives conditioning. The problem is
-        elsewhere: <b>the policy acts most confidently on the segments the
-        model understands least</b>. B2B gets the highest contact rate and the
-        worst correlation with truth; the smallest invoices correlate at
-        essentially zero and are contacted more than the quartiles the model
-        reads best. That is epistemic inequality, and an audit that only checks
-        contact rates passes it without comment.
+        No gap survives conditioning. The problem is elsewhere: <b>the policy
+        acts most confidently on the segments the model understands least</b>.
+        B2B gets the highest contact rate and the worst correlation with truth;
+        the smallest invoices correlate at essentially zero and are contacted
+        more than the quartiles the model reads best. An audit that only checks
+        contact rates passes that without comment.
       </p>
     </Card>
   );

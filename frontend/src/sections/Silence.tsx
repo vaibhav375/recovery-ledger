@@ -74,11 +74,10 @@ export default function Silence({
               <div>
                 <h3>The quadrant conventional dunning cannot represent.</h3>
                 <p>
-                  Every case, plotted as what the model predicted against what
-                  was actually true. Below the line, contacting a customer
-                  makes them <b>less</b> likely to pay — and a system built to
-                  maximise contact has no way to express a customer it should
-                  not contact.
+                  Every case, predicted against true. Below the line,
+                  contacting a customer makes them <b>less</b> likely to pay —
+                  and a system built to maximise contact has no way to express
+                  a customer it should not contact.
                 </p>
                 <p className="rl-dim">
                   The cloud is wide on purpose: predicted and true uplift
@@ -88,8 +87,7 @@ export default function Silence({
                     : "weakly"}
                   , so the bottom-right is not empty.
                   Every point there is a case the model recommended and was
-                  wrong about. A fitted line through this would imply a
-                  precision the model does not have.
+                  wrong about.
                 </p>
               </div>
               <UpliftQuadrant points={scatter} />
@@ -103,19 +101,16 @@ export default function Silence({
               <div className="rl-space-copy">
                 <h3>The same decision, with the axis the flat chart had to drop.</h3>
                 <p>
-                  The agent contacts on expected value, and expected value is
-                  predicted uplift <b>times rupees at risk</b> — so the
-                  boundary between contacting and waiting is a surface over two
-                  inputs, not a line over one. The chart above cannot answer
-                  why a case with almost no predicted uplift was contacted
-                  anyway. This one can: it was a large invoice.
+                  The agent contacts on predicted uplift <b>times rupees at
+                  risk</b>, so the boundary is a surface, not a line. It answers
+                  what the flat chart cannot: why a case with almost no
+                  predicted uplift was contacted anyway. It was a large
+                  invoice.
                 </p>
                 <p className="rl-dim">
                   Height is what contact was really worth, which the model
                   never sees. Below the plane it destroys value. Drag to
-                  rotate — a static 3D projection would be strictly worse than
-                  a flat chart, and points hiding behind other points is only
-                  acceptable because you can move them.
+                  rotate.
                 </p>
               </div>
               <PolicySpaceGuard points={scatter as any} />

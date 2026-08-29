@@ -158,11 +158,8 @@ export default function Console() {
       </div>
 
       <p className="rl-live-caveat">
-        The throttle is a deliberate pause between ledger writes so a human can
-        read the loop and reach the kill switch. It never touches the reported
-        timings — every entry below carries the agent's own elapsed
-        milliseconds, and the summary reports agent time and wall-clock time
-        separately.
+        The throttle paces ledger writes so you can read the loop and reach the
+        kill switch. Timings below are the agent's own, not wall-clock.
       </p>
 
       <div className="rl-live-counters">

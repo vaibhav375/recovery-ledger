@@ -257,8 +257,7 @@ export default function Frontier({ data }: { data: Dashboard }) {
                 <p>
                   more incremental revenue than contacting a{" "}
                   <b>comparable number of cases at random</b>, and the
-                  intervals {overlapsRandom ? "overlap" : "do not overlap"}. That is
-                  the targeting model earning its place — not contact volume.
+                  intervals {overlapsRandom ? "overlap" : "do not overlap"}.
                 </p>
               </div>
               <div>
@@ -274,8 +273,7 @@ export default function Frontier({ data }: { data: Dashboard }) {
                     </>
                   ) : (
                     <>more total recovery, with non-overlapping intervals.</>
-                  )}{" "}
-                  The contact efficiency is the robust claim.
+                  )}
                 </p>
               </div>
               <div>
@@ -285,7 +283,6 @@ export default function Frontier({ data }: { data: Dashboard }) {
                 <p>
                   of incremental recovery per message, against{" "}
                   {money(blast.point / (blast.contacts / 2))} for mass-contact.
-                  Same plane, different economics.
                 </p>
               </div>
             </div>

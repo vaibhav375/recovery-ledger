@@ -59,8 +59,8 @@ export default function Kernel({ data }: { data: Dashboard }) {
 
         <InView index={2}>
           <p className="rl-kernel-note">
-            A refusal is the system working. It is drawn in the accent colour
-            rather than red — red is kept for a violation, and there are none.
+            A refusal is the system working. Red is reserved for a violation,
+            and there are none.
             {busiest && busiest.failed > 0 && (
               <>
                 {" "}Every one of these refusals came from a single rule:{" "}

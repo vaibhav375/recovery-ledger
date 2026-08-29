@@ -50,11 +50,8 @@ export default function Calibration({ cal }: { cal: any }) {
           <div className="rl-cal-copy">
             <InView index={1}>
               <p>
-                Every earlier claim about this uplift model ran through one
-                number: how closely its predictions track a customer trait only
-                the simulator can see. No deployment has that number. This check
-                needs nothing but a holdout — ten bins ranked by what the model
-                predicted, each one scored against its own uncontacted cases.
+                Ten bins, each scored against its own uncontacted cases — the
+                one check on this model that a real deployment could also run.
               </p>
             </InView>
             <InView index={2}>
@@ -63,23 +60,19 @@ export default function Calibration({ cal }: { cal: any }) {
                 {v.mean_top_minus_bottom.toFixed(3)} more payment probability per
                 contact than the bottom, in every draw. The magnitudes do not:
                 predictions are spread about a third wider than the effects they
-                predict. The error concentrates at the two ends — too pessimistic
-                about the lowest bin, too optimistic about the highest, small and
-                unsigned in between.
+                predict, and the error sits at the two ends.
               </p>
             </InView>
             <InView index={3}>
               <p className="rl-cal-note">
                 The bin the agent refuses to contact is{" "}
-                <b>{pct(v.bottom_decile_true_dnd_share)}</b> customers who really
-                are worth less contacted, against{" "}
-                {pct(v.population_true_dnd_share)} of everyone. The model finds
-                them. It then prices them at{" "}
-                {v.bottom_decile_predicted_uplift.toFixed(3)} when they measure{" "}
-                {v.bottom_decile_realised_uplift.toFixed(3)}, on an interval
-                covering zero in all {cal.eval_draws} draws. It locates them
-                without measuring them — which is why the decision to stay quiet
-                runs through a second model, not this one.
+                <b>{pct(v.bottom_decile_true_dnd_share)}</b> customers genuinely
+                worth less contacted, against{" "}
+                {pct(v.population_true_dnd_share)} of everyone — but it prices
+                them at {v.bottom_decile_predicted_uplift.toFixed(3)} when they
+                measure {v.bottom_decile_realised_uplift.toFixed(3)}. It locates
+                them without measuring them, which is why staying quiet runs
+                through a second model.
               </p>
             </InView>
           </div>
@@ -103,10 +96,9 @@ export default function Calibration({ cal }: { cal: any }) {
             </ul>
             <p className="rl-cal-foot">
               {cal.eval_draws} draws × {cal.n_eval.toLocaleString("en-IN")} cases,
-              randomised contact, population disjoint from every other experiment
-              on this page. The slope is not corrected — a fix would move the
-              agent's contact threshold, so it needs its own replicated test
-              rather than a patch.
+              randomised contact. The slope is not corrected: a fix would move
+              the agent's contact threshold, so it needs its own replicated
+              test.
             </p>
           </div>
         </InView>
