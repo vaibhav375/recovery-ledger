@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis
 
 # `uv pip install` honours an ambient VIRTUAL_ENV over the venv it was just
 # told to create. Anyone who runs `make setup` with another virtualenv active
@@ -42,6 +42,14 @@ tier1-hillstrom:
 tier1-criteo:
 	PYTHONPATH=src .venv/bin/python3 experiments/tier1_criteo/run_validation.py \
 		--dataset criteo --sample-frac 0.02 --target-col visit
+
+horizon:
+	PYTHONPATH=src .venv/bin/python3 experiments/horizon/run_horizon.py \
+		--n-eval 2000 --eval-draws 3
+
+dr-diagnosis:
+	cd experiments/tier1_criteo && PYTHONPATH=../../src ../../.venv/bin/python3 \
+		run_dr_diagnosis.py --draws 3
 
 demo:
 	PYTHONPATH=src .venv/bin/python3 -m recovery_ledger.cli
