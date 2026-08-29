@@ -58,10 +58,32 @@ implementation is correct.
 | DR | +0.0462 | +0.0067 |
 
 IPS and SNIPS match exactly on both. **DR is the honest weak spot** — close
-on Hillstrom (balanced 50/50 arms), materially off on Criteo (85/15
-imbalance). Diagnosed as outcome-model calibration on the minority arm,
-partially fixed by refitting per-arm, not fully closed. Documented in
-`experiments/tier1_criteo/REPORT.md` rather than dropped from the table.
+on Hillstrom (balanced 50/50 arms), low on Criteo (85/15 imbalance).
+
+That gap was previously described as "29% low", which overstated what one
+number can support. `make dr-diagnosis` re-measures it on three *disjoint*
+blocks of the Criteo pool, with a paired bootstrap on the treated-minus-control
+contrast rather than two independently bootstrapped intervals:
+
+| Block | Direct ATE | DR | DR 95% CI | Covers truth |
+|---|---:|---:|---|:--:|
+| 1 | +0.0096 | +0.0054 | [+0.0026, +0.0080] | no |
+| 2 | +0.0074 | +0.0071 | [+0.0044, +0.0101] | yes |
+| 3 | +0.0112 | +0.0075 | [+0.0045, +0.0104] | no |
+
+DR reads low in all three blocks, but by 4%, 33% and 44% of the true effect —
+so "29% low" was one draw's number, not a stable bias magnitude. Under the
+pre-registered rule (bias requires *both* every interval missing truth *and* a
+consistent sign) the verdict is **inconclusive, leaning bias**. IPS covers the
+truth in 3/3.
+
+What the diagnosis does rule out is the variance explanation: DR's paired
+interval is 0.82x the width of IPS's, so it is not merely noisier. And with a
+known constant propensity DR is unbiased for any outcome model, which points
+at the cross-fitted q_hat on a 15% control arm carrying a 6.7x importance
+weight. Not closed — but now characterised precisely enough to be actionable,
+and IPS is the estimator to trust on this dataset. See
+`experiments/tier1_criteo/REPORT.md`.
 
 ---
 

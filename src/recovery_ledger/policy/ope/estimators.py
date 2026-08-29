@@ -252,6 +252,44 @@ def doubly_robust_value(
     that failure mode: each model only ever needs to represent one arm's
     outcome surface.
     """
+    contrib = dr_contributions(
+        outcome, treatment, features, propensity, policy_actions,
+        outcome_model=outcome_model, n_folds=n_folds, seed=seed,
+    )
+    n = len(outcome)
+    point = float(np.mean(contrib))
+
+    def stat(idx: NDArray[np.int_]) -> float:
+        return float(np.mean(contrib[idx]))
+
+    lo, hi, degenerate = _bootstrap_ci(contrib, stat, n_boot, seed, confidence)
+    return PolicyValueEstimate(
+        "DR", point, lo, hi, n=n, confidence=confidence,
+        degenerate_bootstrap_draws=degenerate,
+        **_support(treatment, propensity, policy_actions),
+    )
+
+
+def dr_contributions(
+    outcome: NDArray[np.float64],
+    treatment: NDArray[np.int_],
+    features: NDArray[np.float64],
+    propensity: NDArray[np.float64],
+    policy_actions: NDArray[np.int_],
+    *,
+    outcome_model: ClassifierMixin,
+    n_folds: int = 5,
+    seed: int = 0,
+) -> NDArray[np.float64]:
+    """The per-sample DR terms, before they are averaged.
+
+    Exposed separately because the mean is not the only thing worth asking of
+    them. Comparing two policies needs the *paired* difference of these terms
+    on the same resampled rows: the two policy values share the data, the
+    fitted q_hat, and most of the correction, so bootstrapping them
+    independently and differencing the intervals overstates the uncertainty of
+    the contrast by treating shared noise as if it cancelled twice.
+    """
     n = len(outcome)
     q_hat_logged = np.zeros(n)
     q_hat_policy = np.zeros(n)
@@ -278,18 +316,7 @@ def doubly_robust_value(
 
     weights = _match_weights(treatment, propensity, policy_actions)
     correction = weights * (outcome - q_hat_logged)
-    contrib = q_hat_policy + correction
-    point = float(np.mean(contrib))
-
-    def stat(idx: NDArray[np.int_]) -> float:
-        return float(np.mean(contrib[idx]))
-
-    lo, hi, degenerate = _bootstrap_ci(contrib, stat, n_boot, seed, confidence)
-    return PolicyValueEstimate(
-        "DR", point, lo, hi, n=n, confidence=confidence,
-        degenerate_bootstrap_draws=degenerate,
-        **_support(treatment, propensity, policy_actions),
-    )
+    return q_hat_policy + correction
 
 
 def always_treat_policy(n: int) -> NDArray[np.int_]:

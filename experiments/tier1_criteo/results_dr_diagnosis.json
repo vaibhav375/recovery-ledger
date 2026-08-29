@@ -1,0 +1,77 @@
+{
+  "sample_frac": 0.02,
+  "n_boot": 500,
+  "draws": 3,
+  "disjoint_blocks": true,
+  "dr_draws_covering_direct": 1,
+  "ips_draws_covering_direct": 3,
+  "dr_gap_sign_consistent": true,
+  "dr_mean_ci_width": 0.005662933618228522,
+  "ips_mean_ci_width": 0.00692273615145286,
+  "verdict": "inconclusive",
+  "per_draw": [
+    {
+      "seed": 20260823,
+      "n_test": 93198,
+      "direct_ate": 0.009566998883439745,
+      "dr": {
+        "ate": 0.00537763553496155,
+        "ci_low": 0.0026051073505611324,
+        "ci_high": 0.007989357657083567,
+        "covers_direct": false,
+        "gap_to_direct": -0.004189363348478195,
+        "name": "dr"
+      },
+      "ips": {
+        "ate": 0.00949978511957749,
+        "ci_low": 0.006019847517991627,
+        "ci_high": 0.013077090368542002,
+        "covers_direct": true,
+        "gap_to_direct": -6.72137638622547e-05,
+        "name": "ips"
+      }
+    },
+    {
+      "seed": 20261323,
+      "n_test": 93197,
+      "direct_ate": 0.007435013117391177,
+      "dr": {
+        "ate": 0.00712312115061234,
+        "ci_low": 0.00442981516960236,
+        "ci_high": 0.010138236980685124,
+        "covers_direct": true,
+        "gap_to_direct": -0.00031189196677883745,
+        "name": "dr"
+      },
+      "ips": {
+        "ate": 0.007295510043550695,
+        "ci_low": 0.003966097233196353,
+        "ci_high": 0.010760748586734929,
+        "covers_direct": true,
+        "gap_to_direct": -0.00013950307384048236,
+        "name": "ips"
+      }
+    },
+    {
+      "seed": 20261823,
+      "n_test": 93197,
+      "direct_ate": 0.011175077166794,
+      "dr": {
+        "ate": 0.0075072282723981235,
+        "ci_low": 0.004510755159531463,
+        "ci_high": 0.010406883896611832,
+        "covers_direct": false,
+        "gap_to_direct": -0.0036678488943958773,
+        "name": "dr"
+      },
+      "ips": {
+        "ate": 0.011371474907310839,
+        "ci_low": 0.007796551678732241,
+        "ci_high": 0.01471286592900187,
+        "covers_direct": true,
+        "gap_to_direct": 0.00019639774051683802,
+        "name": "ips"
+      }
+    }
+  ]
+}

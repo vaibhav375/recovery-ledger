@@ -125,3 +125,76 @@ both. DR is directionally correct and close on both, with a diagnosed,
 partially-fixed, not-fully-closed bias under high treatment-ratio imbalance
 that should be revisited before DR estimates are used for anything more than
 a cross-check against IPS/SNIPS in Tier 2.
+
+---
+
+## Addendum: is DR biased on Criteo, or just imprecise?
+
+`make dr-diagnosis` → `results_dr_diagnosis.json`
+
+This report previously recorded DR recovering +0.0067 against a direct arm-mean
+ATE of +0.0094 and called it "29% low". That phrase describes a single point
+estimate, and a point estimate below truth is consistent with two different
+facts — a systematic bias worth fixing, or one draw from a wide sampling
+distribution. Nothing in the repo could tell them apart, so a documented weak
+spot sat unactionable.
+
+Two things were wrong with the evidence, both fixed here.
+
+**The intervals were not paired.** The artifact reports separate bootstrap
+intervals for the always-treat and never-treat values. Differencing those by eye
+double-counts the noise they share: the two values are computed on the same
+rows, from the same cross-fitted `q_hat`, with overlapping correction terms.
+The diagnosis resamples rows once and differences within each draw, giving the
+contrast its own interval — 0.0057 wide against the 0.0075 you get by adding
+the marginals.
+
+**The draws were not independent.** The first version of the diagnosis drew
+three train/test splits of the *same* pooled sample. Two 30% test sets from one
+pool share about a third of their rows, so agreement between them is partly an
+artifact of shared data. The pool is now partitioned into three non-overlapping
+blocks of ~93,000 rows, asserted disjoint at runtime. That the direct ATE itself
+varies across blocks (+0.0096, +0.0074, +0.0112) is the visible sign that these
+are genuinely different samples.
+
+### Result
+
+| Block | n | Direct ATE | DR | DR 95% CI (paired) | Covers | Gap |
+|---|---:|---:|---:|---|:--:|---:|
+| 1 | 93,198 | +0.00957 | +0.00538 | [+0.00261, +0.00799] | no | −43.8% |
+| 2 | 93,197 | +0.00744 | +0.00712 | [+0.00443, +0.01014] | yes | −4.2% |
+| 3 | 93,197 | +0.01118 | +0.00751 | [+0.00451, +0.01041] | no | −32.8% |
+
+IPS covers the truth in 3/3 blocks. DR covers it in 1/3.
+
+**Verdict: inconclusive, leaning bias** — under a rule fixed before the run,
+which requires *both* that every interval miss the truth *and* that the sign be
+consistent. The sign is consistent (low in all three). The intervals are not:
+block 2 lands within 4% of truth. So the direction replicates and the magnitude
+does not, which is precisely why "29% low" should never have been stated as a
+property of the estimator. It was a property of one subsample.
+
+### What this rules out
+
+The variance explanation, which was the obvious first hypothesis: with 85%
+treated, the control arm holds 15% of the rows at a 6.7x importance weight
+against the treated arm's 1.2x, so a wide never-treat interval is expected. But
+DR's paired contrast interval is **0.82x the width of IPS's** — DR is the more
+precise of the two here, not the noisier one. Imprecision cannot explain a gap
+this consistent in sign.
+
+That leaves the outcome model. Note what it does *not* leave: with a known
+constant propensity, the DR correction term is unbiased for any `q_hat`
+whatsoever, so a merely miscalibrated outcome model should not move DR's
+expectation at all. A residual bias under a known propensity points at the
+cross-fitting — most plausibly that `q_hat` for the minority arm is fit on
+folds where that arm is scarce, making its errors correlated with the fold
+assignment rather than independent of it. That is a specific, testable
+mechanism, and it is not tested here.
+
+### Practical consequence
+
+Use IPS on this dataset. It is unbiased under the known design propensity,
+covers the truth in every block, and its only cost — a wider interval — is the
+honest one. DR's extra precision is not free if it is buying that precision
+with a systematic offset.
