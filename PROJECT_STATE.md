@@ -202,9 +202,17 @@ definition of done — that is §7.
 - [ ] Cost-sensitive channel choice (SMS vs WhatsApp vs voice by expected value).
 
 ### Housekeeping
+- [ ] **41 of 49 commits carry `Co-Authored-By: Claude` trailers**, so GitHub's
+      contributor graph lists a second contributor. Only the most recent 8
+      commits are clean. Stripping them means rewriting every commit
+      (`git filter-branch` or `rebase --exec`) and force-pushing a public repo
+      — every SHA changes and any existing link to a commit breaks.
+      **Owner's decision.** Verify current state with:
+      `git log --format='%(trailers:only)' | grep -c Co-Authored-By`
 - [ ] Commit `8d424b2` says "348 tests" when it was 331. Amending needs a
       force-push. **Owner's call** — a wrong number in a commit message is a
-      small blemish; a rewritten public history may be a larger one.
+      small blemish; a rewritten public history may be a larger one. If the
+      trailer rewrite above happens, fix this in the same pass.
 
 ---
 
