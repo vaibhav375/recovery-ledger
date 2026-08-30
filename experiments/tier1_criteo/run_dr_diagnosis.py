@@ -40,6 +40,35 @@ The outcome decides what RESULTS.md should say. If truth falls inside the
 paired interval, "29% low" is the wrong description and gets replaced by a
 statement about precision. If it falls outside consistently, the bias is real
 and stays documented as a weak spot.
+
+--fold-sweep: is the named mechanism (cross-fitted q_hat, starved on a 15%
+minority arm) actually the cause?
+
+PROJECT_STATE.md's Tier B once proposed "refit with stratified folds that
+guarantee minority-arm balance" as the untested fix. Half of that already
+existed when it was written: `dr_contributions` already stratifies its
+k-fold split on the *joint* of treatment and outcome, and `q_hat` is already
+one model per arm rather than a joint model with T as a feature (the
+docstring on `doubly_robust_value` records that an earlier joint-model
+version *was* measurably biased for exactly this reason). So "refit with
+stratified folds" is not an outstanding step -- it is already what ships.
+
+What is untested is narrower and still open: does the residual gap respond
+to the cross-fitting configuration *at all*? If starving the minority arm's
+fold-local training set is really the mechanism, more folds should help --
+each fold then holds out a smaller slice, leaving more of the scarce control
+arm available to train on. This flag sweeps n_folds in {2, 5, 10, 20} across
+the same three disjoint blocks above and checks whether coverage and the gap
+respond.
+
+FOLD_SWEEP_RULE (pre-registered before running, same discipline as the
+bias/noise/inconclusive rule above): "The cross-fitting hypothesis predicts
+the gap shrinks as folds increase -- more folds means more training data per
+fold and a better-conditioned minority arm. It is CONFIRMED if coverage rises
+to 3/3 at higher fold counts. It is REFUTED if coverage and the mean gap are
+essentially flat across 2 -> 20 folds, which would mean the residual gap has
+some other cause and the named mechanism is not it. Anything else is
+UNRESOLVED."
 """
 
 from __future__ import annotations
@@ -61,6 +90,15 @@ from run_validation import SEED, load_criteo
 
 HERE = Path(__file__).parent
 
+FOLD_SWEEP_RULE = (
+    "The cross-fitting hypothesis predicts the gap shrinks as folds increase "
+    "-- more folds means more training data per fold and a better-conditioned "
+    "minority arm. It is CONFIRMED if coverage rises to 3/3 at higher fold "
+    "counts. It is REFUTED if coverage and the mean gap are essentially flat "
+    "across 2 -> 20 folds, which would mean the residual gap has some other "
+    "cause and the named mechanism is not it. Anything else is UNRESOLVED."
+)
+
 
 def paired_ate(contrib_treat, contrib_ctrl, *, n_boot: int, seed: int,
                confidence: float = 0.95) -> dict:
@@ -81,19 +119,30 @@ def disjoint_blocks(n: int, k: int, seed: int) -> list[np.ndarray]:
     return [np.sort(b) for b in np.array_split(idx, k)]
 
 
-def one_draw(X, T, Y, prop, block, *, seed: int, n_boot: int) -> dict:
+def dr_for_folds(Xt, Tt, Yt, pt, treat, ctrl, *, n_folds: int, n_boot: int) -> dict:
+    """The paired DR contrast at a given cross-fitting fold count.
+
+    Split out of `one_draw` so `--fold-sweep` can vary n_folds without
+    recomputing the direct ATE and IPS, neither of which depends on n_folds
+    at all -- the only thing that changes with n_folds is what
+    `dr_contributions` does internally.
+    """
+    model = GradientBoostingClassifier(random_state=SEED, n_estimators=80)
+    return paired_ate(
+        dr_contributions(Yt, Tt, Xt, pt, treat, outcome_model=model, n_folds=n_folds, seed=SEED),
+        dr_contributions(Yt, Tt, Xt, pt, ctrl, outcome_model=model, n_folds=n_folds, seed=SEED),
+        n_boot=n_boot, seed=SEED,
+    )
+
+
+def one_draw(X, T, Y, prop, block, *, seed: int, n_boot: int, n_folds: int = 5) -> dict:
     Xt, Tt, Yt, pt = X[block], T[block], Y[block], prop[block]
     n = len(Yt)
     treat, ctrl = always_treat_policy(n), never_treat_policy(n)
 
     direct = float(Yt[Tt == 1].mean() - Yt[Tt == 0].mean())
 
-    model = GradientBoostingClassifier(random_state=SEED, n_estimators=80)
-    dr = paired_ate(
-        dr_contributions(Yt, Tt, Xt, pt, treat, outcome_model=model, seed=SEED),
-        dr_contributions(Yt, Tt, Xt, pt, ctrl, outcome_model=model, seed=SEED),
-        n_boot=n_boot, seed=SEED,
-    )
+    dr = dr_for_folds(Xt, Tt, Yt, pt, treat, ctrl, n_folds=n_folds, n_boot=n_boot)
     ips = paired_ate(
         _match_weights(Tt, pt, treat) * Yt,
         _match_weights(Tt, pt, ctrl) * Yt,
@@ -103,7 +152,109 @@ def one_draw(X, T, Y, prop, block, *, seed: int, n_boot: int) -> dict:
         est["covers_direct"] = bool(est["ci_low"] <= direct <= est["ci_high"])
         est["gap_to_direct"] = est["ate"] - direct
         est["name"] = name
-    return {"seed": seed, "n_test": n, "direct_ate": direct, "dr": dr, "ips": ips}
+    return {"seed": seed, "n_test": n, "n_folds": n_folds, "direct_ate": direct, "dr": dr, "ips": ips}
+
+
+def fold_sweep(X, T, Y, prop, blocks, fold_counts: list[int], *, n_boot: int) -> list[dict]:
+    """Re-run the DR diagnosis at each n_folds in `fold_counts`, on the same
+    three disjoint blocks, holding everything else (sample, seeds, n_boot,
+    model) fixed. Direct ATE and IPS are computed once per block and reused
+    across the sweep since neither depends on n_folds; only the cross-fitted
+    q_hat inside `dr_contributions` does.
+    """
+    block_ctx = []
+    for d, block in enumerate(blocks):
+        seed = SEED + 500 * d
+        Xt, Tt, Yt, pt = X[block], T[block], Y[block], prop[block]
+        n = len(Yt)
+        treat, ctrl = always_treat_policy(n), never_treat_policy(n)
+        direct = float(Yt[Tt == 1].mean() - Yt[Tt == 0].mean())
+        ips = paired_ate(
+            _match_weights(Tt, pt, treat) * Yt,
+            _match_weights(Tt, pt, ctrl) * Yt,
+            n_boot=n_boot, seed=SEED,
+        )
+        ips["covers_direct"] = bool(ips["ci_low"] <= direct <= ips["ci_high"])
+        ips["gap_to_direct"] = ips["ate"] - direct
+        ips["name"] = "ips"
+        block_ctx.append({
+            "seed": seed, "n": n, "Xt": Xt, "Tt": Tt, "Yt": Yt, "pt": pt,
+            "treat": treat, "ctrl": ctrl, "direct": direct, "ips": ips,
+        })
+
+    rows = []
+    for n_folds in fold_counts:
+        per_draw = []
+        for ctx in block_ctx:
+            dr = dr_for_folds(
+                ctx["Xt"], ctx["Tt"], ctx["Yt"], ctx["pt"], ctx["treat"], ctx["ctrl"],
+                n_folds=n_folds, n_boot=n_boot,
+            )
+            dr["covers_direct"] = bool(dr["ci_low"] <= ctx["direct"] <= dr["ci_high"])
+            dr["gap_to_direct"] = dr["ate"] - ctx["direct"]
+            dr["name"] = "dr"
+            per_draw.append({
+                "seed": ctx["seed"], "n_test": ctx["n"], "n_folds": n_folds,
+                "direct_ate": ctx["direct"], "dr": dr, "ips": ctx["ips"],
+            })
+        gaps = [d["dr"]["gap_to_direct"] for d in per_draw]
+        rows.append({
+            "n_folds": n_folds,
+            "coverage": sum(d["dr"]["covers_direct"] for d in per_draw),
+            "n_draws": len(per_draw),
+            "mean_gap": float(np.mean(gaps)),
+            "mean_abs_gap": float(np.mean(np.abs(gaps))),
+            "per_draw": per_draw,
+        })
+    return rows
+
+
+def fold_sweep_verdict(rows: list[dict]) -> str:
+    """Apply FOLD_SWEEP_RULE to the sweep's two extremes (lowest and highest
+    n_folds), fixed here before the sweep is run so the same rule always
+    yields the same verdict for the same numbers -- no eyeballing a curve
+    after seeing it.
+
+    CONFIRMED  coverage at the highest fold count is a clean 3/3, and that is
+               a rise from the lowest fold count (the monotone pattern
+               cross-fitting predicts).
+    REFUTED    coverage is identical at both extremes, and the mean absolute
+               gap at the highest fold count has not shrunk by more than 20%
+               relative to the lowest -- "essentially flat" operationalised
+               as a threshold fixed before the run, not tuned after it.
+    UNRESOLVED anything else.
+    """
+    lo, hi = rows[0], rows[-1]
+    n_draws = lo["n_draws"]
+    if hi["coverage"] == n_draws and hi["coverage"] > lo["coverage"]:
+        return "CONFIRMED"
+    if (hi["coverage"] == lo["coverage"] and lo["mean_abs_gap"] > 0
+            and abs(hi["mean_abs_gap"] - lo["mean_abs_gap"]) < 0.2 * lo["mean_abs_gap"]):
+        return "REFUTED"
+    return "UNRESOLVED"
+
+
+def run_fold_sweep(X, T, Y, prop, blocks, args) -> None:
+    fold_counts = [int(x) for x in args.fold_counts.split(",")]
+    rows = fold_sweep(X, T, Y, prop, blocks, fold_counts, n_boot=args.n_boot)
+
+    print(f"{'n_folds':>8}{'coverage':>10}{'mean gap':>12}{'mean |gap|':>12}")
+    for r in rows:
+        print("%8d%7d/%d%12.5f%12.5f" % (
+            r["n_folds"], r["coverage"], r["n_draws"], r["mean_gap"], r["mean_abs_gap"]))
+
+    verdict = fold_sweep_verdict(rows)
+    print(f"\nrule: {FOLD_SWEEP_RULE}")
+    print(f"\nfold-sweep verdict: {verdict}")
+
+    out = {
+        "sample_frac": args.sample_frac, "n_boot": args.n_boot, "draws": args.draws,
+        "disjoint_blocks": True, "fold_counts": fold_counts,
+        "rule": FOLD_SWEEP_RULE, "verdict": verdict, "rows": rows,
+    }
+    path = HERE / "results_dr_foldsweep.json"
+    path.write_text(json.dumps(out, indent=2))
+    print(f"Wrote {path}")
 
 
 def main() -> None:
@@ -112,6 +263,13 @@ def main() -> None:
     ap.add_argument("--n-boot", type=int, default=500)
     ap.add_argument("--draws", type=int, default=3,
                     help="independent train/test splits; one draw is not a result")
+    ap.add_argument("--fold-sweep", action="store_true",
+                    help="sweep dr_contributions' n_folds (see --fold-counts) across the "
+                         "same disjoint blocks instead of running the single-n_folds "
+                         "diagnosis; tests whether the cross-fitting mechanism named in "
+                         "PROJECT_STATE.md responds to the fold count at all")
+    ap.add_argument("--fold-counts", type=str, default="2,5,10,20",
+                    help="comma-separated n_folds values for --fold-sweep")
     args = ap.parse_args()
 
     X, T, Y, prop, _ = load_criteo(args.sample_frac, "visit")
@@ -120,6 +278,11 @@ def main() -> None:
     blocks = disjoint_blocks(len(Y), args.draws, SEED)
     assert sum(len(b) for b in blocks) == len(Y)
     assert len(set().union(*(set(b.tolist()) for b in blocks))) == len(Y), "blocks overlap"
+
+    if args.fold_sweep:
+        run_fold_sweep(X, T, Y, prop, blocks, args)
+        return
+
     draws = [one_draw(X, T, Y, prop, b, seed=SEED + 500 * d, n_boot=args.n_boot)
              for d, b in enumerate(blocks)]
 

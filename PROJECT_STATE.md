@@ -2,7 +2,7 @@
 
 **Track 03 (AI Revenue Recovery), Razorpay AI Buildathon.**
 Repo: https://github.com/vaibhav375/recovery-ledger (public)
-Deadline: **5 September 2026**. Last updated: **30 August 2026** (6 days out).
+Deadline: **5 September 2026**. Last updated: **31 August 2026** (5 days out).
 
 > ## How to use this file
 >
@@ -74,7 +74,7 @@ All from committed artifacts, all reproducible from the listed target.
 | Compliance kernel | **13 rules**, all with provenance citations | `make redteam` |
 | Ledger | 34,304 entries, chain valid | `make eval` |
 | Regret — what the silences cost | 554 declined cases: cost ₹134,347, saved ₹93,679, **net ₹-40,669**; pre-registered prediction (170 model errors) HOLDS | `make regret` |
-| Tests | **455 passing** across 42 files | `make test` |
+| Tests | **468 passing** across 42 files | `make test` |
 
 ---
 
@@ -212,12 +212,22 @@ definition of done — that is §7.
       needs its own A/B under the replication rule — see Tier B.
 
 ### Tier B — strengthens the strongest claims
-- [ ] **Test the DR cross-fitting hypothesis.** The mechanism is named but
-      untested. Refit with stratified folds that guarantee minority-arm balance,
-      or increase folds, and re-run `make dr-diagnosis`.
-      *Expected validation:* either coverage rises to 3/3 (hypothesis confirmed,
-      weak spot closed) or it does not (hypothesis refuted, still progress).
-      Either outcome is publishable; do not tune until it passes.
+- [x] **Test the DR cross-fitting hypothesis — REFUTED.** This item was
+      written believing stratified folds were an outstanding fix; they were
+      not — `dr_contributions` already stratifies its k-fold split on the
+      *joint* of treatment and outcome and already fits one outcome model
+      per arm, not a joint model with treatment as a feature (that was fixed
+      earlier; see the docstring on `doubly_robust_value`). What was actually
+      untested was narrower: does the residual gap respond to the
+      cross-fitting fold count at all. `make dr-foldsweep` swept n_folds over
+      {2, 5, 10, 20} on the same three disjoint blocks
+      `make dr-diagnosis` uses, under a rule fixed before running (coverage
+      rising to 3/3 confirms; coverage and mean gap essentially flat across
+      the range refutes). Result: coverage flat at 1/3 and the mean gap flat
+      within 4% (0.00272–0.00282) across the whole range — **REFUTED**.
+      Cross-fitting is not the mechanism; the bias itself is unchanged and
+      still "inconclusive, leaning bias." See
+      `experiments/tier1_criteo/REPORT.md` and `RESULTS.md`.
 - [ ] **Recalibrate τ̂ and A/B it.** New, and now the best-supported item here:
       the decile chart measured the over-spread (0.758) rather than inferring
       it, so the fix is a known quantity. Fit isotonic regression (or a single

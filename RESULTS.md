@@ -79,10 +79,23 @@ truth in 3/3.
 
 What the diagnosis does rule out is the variance explanation: DR's paired
 interval is 0.82x the width of IPS's, so it is not merely noisier. And with a
-known constant propensity DR is unbiased for any outcome model, which points
+known constant propensity DR is unbiased for any outcome model, which pointed
 at the cross-fitted q_hat on a 15% control arm carrying a 6.7x importance
-weight. Not closed — but now characterised precisely enough to be actionable,
-and IPS is the estimator to trust on this dataset. See
+weight as the leading suspect — named, at that point, but not yet tested.
+
+It has since been tested. `make dr-foldsweep` reruns the same diagnosis on
+the same three blocks with `dr_contributions`' fold count swept over
+**{2, 5, 10, 20}**, under a rule fixed before the run: confirmed if coverage
+rises to 3/3 at higher fold counts, refuted if coverage and the mean gap are
+essentially flat across the range. Coverage sits at **1/3 at every fold
+count**, and the mean gap wanders in a **0.00272–0.00282** band with no trend
+— a 10x increase in fold count moves neither number. **Verdict: REFUTED.**
+Cross-fitting starving the minority arm's fold-local training data is not
+the mechanism; PROJECT_STATE.md's Tier B item is closed on that finding. The
+bias itself is unchanged by this — it is still there, still low in all three
+blocks, still "inconclusive, leaning bias" under the rule above — only its
+proposed cause is now ruled out alongside sampling noise. IPS remains the
+estimator to trust on this dataset. See
 `experiments/tier1_criteo/REPORT.md`.
 
 ---

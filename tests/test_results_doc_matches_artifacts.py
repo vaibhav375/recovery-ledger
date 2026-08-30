@@ -45,6 +45,9 @@ TIER1 = {
     "hillstrom": ROOT / "experiments" / "tier1_criteo" / "results_hillstrom.json",
     "criteo": ROOT / "experiments" / "tier1_criteo" / "results_criteo.json",
 }
+DR_DIAGNOSIS = ROOT / "experiments" / "tier1_criteo" / "results_dr_diagnosis.json"
+DR_FOLDSWEEP = ROOT / "experiments" / "tier1_criteo" / "results_dr_foldsweep.json"
+DR_REPORT = ROOT / "experiments" / "tier1_criteo" / "REPORT.md"
 
 
 def _load(path: Path) -> dict:
@@ -56,6 +59,11 @@ def _load(path: Path) -> dict:
 @pytest.fixture(scope="module")
 def results_md() -> str:
     return RESULTS_MD.read_text()
+
+
+@pytest.fixture(scope="module")
+def dr_report() -> str:
+    return DR_REPORT.read_text()
 
 
 # ── B1: the headline ─────────────────────────────────────────────────────
@@ -126,6 +134,94 @@ def test_tier1_dr_is_still_reported_as_the_weak_spot(results_md):
         assert "honest weak spot" not in results_md, (
             "DR now matches on Criteo; RESULTS.md still calls it a weak spot"
         )
+
+
+# ── DR fold-count sweep: does the cross-fitting mechanism respond at all ───
+#
+# PROJECT_STATE.md's Tier B backlog named the mechanism (a cross-fitted q_hat
+# starved on Criteo's 15% control arm) but proposed "refit with stratified
+# folds that guarantee minority-arm balance" as the untested fix -- half of
+# which (stratified folds, one model per arm) was already shipped when that
+# was written. What was actually untested is whether the residual gap
+# responds to the fold count at all. `make dr-foldsweep` sweeps n_folds in
+# {2, 5, 10, 20} across the same three disjoint blocks and applies a rule
+# fixed before the run. These tests pin the rule, the sweep table and the
+# verdict the same way the rest of this file pins every other artifact.
+
+
+def test_fold_sweep_reused_the_prescribed_fold_counts_and_draws():
+    d = _load(DR_FOLDSWEEP)
+    assert [r["n_folds"] for r in d["rows"]] == [2, 5, 10, 20]
+    assert d["draws"] == 3
+    for r in d["rows"]:
+        assert r["n_draws"] == 3
+
+
+def test_fold_sweep_at_n_folds_5_matches_the_dr_diagnosis_artifact():
+    """n_folds=5 is common to both `results_dr_diagnosis.json` and the sweep,
+    computed by the same `dr_for_folds` code path on the same disjoint
+    blocks. If the two disagree, exposing n_folds as a sweep parameter
+    changed the estimator's behaviour rather than merely measuring it --
+    which this experiment's brief forbids."""
+    diag = _load(DR_DIAGNOSIS)
+    sweep = _load(DR_FOLDSWEEP)
+    row5 = next(r for r in sweep["rows"] if r["n_folds"] == 5)
+    assert len(row5["per_draw"]) == len(diag["per_draw"])
+    for sweep_draw, diag_draw in zip(row5["per_draw"], diag["per_draw"]):
+        assert sweep_draw["seed"] == diag_draw["seed"]
+        for field in ("ate", "ci_low", "ci_high"):
+            assert sweep_draw["dr"][field] == pytest.approx(diag_draw["dr"][field]), (
+                f"seed {sweep_draw['seed']}: sweep's n_folds=5 DR.{field} does not "
+                f"match results_dr_diagnosis.json's own n_folds=5 run"
+            )
+
+
+def test_fold_sweep_rule_is_quoted_verbatim(dr_report):
+    """The pre-registered rule must be quoted in REPORT.md, not just enforced
+    silently in code -- otherwise a reader has no way to check the verdict
+    against the rule that produced it (same discipline as the regret
+    disagreement-replication rule elsewhere in this file)."""
+    d = _load(DR_FOLDSWEEP)
+    assert d["rule"] in dr_report
+
+
+def test_fold_sweep_rows_match_the_artifact(dr_report):
+    """Every row of the sweep table -- one per n_folds -- must match what the
+    artifact actually measured."""
+    d = _load(DR_FOLDSWEEP)
+    for r in d["rows"]:
+        row = (
+            f"| {r['n_folds']} | {r['coverage']}/{r['n_draws']} "
+            f"| {r['mean_gap']:+.5f} | {r['mean_abs_gap']:.5f} |"
+        )
+        assert row in dr_report, (
+            f"fold-sweep row for n_folds={r['n_folds']} missing or stale: {row!r}"
+        )
+
+
+def test_fold_sweep_verdict_is_recomputed_from_the_rows_not_hand_typed(dr_report, results_md):
+    """The verdict stored in the artifact must match what the pre-registered
+    rule actually yields on the rows beside it in the same artifact -- this
+    reimplements the rule independently of `run_dr_diagnosis.py` so a
+    hand-edited or stale 'verdict' field cannot silently drift from the
+    numbers, and pins the verdict word into both documents."""
+    d = _load(DR_FOLDSWEEP)
+    rows = d["rows"]
+    lo, hi = rows[0], rows[-1]
+    n_draws = lo["n_draws"]
+    if hi["coverage"] == n_draws and hi["coverage"] > lo["coverage"]:
+        expected = "CONFIRMED"
+    elif (hi["coverage"] == lo["coverage"] and lo["mean_abs_gap"] > 0
+          and abs(hi["mean_abs_gap"] - lo["mean_abs_gap"]) < 0.2 * lo["mean_abs_gap"]):
+        expected = "REFUTED"
+    else:
+        expected = "UNRESOLVED"
+    assert d["verdict"] == expected, (
+        f"artifact verdict {d['verdict']!r} does not match what the "
+        f"pre-registered rule yields ({expected!r}) on rows[0]/rows[-1]"
+    )
+    assert expected in dr_report, f"REPORT.md does not state the verdict {expected!r}"
+    assert expected in results_md, f"RESULTS.md does not state the verdict {expected!r}"
 
 
 # ── stopping rules ───────────────────────────────────────────────────────

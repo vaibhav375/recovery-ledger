@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis uplift-ab lambda-sweep regret
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
 
 # `uv pip install` honours an ambient VIRTUAL_ENV over the venv it was just
 # told to create. Anyone who runs `make setup` with another virtualenv active
@@ -66,6 +66,16 @@ horizon:
 dr-diagnosis:
 	cd experiments/tier1_criteo && PYTHONPATH=../../src ../../.venv/bin/python3 \
 		run_dr_diagnosis.py --draws 3
+
+# Separate target rather than folding into `dr-diagnosis`: this sweeps
+# n_folds in {2,5,10,20} across the same 3 disjoint blocks, which refits the
+# cross-fitted outcome model dozens of extra times and takes far longer than
+# the single-n_folds diagnosis above. Keeping it a separate target means
+# `make dr-diagnosis` stays fast and its committed artifact is untouched by
+# runs of this one.
+dr-foldsweep:
+	cd experiments/tier1_criteo && PYTHONPATH=../../src ../../.venv/bin/python3 \
+		run_dr_diagnosis.py --draws 3 --fold-sweep
 
 demo:
 	PYTHONPATH=src .venv/bin/python3 -m recovery_ledger.cli

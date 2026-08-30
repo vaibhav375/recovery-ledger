@@ -198,3 +198,77 @@ Use IPS on this dataset. It is unbiased under the known design propensity,
 covers the truth in every block, and its only cost — a wider interval — is the
 honest one. DR's extra precision is not free if it is buying that precision
 with a systematic offset.
+
+---
+
+## Fold-count sweep: does the named mechanism respond to cross-fitting at all?
+
+`make dr-foldsweep` → `results_dr_foldsweep.json` (sample_frac 0.02, n_boot 500,
+same 3 disjoint blocks as above; 26m45.57s wall clock — see Runtime below)
+
+PROJECT_STATE.md's Tier B backlog named the mechanism above — a cross-fitted
+`q_hat` starved on Criteo's 15% control arm — but proposed "refit with
+stratified folds that guarantee minority-arm balance, or increase folds" as
+the untested fix. Half of that was already shipped when it was written:
+`dr_contributions` already stratifies its k-fold split on the *joint* of
+treatment and outcome (`strata = treatment * 2 + outcome`), and `q_hat` is
+already fit as one model per arm, not a joint model with treatment as a
+feature. So "refit with stratified folds" was not an outstanding step. What
+was never tested is narrower: does the residual gap actually respond to the
+cross-fitting fold count at all? If the mechanism is a fold-local minority
+arm starved of training rows, more folds should shrink it — each fold then
+holds out a smaller slice, leaving more of the scarce control arm available
+to train `q_hat` on.
+
+**The rule, fixed before running (quoted verbatim from
+`results_dr_foldsweep.json`'s `rule` field, the same string
+`FOLD_SWEEP_RULE` in `run_dr_diagnosis.py` enforces and prints, so the prose
+here and the string the code actually carries cannot drift apart unnoticed):**
+
+> The cross-fitting hypothesis predicts the gap shrinks as folds increase -- more folds means more training data per fold and a better-conditioned minority arm. It is CONFIRMED if coverage rises to 3/3 at higher fold counts. It is REFUTED if coverage and the mean gap are essentially flat across 2 -> 20 folds, which would mean the residual gap has some other cause and the named mechanism is not it. Anything else is UNRESOLVED.
+
+### Result
+
+| n_folds | coverage | mean gap | mean \|gap\| |
+|---:|---:|---:|---:|
+| 2 | 1/3 | -0.00282 | 0.00282 |
+| 5 | 1/3 | -0.00272 | 0.00272 |
+| 10 | 1/3 | -0.00281 | 0.00281 |
+| 20 | 1/3 | -0.00278 | 0.00278 |
+
+**Verdict: REFUTED.** Coverage sits at exactly 1/3 at every fold count from 2
+to 20 — a 10x increase in fold count does not move it even once. The mean
+gap magnitude wanders between 0.00272 and 0.00282, a spread of 4% around its
+own mean, with no monotone trend in either direction as folds increase — not
+the shrinking-toward-zero the cross-fitting hypothesis predicts. Per-draw,
+the same block (seed 20260823) misses the direct ATE by roughly the same
+margin (−0.0042 to −0.0045) at every fold count, and the block that already
+covered truth (seed 20261323) keeps covering it at every fold count too. The
+fold count is not moving anything.
+
+This closes the mechanism PROJECT_STATE.md's Tier B item named. The gap is
+real (see the bias-vs-noise diagnosis above), but it is not caused by
+cross-fitting starving the minority arm on fold-local training data — if it
+were, refitting with more folds would have shown at least some movement in
+either coverage or the gap, and it shows none. The residual bias's actual
+cause remains open; ruled out are (1) sampling noise (the bias-vs-noise
+diagnosis above), and now (2) the cross-fitting fold count. What has not
+been tested: the outcome model class itself (`GradientBoostingClassifier`,
+80 trees, uncalibrated) on the minority arm's absolute row count — the fold
+count changes what fraction of the control arm each fold model trains on
+within one block, but the block's total control-arm row count (∼15% of
+~93,000) doesn't move with it, and that total may be the actual constraint.
+
+### Runtime
+
+The sweep fits the cross-fitted outcome model 2 arms × 2 policies × n_folds
+times per block, for n_folds ∈ {2, 5, 10, 20} across 3 blocks — 444 model
+fits versus 60 for the single `make dr-diagnosis` run. Measured wall time:
+26m45.57s (1,457.74s user + 67.59s system CPU, 95% CPU). Direct ATE and IPS
+are computed once per block and
+reused across the sweep since neither depends on n_folds — only the model
+fits inside `dr_contributions` do.
+
+No fold count, sample fraction, seed, or bootstrap setting was tuned after
+seeing a result. The rule above was fixed before the sweep ran, on the same
+committed disjoint blocks the bias-vs-noise diagnosis already used.

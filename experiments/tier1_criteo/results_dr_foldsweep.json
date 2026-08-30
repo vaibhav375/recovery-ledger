@@ -1,0 +1,316 @@
+{
+  "sample_frac": 0.02,
+  "n_boot": 500,
+  "draws": 3,
+  "disjoint_blocks": true,
+  "fold_counts": [
+    2,
+    5,
+    10,
+    20
+  ],
+  "rule": "The cross-fitting hypothesis predicts the gap shrinks as folds increase -- more folds means more training data per fold and a better-conditioned minority arm. It is CONFIRMED if coverage rises to 3/3 at higher fold counts. It is REFUTED if coverage and the mean gap are essentially flat across 2 -> 20 folds, which would mean the residual gap has some other cause and the named mechanism is not it. Anything else is UNRESOLVED.",
+  "verdict": "REFUTED",
+  "rows": [
+    {
+      "n_folds": 2,
+      "coverage": 1,
+      "n_draws": 3,
+      "mean_gap": -0.002815711571312519,
+      "mean_abs_gap": 0.002815711571312519,
+      "per_draw": [
+        {
+          "seed": 20260823,
+          "n_test": 93198,
+          "n_folds": 2,
+          "direct_ate": 0.009566998883439745,
+          "dr": {
+            "ate": 0.0053927425996255175,
+            "ci_low": 0.0026376646910231706,
+            "ci_high": 0.007938908312947428,
+            "covers_direct": false,
+            "gap_to_direct": -0.004174256283814228,
+            "name": "dr"
+          },
+          "ips": {
+            "ate": 0.00949978511957749,
+            "ci_low": 0.006019847517991627,
+            "ci_high": 0.013077090368542002,
+            "covers_direct": true,
+            "gap_to_direct": -6.72137638622547e-05,
+            "name": "ips"
+          }
+        },
+        {
+          "seed": 20261323,
+          "n_test": 93197,
+          "n_folds": 2,
+          "direct_ate": 0.007435013117391177,
+          "dr": {
+            "ate": 0.007277695746955197,
+            "ci_low": 0.004612063134064259,
+            "ci_high": 0.010342368526610935,
+            "covers_direct": true,
+            "gap_to_direct": -0.0001573173704359802,
+            "name": "dr"
+          },
+          "ips": {
+            "ate": 0.007295510043550695,
+            "ci_low": 0.003966097233196353,
+            "ci_high": 0.010760748586734929,
+            "covers_direct": true,
+            "gap_to_direct": -0.00013950307384048236,
+            "name": "ips"
+          }
+        },
+        {
+          "seed": 20261823,
+          "n_test": 93197,
+          "n_folds": 2,
+          "direct_ate": 0.011175077166794,
+          "dr": {
+            "ate": 0.007059516107106653,
+            "ci_low": 0.0040875648028836885,
+            "ci_high": 0.009908865013758657,
+            "covers_direct": false,
+            "gap_to_direct": -0.004115561059687348,
+            "name": "dr"
+          },
+          "ips": {
+            "ate": 0.011371474907310839,
+            "ci_low": 0.007796551678732241,
+            "ci_high": 0.01471286592900187,
+            "covers_direct": true,
+            "gap_to_direct": 0.00019639774051683802,
+            "name": "ips"
+          }
+        }
+      ]
+    },
+    {
+      "n_folds": 5,
+      "coverage": 1,
+      "n_draws": 3,
+      "mean_gap": -0.00272303473655097,
+      "mean_abs_gap": 0.00272303473655097,
+      "per_draw": [
+        {
+          "seed": 20260823,
+          "n_test": 93198,
+          "n_folds": 5,
+          "direct_ate": 0.009566998883439745,
+          "dr": {
+            "ate": 0.00537763553496155,
+            "ci_low": 0.0026051073505611324,
+            "ci_high": 0.007989357657083567,
+            "covers_direct": false,
+            "gap_to_direct": -0.004189363348478195,
+            "name": "dr"
+          },
+          "ips": {
+            "ate": 0.00949978511957749,
+            "ci_low": 0.006019847517991627,
+            "ci_high": 0.013077090368542002,
+            "covers_direct": true,
+            "gap_to_direct": -6.72137638622547e-05,
+            "name": "ips"
+          }
+        },
+        {
+          "seed": 20261323,
+          "n_test": 93197,
+          "n_folds": 5,
+          "direct_ate": 0.007435013117391177,
+          "dr": {
+            "ate": 0.00712312115061234,
+            "ci_low": 0.00442981516960236,
+            "ci_high": 0.010138236980685124,
+            "covers_direct": true,
+            "gap_to_direct": -0.00031189196677883745,
+            "name": "dr"
+          },
+          "ips": {
+            "ate": 0.007295510043550695,
+            "ci_low": 0.003966097233196353,
+            "ci_high": 0.010760748586734929,
+            "covers_direct": true,
+            "gap_to_direct": -0.00013950307384048236,
+            "name": "ips"
+          }
+        },
+        {
+          "seed": 20261823,
+          "n_test": 93197,
+          "n_folds": 5,
+          "direct_ate": 0.011175077166794,
+          "dr": {
+            "ate": 0.0075072282723981235,
+            "ci_low": 0.004510755159531463,
+            "ci_high": 0.010406883896611832,
+            "covers_direct": false,
+            "gap_to_direct": -0.0036678488943958773,
+            "name": "dr"
+          },
+          "ips": {
+            "ate": 0.011371474907310839,
+            "ci_low": 0.007796551678732241,
+            "ci_high": 0.01471286592900187,
+            "covers_direct": true,
+            "gap_to_direct": 0.00019639774051683802,
+            "name": "ips"
+          }
+        }
+      ]
+    },
+    {
+      "n_folds": 10,
+      "coverage": 1,
+      "n_draws": 3,
+      "mean_gap": -0.0028138676740866076,
+      "mean_abs_gap": 0.0028138676740866076,
+      "per_draw": [
+        {
+          "seed": 20260823,
+          "n_test": 93198,
+          "n_folds": 10,
+          "direct_ate": 0.009566998883439745,
+          "dr": {
+            "ate": 0.005067497525488549,
+            "ci_low": 0.0023020698262435765,
+            "ci_high": 0.007643837233031132,
+            "covers_direct": false,
+            "gap_to_direct": -0.004499501357951196,
+            "name": "dr"
+          },
+          "ips": {
+            "ate": 0.00949978511957749,
+            "ci_low": 0.006019847517991627,
+            "ci_high": 0.013077090368542002,
+            "covers_direct": true,
+            "gap_to_direct": -6.72137638622547e-05,
+            "name": "ips"
+          }
+        },
+        {
+          "seed": 20261323,
+          "n_test": 93197,
+          "n_folds": 10,
+          "direct_ate": 0.007435013117391177,
+          "dr": {
+            "ate": 0.007129404202246406,
+            "ci_low": 0.004479404419751695,
+            "ci_high": 0.010022290564190465,
+            "covers_direct": true,
+            "gap_to_direct": -0.00030560891514477134,
+            "name": "dr"
+          },
+          "ips": {
+            "ate": 0.007295510043550695,
+            "ci_low": 0.003966097233196353,
+            "ci_high": 0.010760748586734929,
+            "covers_direct": true,
+            "gap_to_direct": -0.00013950307384048236,
+            "name": "ips"
+          }
+        },
+        {
+          "seed": 20261823,
+          "n_test": 93197,
+          "n_folds": 10,
+          "direct_ate": 0.011175077166794,
+          "dr": {
+            "ate": 0.007538584417630145,
+            "ci_low": 0.004666129170343297,
+            "ci_high": 0.010451954825584376,
+            "covers_direct": false,
+            "gap_to_direct": -0.003636492749163856,
+            "name": "dr"
+          },
+          "ips": {
+            "ate": 0.011371474907310839,
+            "ci_low": 0.007796551678732241,
+            "ci_high": 0.01471286592900187,
+            "covers_direct": true,
+            "gap_to_direct": 0.00019639774051683802,
+            "name": "ips"
+          }
+        }
+      ]
+    },
+    {
+      "n_folds": 20,
+      "coverage": 1,
+      "n_draws": 3,
+      "mean_gap": -0.002783118821295004,
+      "mean_abs_gap": 0.002783118821295004,
+      "per_draw": [
+        {
+          "seed": 20260823,
+          "n_test": 93198,
+          "n_folds": 20,
+          "direct_ate": 0.009566998883439745,
+          "dr": {
+            "ate": 0.0051797635093499645,
+            "ci_low": 0.0023414289568514887,
+            "ci_high": 0.007851858619880336,
+            "covers_direct": false,
+            "gap_to_direct": -0.004387235374089781,
+            "name": "dr"
+          },
+          "ips": {
+            "ate": 0.00949978511957749,
+            "ci_low": 0.006019847517991627,
+            "ci_high": 0.013077090368542002,
+            "covers_direct": true,
+            "gap_to_direct": -6.72137638622547e-05,
+            "name": "ips"
+          }
+        },
+        {
+          "seed": 20261323,
+          "n_test": 93197,
+          "n_folds": 20,
+          "direct_ate": 0.007435013117391177,
+          "dr": {
+            "ate": 0.00727810390227191,
+            "ci_low": 0.004588977893787434,
+            "ci_high": 0.010178751823319695,
+            "covers_direct": true,
+            "gap_to_direct": -0.00015690921511926723,
+            "name": "dr"
+          },
+          "ips": {
+            "ate": 0.007295510043550695,
+            "ci_low": 0.003966097233196353,
+            "ci_high": 0.010760748586734929,
+            "covers_direct": true,
+            "gap_to_direct": -0.00013950307384048236,
+            "name": "ips"
+          }
+        },
+        {
+          "seed": 20261823,
+          "n_test": 93197,
+          "n_folds": 20,
+          "direct_ate": 0.011175077166794,
+          "dr": {
+            "ate": 0.007369865292118037,
+            "ci_low": 0.0044121412843792064,
+            "ci_high": 0.010205324180854626,
+            "covers_direct": false,
+            "gap_to_direct": -0.003805211874675964,
+            "name": "dr"
+          },
+          "ips": {
+            "ate": 0.011371474907310839,
+            "ci_low": 0.007796551678732241,
+            "ci_high": 0.01471286592900187,
+            "covers_direct": true,
+            "gap_to_direct": 0.00019639774051683802,
+            "name": "ips"
+          }
+        }
+      ]
+    }
+  ]
+}
