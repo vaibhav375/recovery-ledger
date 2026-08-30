@@ -58,7 +58,8 @@
     "realised_cost_inside_interval": false
   },
   "disagreement_replication": {
-    "rule": "The cost-side disagreement is a replicated finding only if the realised cost falls outside the model-based interval in every draw. If it falls outside in some draws and inside in others, the disagreement is not established and must be reported as unresolved -- a property of the headline draw rather than of the method. If it falls inside in every draw, the headline draw was the outlier and that must be published as such.",
+    "rule": "The cost-side disagreement is a replicated finding only if the realised cost falls outside the model-based interval in every draw. If it falls outside in some draws and inside in others, the disagreement is not established and must be reported as unresolved -- a property of the headline draw rather than of the method. If it falls inside in every draw, the headline draw was the outlier and that must be published as such. Either conclusion requires at least 3 draws; below that floor, report that too few draws were run to conclude anything, not a replicated finding or a resolved non-finding.",
+    "min_draws_for_verdict": 3,
     "n_draws": 6,
     "replication_draws": 5,
     "draws": [

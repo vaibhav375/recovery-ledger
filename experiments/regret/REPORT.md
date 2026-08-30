@@ -156,9 +156,12 @@ Paired counterfactual over 560 declined cases...
 print statement in the brief's code counts before the deferred filter; the
 comparison itself — `check["n"] = 554` — matches `totals.n` exactly.)
 
-**`realised_cost` disagrees with the model-based cost estimate by more than
-resampling variance explains — a real finding on the one side of the ledger
-this check can validate at all.** The spec named
+**On this headline draw, `realised_cost` falls outside the model-based cost
+interval — but that is a single-draw observation, and (see "Replicating the
+cost-side disagreement" below) it is NOT established as a general property
+of the method: replicated across 6 independent draws, the check landed
+outside its interval in half of them and inside in the other half, so the
+disagreement is UNRESOLVED, not a standing finding.** The spec named
 `counterfactual_check.inside_headline_interval` before anyone knew this
 check is one-sided by selection; implemented here on the half it actually
 validates: a 95% bootstrap interval on the model-based cost total, built by
@@ -168,16 +171,15 @@ estimate would move across comparable draws of this same declined sample.
 That interval is **[₹119,877, ₹148,032]**
 (`cost_interval_low`/`cost_interval_high` in `results_regret.json`).
 `realised_cost` — ₹111,614, from the paired WAIT/NUDGE simulation replay —
-falls **outside** it, below the low end
+falls **outside** it on this draw, below the low end
 (`realised_cost_inside_interval: false`). This is published as computed,
-not suppressed or tuned: even on the side of the ledger this check is
-capable of validating, the realised replay and the model-based estimate
-disagree by more than the sampling variance of the cost total accounts
-for. It is not evidence that `totals.cost` is fabricated — both numbers
-come from the same committed, deterministic code, run twice and confirmed
-byte-identical — but it means this section's earlier framing ("the
-realised and expected costs agree closely") overstated the agreement, and
-is corrected here rather than repeated.
+not suppressed or tuned: it means this section's earlier framing ("the
+realised and expected costs agree closely") overstated the agreement *on
+this draw*. It does **not** mean the realised replay and the model-based
+estimate disagree in general — that stronger claim was checked by
+replication and did not survive it (below). It is not evidence that
+`totals.cost` is fabricated either way — both numbers come from the same
+committed, deterministic code, run twice and confirmed byte-identical.
 
 `realised_saved` is exactly **`-0.0`** — not a small or noisy number, a
 literal zero — against `totals.saved` of **₹93,679** baked into
@@ -222,21 +224,27 @@ declined universe, `paid_0` is therefore ~0 by construction, so
 many true do-not-disturbs are in it.
 
 **Consequence: `realised_net` and `expected_net` are not the same estimand,
-and the cost side is not cleanly validated either.** The paired
+and the cost side is not cleanly confirmed as agreeing either.** The paired
 counterfactual can only speak to the *cost* side of the ledger at all — it
 structurally cannot validate *saved* — and the bootstrap check above shows
-it does not corroborate cleanly even there: `realised_cost` sits below its
-own model-based interval, a real, published disagreement on the one side
-this check can address. The 2.7x gap between `realised_net` (-₹111,614) and
+it does not corroborate cleanly on this draw: `realised_cost` sits below its
+own model-based interval on the headline draw specifically. Whether that
+generalises is answered, not assumed, in "Replicating the cost-side
+disagreement" below — it does not: replicated across 6 draws, the check
+landed outside its interval in 3 and inside in 3, UNRESOLVED rather than a
+standing disagreement. The 2.7x gap between `realised_net` (-₹111,614) and
 `expected_net` (-₹40,669) remains an artifact of comparing a one-sided
 quantity (cost only) against a two-sided one (cost minus saved) — that part
 is not evidence `totals.net` is wrong — but it is no longer accurate to
-call the cost-only comparison itself clean agreement. `results_regret.json`
-records both facts directly on `counterfactual_check`: `"validates": "cost
-side only"`, `"one_sided_because"` naming the selection mechanism above, and
-now `cost_interval_low`/`cost_interval_high`/`realised_cost_inside_interval`
-recording the bootstrap test and its outcome, so the caveat and the finding
-both travel with the artifact and not only with this prose.
+call the cost-only comparison itself clean agreement, on this draw or in
+general. `results_regret.json` records all of this directly on
+`counterfactual_check`: `"validates": "cost side only"`,
+`"one_sided_because"` naming the selection mechanism above, and
+`cost_interval_low`/`cost_interval_high`/`realised_cost_inside_interval`
+recording the bootstrap test and its outcome on this draw — and on
+`disagreement_replication`, the 6-draw replication and its UNRESOLVED
+verdict — so the caveat, the headline-draw observation, and the replicated
+(non-)finding all travel with the artifact and not only with this prose.
 
 ## Replicating the cost-side disagreement
 
@@ -257,14 +265,19 @@ model-based interval in **every** draw. If it falls outside in some draws
 and inside in others, the disagreement is **not** established and must be
 reported as unresolved — a property of the headline draw rather than of the
 method. If it falls inside in every draw, the headline draw was the outlier
-and that must be published as such.
+and that must be published as such. Either conclusion requires at least
+`MIN_DRAWS_FOR_VERDICT` (3) draws — the floor every other experiment in this
+repo defaults `--eval-draws` to before treating a replicated result as
+established; below it, `disagreement_verdict()` returns a distinct
+"insufficient draws" verdict rather than let a one- or two-draw run
+manufacture a "replicates" or "outlier" conclusion.
 
 Quoted verbatim from `results_regret.json`'s `disagreement_replication.rule`
 (the same string `DISAGREEMENT_REPLICATION_RULE` in `run_regret.py` enforces
 and prints, so the prose above and the string the code actually carries
 cannot drift apart unnoticed):
 
-> The cost-side disagreement is a replicated finding only if the realised cost falls outside the model-based interval in every draw. If it falls outside in some draws and inside in others, the disagreement is not established and must be reported as unresolved -- a property of the headline draw rather than of the method. If it falls inside in every draw, the headline draw was the outlier and that must be published as such.
+> The cost-side disagreement is a replicated finding only if the realised cost falls outside the model-based interval in every draw. If it falls outside in some draws and inside in others, the disagreement is not established and must be reported as unresolved -- a property of the headline draw rather than of the method. If it falls inside in every draw, the headline draw was the outlier and that must be published as such. Either conclusion requires at least 3 draws; below that floor, report that too few draws were run to conclude anything, not a replicated finding or a resolved non-finding.
 
 `run_regret.py --replication-draws 5` (the default) reruns the *entire*
 pipeline — `run_eval`, `treatment_arm`, `declined_cases`, the paired

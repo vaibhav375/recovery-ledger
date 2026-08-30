@@ -37,7 +37,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "experiments" / "regret"))
 sys.path.insert(0, str(Path(__file__).parent.parent / "experiments" / "tier2_simulation"))
 
 from run_batch import NOW  # noqa: E402
-from run_regret import declined_cases, treatment_arm  # noqa: E402
+from run_regret import (  # noqa: E402
+    MIN_DRAWS_FOR_VERDICT,
+    declined_cases,
+    disagreement_verdict,
+    treatment_arm,
+)
 
 from recovery_ledger.events.actions import ActionType, StopReason  # noqa: E402
 from recovery_ledger.kernel.certificate import Decision  # noqa: E402
@@ -136,3 +141,55 @@ def test_declined_cases_end_to_end_against_a_small_constructed_ledger():
     assert by_id[c4].bucket is Bucket.ALLOCATION
     assert by_id[c5].bucket is Bucket.DEFERRED
     assert c0 not in by_id and c1 not in by_id
+
+
+def _row(inside: bool) -> dict:
+    return {"realised_cost_inside_interval": inside}
+
+
+def test_disagreement_verdict_refuses_to_conclude_below_the_draw_floor():
+    """Review finding: `--replication-draws 0` used to leave `rows =
+    [draw0]`, a single draw, and the old unanimity check ("outside in every
+    draw of the rows given" / "inside in every draw of the rows given")
+    would return `replicates=True` from that one draw — manufacturing
+    exactly the single-draw-conclusion fallacy this whole feature exists to
+    close. `MIN_DRAWS_FOR_VERDICT` (3, the same floor every other
+    experiment's default `--eval-draws` uses) must block a "replicates" or
+    "outlier" verdict below it, on both an all-outside and an all-inside set
+    of rows, and return a distinct "insufficient" verdict with
+    `replicates=False` instead."""
+    assert MIN_DRAWS_FOR_VERDICT == 3
+
+    for n in range(1, MIN_DRAWS_FOR_VERDICT):
+        for rows in ([_row(False)] * n, [_row(True)] * n):
+            replicates, verdict = disagreement_verdict(rows)
+            assert replicates is False, (
+                f"{n} draw(s) is below the floor of "
+                f"{MIN_DRAWS_FOR_VERDICT} -- must never return "
+                f"replicates=True"
+            )
+            assert "INSUFFICIENT" in verdict
+            assert "REPLICATES" not in verdict
+            assert "OUTLIER" not in verdict
+
+
+def test_disagreement_verdict_at_and_above_the_floor_reaches_a_real_verdict():
+    """At exactly the floor (3 draws), the ordinary three-way rule applies:
+    unanimously outside replicates, unanimously inside means the headline
+    draw was the outlier, anything mixed is unresolved. This is the
+    behaviour the floor guards without disabling."""
+    n = MIN_DRAWS_FOR_VERDICT
+    replicates, verdict = disagreement_verdict([_row(False)] * n)
+    assert replicates is True
+    assert "REPLICATES" in verdict
+    assert "INSUFFICIENT" not in verdict
+
+    replicates, verdict = disagreement_verdict([_row(True)] * n)
+    assert replicates is False
+    assert "OUTLIER" in verdict
+    assert "INSUFFICIENT" not in verdict
+
+    replicates, verdict = disagreement_verdict([_row(False), _row(True)] * (n // 2) + [_row(False)])
+    assert replicates is False
+    assert "UNRESOLVED" in verdict
+    assert "INSUFFICIENT" not in verdict

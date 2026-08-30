@@ -243,11 +243,11 @@ and `paid_1 = 0`, and every such case was already routed out as `resolved`
 before it could enter this universe. **This check validates the cost side of
 the ledger only — and, per the replication above, does not establish
 agreement or disagreement there either — so the ₹93,679 saved figure must not be quoted as
-independently validated** — it rests on the model-based
-estimate alone; nor should the ₹134,347 cost figure be quoted as
-independently validated, since the realised replay landed outside its own
-interval on the headline draw and the replication left the general question
-unresolved. `results_regret.json` records this directly on
+independently validated** — it rests on the model-based estimate alone; nor
+should the ₹134,347 cost figure be quoted as independently validated, since
+the realised replay landed outside its own interval on the headline draw
+and the replication left the general question unresolved. `results_regret.json`
+records this directly on
 `counterfactual_check`: `"validates": "cost side only"`, and the six-draw
 replication on `disagreement_replication`. See `experiments/regret/REPORT.md`
 for the full design and the estimator diagnostics that back this claim,

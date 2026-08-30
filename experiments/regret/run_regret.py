@@ -33,8 +33,13 @@ EVERY draw. If it falls outside in some draws and inside in others, the
 disagreement is NOT established and must be reported as unresolved — a
 property of the headline draw rather than of the method. If it falls inside
 in every draw, the headline draw was the outlier and that must be published
-as such. Whatever comes out gets published as it is: seeds, draw counts and
-interval widths are not tuned to reach a preferred answer.
+as such. Either conclusion requires at least MIN_DRAWS_FOR_VERDICT (3) draws
+— the same floor every other experiment in this repo uses by default before
+treating a replicated result as established; below it, this reports that
+too few draws were run to conclude anything, neither a replicated finding
+nor a resolved non-finding. Whatever comes out gets published as it is:
+seeds, draw counts and interval widths are not tuned to reach a preferred
+answer.
 """
 
 from __future__ import annotations
@@ -88,7 +93,25 @@ DISAGREEMENT_REPLICATION_RULE = (
     "disagreement is not established and must be reported as unresolved -- "
     "a property of the headline draw rather than of the method. If it "
     "falls inside in every draw, the headline draw was the outlier and "
-    "that must be published as such."
+    "that must be published as such. Either conclusion requires at least "
+    f"{{min_draws}} draws; below that floor, report that too few draws "
+    "were run to conclude anything, not a replicated finding or a "
+    "resolved non-finding."
+)
+
+# The same floor this project uses everywhere else before treating a
+# replicated result as established -- every other experiment's default
+# `--eval-draws` (horizon, pessimism, sensitivity, uplift_calibration,
+# uplift_ab) is 3. Below this many total draws (the headline draw plus
+# however many --replication-draws add), disagreement_verdict() must not
+# return "replicates" or "the headline was the outlier": either would be a
+# one- or two-draw claim wearing a replicated conclusion's clothes, which
+# is the exact fallacy this feature exists to close. `--replication-draws
+# 0` is therefore an honest "headline only, no replication claim" fast
+# path, not a way to manufacture a false "replicates" verdict from n=1.
+MIN_DRAWS_FOR_VERDICT = 3
+DISAGREEMENT_REPLICATION_RULE = DISAGREEMENT_REPLICATION_RULE.format(
+    min_draws=MIN_DRAWS_FOR_VERDICT
 )
 
 
@@ -365,15 +388,33 @@ def disagreement_verdict(rows: list[dict]) -> tuple[bool, str]:
     """Apply THE REPLICATION RULE (see the module docstring) to a list of
     per-draw rows, each carrying `realised_cost_inside_interval`.
 
-    Three outcomes, and only three: outside in every draw (replicates),
-    inside in every draw (the headline draw was the outlier), or a mix
-    (unresolved). There is no fourth branch that reweights or averages the
-    draws into a softer verdict -- the rule is a straight per-draw
-    unanimity check, on purpose.
+    Four outcomes, not three: below `MIN_DRAWS_FOR_VERDICT` (insufficient
+    draws to conclude anything), outside in every draw (replicates), inside
+    in every draw (the headline draw was the outlier), or a mix
+    (unresolved). The floor check runs first and short-circuits the other
+    three -- without it, `--replication-draws 0` would leave `rows = [draw0]`,
+    `n_total = 1`, and the unanimity check below would return "replicates"
+    from a single draw, which is exactly the single-draw-conclusion fallacy
+    this whole feature exists to close. There is no fifth branch that
+    reweights or averages the draws into a softer verdict -- past the floor,
+    the rule is a straight per-draw unanimity check, on purpose.
     """
     n_total = len(rows)
     n_outside = sum(1 for r in rows if not r["realised_cost_inside_interval"])
     n_replications = n_total - 1
+    if n_total < MIN_DRAWS_FOR_VERDICT:
+        return False, (
+            f"INSUFFICIENT DRAWS TO CONCLUDE ANYTHING: only {n_total} draw"
+            f"{'s' if n_total != 1 else ''} run (the headline draw plus "
+            f"{n_replications} replication draw"
+            f"{'s' if n_replications != 1 else ''}), below the floor of "
+            f"{MIN_DRAWS_FOR_VERDICT} this project requires before treating "
+            f"any replicated result as established. This is neither a "
+            f"replicated finding nor a resolved non-finding -- replication "
+            f"was not run, or was run at too few draws to conclude "
+            f"anything, and that is reported plainly rather than forcing a "
+            f"verdict out of {n_total} draw{'s' if n_total != 1 else ''}."
+        )
     if n_outside == n_total:
         return True, (
             f"REPLICATES: the realised cost fell OUTSIDE the model-based "
@@ -563,6 +604,7 @@ def main() -> None:
         print(f"\n{verdict}")
         disagreement_replication = {
             "rule": DISAGREEMENT_REPLICATION_RULE,
+            "min_draws_for_verdict": MIN_DRAWS_FOR_VERDICT,
             "n_draws": len(rows),
             "replication_draws": args.replication_draws,
             "draws": rows,

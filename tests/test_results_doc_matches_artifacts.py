@@ -914,6 +914,71 @@ def test_disagreement_replication_draw_rows_match_the_artifact(results_md, regre
             )
 
 
+def _line_containing(text: str, *, needle: str, doc_name: str, seed: int) -> str:
+    """The single physical line of `text` naming this seed — used to check
+    that a per-draw figure or label is attached to THAT draw's own row, not
+    merely present somewhere in the document. A bare `x in doc` check (as
+    used elsewhere in this file for figures that appear only once) cannot
+    catch a transposed label between two rows, because both labels would
+    still be present somewhere in the document; anchoring to the row's own
+    line is what makes that failure visible."""
+    matches = [line for line in text.splitlines() if needle in line]
+    assert matches, f"{doc_name} has no line naming seed {seed} ({needle!r})"
+    assert len(matches) == 1, (
+        f"{doc_name} has {len(matches)} lines naming seed {seed}, expected "
+        f"exactly one to anchor the per-draw check to"
+    )
+    return matches[0]
+
+
+def test_disagreement_replication_n_and_label_match_their_own_row(results_md, regret_report):
+    """Review findings: (1) REPORT.md's per-draw table states each draw's
+    `n` (declined-and-priced case count for that draw's population) with
+    nothing pinning it — a rerun that moved any draw's `n` could drift the
+    table silently. (2) No test checked that an INSIDE/OUTSIDE (or
+    inside/outside) label sits next to the *correct* draw's numbers — a
+    transposed pair of labels between two rows would still pass a test that
+    only checks both words appear somewhere in the document. This ties both
+    the `n` and the label to the physical line naming that draw's own seed,
+    in both documents, so a transposition or a drifted `n` fails here."""
+    draws = _load(REGRET)["disagreement_replication"]["draws"]
+    for row in draws:
+        seed = row["seed"]
+        n = row["n"]
+        inside = row["realised_cost_inside_interval"]
+        right_word, wrong_word = ("INSIDE", "OUTSIDE") if inside else ("OUTSIDE", "INSIDE")
+
+        report_line = _line_containing(
+            regret_report, needle=str(seed), doc_name="REPORT.md", seed=seed
+        )
+        assert str(n) in report_line, (
+            f"REPORT.md's row for seed {seed} does not state n={n}"
+        )
+        assert right_word in report_line, (
+            f"REPORT.md's row for seed {seed} does not say {right_word} "
+            f"(realised_cost_inside_interval={inside})"
+        )
+        assert wrong_word not in report_line, (
+            f"REPORT.md's row for seed {seed} says {wrong_word}, but "
+            f"realised_cost_inside_interval={inside} means it should say "
+            f"{right_word} -- labels may be transposed between rows"
+        )
+
+        results_line = _line_containing(
+            results_md, needle=str(seed), doc_name="RESULTS.md", seed=seed
+        )
+        assert right_word.lower() in results_line, (
+            f"RESULTS.md's row for seed {seed} does not say "
+            f"{right_word.lower()} (realised_cost_inside_interval={inside})"
+        )
+        assert wrong_word.lower() not in results_line, (
+            f"RESULTS.md's row for seed {seed} says {wrong_word.lower()}, "
+            f"but realised_cost_inside_interval={inside} means it should "
+            f"say {right_word.lower()} -- labels may be transposed between "
+            f"rows"
+        )
+
+
 def test_disagreement_replication_verdict_matches_the_artifact(results_md, regret_report):
     """Ruling: the replicated verdict is one of three outcomes (replicates /
     the headline was the outlier / unresolved), computed fresh by
