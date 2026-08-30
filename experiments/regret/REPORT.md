@@ -117,11 +117,15 @@ TOTAL                554       134,347        93,679       -40,669     170
 Pre-registered prediction: model errors > 0
 observed **170** → **HOLDS**
 
-No `mandatory` bucket appears above zero: no treatment-arm case in this
-batch was both refused-on-first-attempt by a kernel `DENY` on a contact
-action AND never subsequently contacted. Every declined case's binding
-constraint was the model's own judgement, running out of allocated attempts,
-or an unrelated case-state change (dispute, hard decline).
+No `mandatory` bucket appears above zero: this is structural, not a sampling
+accident. In this pipeline the compliance kernel issues `DENY` only on `retry`
+actions—all 320 DENY certificates in `experiments/tier2_simulation/batch_ledger.json`
+carry `action_type: "retry"`, with zero DENY on `nudge` or `negotiate`. Since only
+`nudge` and `negotiate` count as customer contact (the distinction that is novelty
+claim N6), a kernel denial can never turn a declined case into a *contact* refusal
+here. The mandatory bucket is therefore unreachable via kernel denial in this pipeline,
+and the other mandatory reasons (`opt_out`, `promise_to_pay_active`, `regulatory_ceiling`,
+`global_kill_switch`) terminate cases before they reach the declined universe.
 
 **Reading the table**: `allocation` (attempts exhausted) is the largest
 single cost, and it is *not* the bucket the pre-registered prediction is
