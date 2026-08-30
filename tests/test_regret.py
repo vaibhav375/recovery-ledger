@@ -1,9 +1,21 @@
 """Attribution and pricing of the cases the agent declined to contact.
 
-Two of these tests exist to fail. A holdout-arm case entering the universe
-would roughly double the reported regret, and a `negative_ev` refusal of a
-customer with positive true uplift being filed as "saved" would turn a model
-error into a success. Both are mutated in Task 1 Step 6 to prove they bite.
+Two of these tests exist to fail. A denied nudge must not count as contact
+(`test_a_denied_nudge_is_not_contact`) — a kernel-blocked action falls back to
+WAIT and never reaches the customer, so counting the decision rather than the
+executed result would record a contact that did not happen. And a
+`negative_ev` refusal of a customer with positive true uplift must be counted
+as a model error, not filed as "saved"
+(`test_a_negative_ev_refusal_of_a_persuadable_customer_is_a_model_error`) —
+that would turn the system's own mistake into a success. Both are mutated in
+Task 1 Step 6 to prove they bite.
+
+This module has no test for holdout-arm exclusion, and cannot: `DeclinedCase`
+has no field for arm membership, so there is nothing here to construct a
+holdout case out of. A holdout-arm case entering the universe would roughly
+double the reported regret, but that guard lives one layer up, in
+`experiments/regret/run_regret.py`'s `treatment_arm()` (which reconstructs
+`run_eval`'s own 50/50 assignment) and the arm-size assertion in its `main()`.
 """
 
 from __future__ import annotations

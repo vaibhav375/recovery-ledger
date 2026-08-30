@@ -57,6 +57,10 @@ SEED_REGISTRY: dict[str, tuple[str, str]] = {
         "shares", "tier2_simulation/run_baselines.py — the curve is a "
                   "decomposition of the baselines table, so it must be "
                   "measured on the baselines cases"),
+    "regret/run_regret.py": (
+        "shares", "tier2_simulation/run_batch.py — a regret figure is only "
+                  "quotable beside the headline if it is measured on the same "
+                  "customers"),
     "tier1_criteo/run_validation.py": ("none", "real RCT data (Criteo, Hillstrom)"),
     "tier1_criteo/run_dr_diagnosis.py": ("none", "real RCT data"),
     "listener_eval/run_eval.py": ("none", "a hand-authored gold set"),

@@ -1,0 +1,53 @@
+{
+  "n_eval": 2000,
+  "eval_seed": 20261823,
+  "shares_population_with": "tier2_simulation/run_batch.py",
+  "n_declined": 554,
+  "n_worked": 234,
+  "n_deferred": 6,
+  "prediction": {
+    "rule": "make calibration reports the bottom tau_hat bin as 43.8% true do-not-disturbs, so it is also ~56% customers with positive true uplift. The model-judgement bucket must therefore contain a non-trivial count of tau_true > 0 refusals. Near zero refutes one of the two experiments.",
+    "model_errors_expected_above": 0,
+    "model_errors_observed": 170,
+    "holds": true
+  },
+  "totals": {
+    "cost": 134347.46,
+    "saved": 93678.91,
+    "net": -40668.55,
+    "model_errors": 170
+  },
+  "buckets": [
+    {
+      "bucket": "allocation",
+      "n": 264,
+      "cost": 69247.13,
+      "saved": 1501.52,
+      "net": -67745.61,
+      "model_errors": 0
+    },
+    {
+      "bucket": "model_judgement",
+      "n": 286,
+      "cost": 63822.36,
+      "saved": 92177.39,
+      "net": 28355.02,
+      "model_errors": 170
+    },
+    {
+      "bucket": "case_state",
+      "n": 4,
+      "cost": 1277.96,
+      "saved": 0.0,
+      "net": -1277.96,
+      "model_errors": 0
+    }
+  ],
+  "counterfactual_check": {
+    "n": 554,
+    "realised_cost": 111613.81308308657,
+    "realised_saved": -0.0,
+    "realised_net": -111613.81308308656,
+    "expected_net": -40668.54936746729
+  }
+}

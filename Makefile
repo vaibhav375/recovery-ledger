@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis uplift-ab lambda-sweep
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis uplift-ab lambda-sweep regret
 
 # `uv pip install` honours an ambient VIRTUAL_ENV over the venv it was just
 # told to create. Anyone who runs `make setup` with another virtualenv active
@@ -50,6 +50,10 @@ uplift-ab:
 calibration:
 	PYTHONPATH=src .venv/bin/python3 experiments/uplift_calibration/run_calibration.py \
 		--n-train 5000 --n-eval 4000 --eval-draws 3
+
+regret:
+	PYTHONPATH=src .venv/bin/python3 experiments/regret/run_regret.py \
+		--n-train 5000 --n-eval 2000
 
 lambda-sweep:
 	PYTHONPATH=src .venv/bin/python3 experiments/churn_lambda/run_lambda_sweep.py \
