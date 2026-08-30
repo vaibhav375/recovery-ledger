@@ -608,9 +608,28 @@ def test_regret_totals_match_the_artifact(results_md):
 
 
 def test_regret_bucket_rows_match_the_artifact(results_md):
+    """Checks all six rendered columns, not just a four-column prefix. A
+    four-column check would pass unchanged if Net or Model errors were edited
+    to something the artifact no longer says — this was found in review and
+    is exactly the drift this test file exists to catch."""
     for row in _load(REGRET)["buckets"]:
-        rendered = f"| {row['bucket']} | {row['n']} | ₹{row['cost']:,.0f} | ₹{row['saved']:,.0f} |"
+        rendered = (
+            f"| {row['bucket']} | {row['n']} | ₹{row['cost']:,.0f} | "
+            f"₹{row['saved']:,.0f} | ₹{row['net']:,.0f} | {row['model_errors']} |"
+        )
         assert rendered in results_md, f"bucket row missing or stale: {rendered!r}"
+
+
+def test_regret_total_row_matches_the_artifact(results_md):
+    """Pins n_declined (554) against the bold Total row, which was otherwise
+    asserted nowhere — found in review."""
+    d = _load(REGRET)
+    t = d["totals"]
+    rendered = (
+        f"| **Total** | **{d['n_declined']}** | **₹{t['cost']:,.0f}** | "
+        f"**₹{t['saved']:,.0f}** | **₹{t['net']:,.0f}** | **{t['model_errors']}** |"
+    )
+    assert rendered in results_md, f"total row missing or stale: {rendered!r}"
 
 
 def test_the_regret_prediction_verdict_is_reported_as_it_came_out(results_md):
@@ -625,6 +644,37 @@ def test_the_regret_prediction_verdict_is_reported_as_it_came_out(results_md):
 
 def test_regret_was_measured_on_the_headline_population():
     assert _load(REGRET)["shares_population_with"] == "tier2_simulation/run_batch.py"
+
+
+def test_regret_counterfactual_check_matches_the_artifact(results_md):
+    """`counterfactual_check` was quoted in RESULTS.md's Counterfactual-check
+    subsection with nothing loading or asserting it — found in review, and
+    it is exactly the failure mode this file exists to close: a later change
+    to the counterfactual logic or its seeded population could move
+    realised_cost/realised_net while the prose kept the old figures and the
+    suite stayed green.
+
+    realised_saved is included deliberately, not just cost/net: it is
+    currently exactly -0.0, which is the load-bearing evidence that the
+    check is one-sided (see REPORT.md and the surrounding prose in
+    RESULTS.md). It must not be able to drift to a nonzero value while the
+    document still calls the check one-sided.
+    """
+    c = _load(REGRET)["counterfactual_check"]
+    assert f"{c['n']} cases" in results_md
+    assert f"₹{c['realised_cost']:,.0f}" in results_md
+    assert f"₹{c['realised_net']:,.0f}" in results_md
+    # Not a bare f"{value:.1f}" substring check: this document also carries
+    # unrelated decimals like -0.0642 (the calibration decile table) that
+    # contain "-0.0" as a literal substring, which would make a bare check
+    # unable to fail. Anchored to the specific phrase RESULTS.md uses so a
+    # mutation of the actual claim is what this test responds to.
+    assert f"exactly `{c['realised_saved']:.1f}`" in results_md, (
+        f"RESULTS.md does not state realised_saved as exactly "
+        f"{c['realised_saved']:.1f} — if this is now nonzero, the prose "
+        f"calling the counterfactual check one-sided needs to be revisited, "
+        f"not just this assertion"
+    )
 
 
 # ── Regret's estimator diagnostics: three numbers REPORT.md used to cite
@@ -646,4 +696,29 @@ def test_regret_report_ratio_diagnostic_matches_the_artifact(regret_report):
     assert f"{diag['ratio_realised_to_tau']:.3f}" in regret_report, (
         f"REPORT.md does not state the current ratio of "
         f"{diag['ratio_realised_to_tau']:.3f} from results_regret.json"
+    )
+
+
+def test_regret_report_dnd_negative_draw_diagnostic_matches_the_artifact(regret_report):
+    """The brief only required pinning the ratio ('at least'); the other two
+    estimator_diagnostics figures were left unpinned and flagged as a known
+    hole in review. This closes it: REPORT.md's '32 of 1,003 true
+    do-not-disturbs' claim must match what estimator_diagnostics() actually
+    computed."""
+    diag = _load(REGRET)["estimator_diagnostics"]
+    rendered = f"{diag['n_true_dnd_negative_draw']} of {diag['n_true_dnd']:,}"
+    assert rendered in regret_report, (
+        f"REPORT.md does not state {rendered!r} from results_regret.json's "
+        f"estimator_diagnostics"
+    )
+
+
+def test_regret_report_wait_side_pay_rate_diagnostic_matches_the_artifact(regret_report):
+    """The third out-of-band figure REPORT.md used to cite unbacked: the
+    WAIT-side pay rate. Same closure as the negative-draw test above."""
+    diag = _load(REGRET)["estimator_diagnostics"]
+    rate = f"{diag['wait_side_pay_rate'] * 100:.1f}%"
+    assert rate in regret_report, (
+        f"REPORT.md does not state the WAIT-side pay rate as {rate!r} from "
+        f"results_regret.json's estimator_diagnostics"
     )
