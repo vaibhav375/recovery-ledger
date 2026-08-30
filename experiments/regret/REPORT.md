@@ -130,38 +130,81 @@ Paired counterfactual over 560 declined cases...
 print statement in the brief's code counts before the deferred filter; the
 comparison itself — `check["n"] = 554` — matches `totals.n` exactly.)
 
-The two estimates agree in sign and rough magnitude — both say declining
-cost more than it saved, net — but disagree by roughly 2.7x in size
-(-₹111,614 realised vs. -₹40,669 expected). This is not a bug: `tau_true`
-priced via `persuadability()` alone is a linear, single-number summary of
-each case's treatment effect, while the paired simulation runs the full
-stochastic response model (`SimulationEnvironment.step`), which includes
-variance the linear summary doesn't capture. The two are different
-estimators of the same underlying question, not the same calculation done
-twice, and a gap between them is expected rather than a sign one of them is
-wrong. It is reported rather than reconciled.
+**The realised and expected costs agree closely; the realised and expected
+savings do not, because the check cannot see savings at all.**
+`realised_cost` is ₹111,614 against `totals.cost` of ₹134,347 — same order,
+same sign, the kind of gap ordinary sampling variance produces. But
+`realised_saved` is exactly **`-0.0`** — not a small or noisy number, a
+literal zero — against `totals.saved` of **₹92,177** baked into
+`totals.net`. Across all 554 declined cases, the paired simulation replay
+never once produced an instance where nudging looked worse than waiting.
+
+That is not because the simulator or the common-random-numbers design makes
+negative draws structurally impossible — sampled outside this declined
+universe, over 6,000 fresh cases, 46 of 973 true do-not-disturbs (4.7%)
+showed a genuine negative realised draw (paid under WAIT, not paid under
+NUDGE), and the headline expectation estimator itself checks out exactly:
+mean `tau` and mean realised `(paid_1 - paid_0)` agree at a ratio of
+**1.000** over those 6,000 cases, so `amount x tau_true` is on the same
+scale as the realised effect and nothing is wrong with `totals.cost` or
+`totals.saved` on their own terms.
+
+**The actual cause is selection, not variance.** `declined_cases()` (by
+design, not by accident — see "Design" above) excludes `resolved` cases:
+they paid, so nothing was forgone. But that conditions the declined universe
+on *not having paid under WAIT* — a refusal can only be observed to "save"
+money when `paid_0 = 1` and `paid_1 = 0`, and every case where `paid_0 = 1`
+was already routed to the resolved-skip before it could enter this universe.
+Measured directly: the treatment arm's overall WAIT-side pay rate is 5.5%
+(22 of 400 sampled), and those are exactly the cases removed as `resolved`
+before the declined universe is built. Inside the declined universe,
+`paid_0` is therefore ~0 by construction, so `realised_saved` has no way to
+be anything but zero here regardless of how many true do-not-disturbs are in
+it.
+
+**Consequence: `realised_net` and `expected_net` are not the same estimand.**
+The paired counterfactual validates the *cost* side of the ledger only — and
+does so well, ratio 1.000 on the underlying per-case effect and the same
+order of magnitude on `realised_cost` vs `totals.cost` — but it structurally
+cannot validate the *saved* side. The 2.7x gap between `realised_net`
+(-₹111,614) and `expected_net` (-₹40,669) is an artifact of comparing a
+one-sided quantity (cost only) against a two-sided one (cost minus saved),
+not evidence that either figure in `totals` is wrong. `results_regret.json`
+records this directly on `counterfactual_check`: `"validates": "cost side
+only"` and `"one_sided_because"` naming the selection mechanism above, so
+the caveat travels with the artifact and not only with this prose.
 
 ## What this does and does not license
 
 **This licenses**: reporting the B1 headline (₹272,281 / 1,000 cases) beside
 its own cost of declining, on the same customers, for the first time. It
 licenses saying that of the 554 treatment-arm cases the agent declined to
-contact, refusing cost more than it saved on net (-₹40,669 to -₹111,614,
-depending on estimator), and that within the bucket the agent itself
-controls (`model_judgement`), 170 of 286 refusals were later shown to be
-customers who would have responded positively to contact — a real, non-zero
-error rate that the calibration experiment's decile analysis predicted must
-exist. It licenses treating this as a genuine, structural cost of the
-policy's caution, not noise.
+contact, the model-based estimate is a net -₹40,669 (₹134,347 forgone against
+₹93,679 avoided), that the *cost* half of that figure is independently
+validated by the paired simulation (₹111,614 realised against ₹134,347
+expected, ratio 1.000 on the underlying per-case effect), and that within
+the bucket the agent itself controls (`model_judgement`), 170 of 286
+refusals were later shown to be customers who would have responded
+positively to contact — a real, non-zero error rate that the calibration
+experiment's decile analysis predicted must exist. It licenses treating this
+as a genuine, structural cost of the policy's caution, not noise.
 
-**This does not license**: claiming the agent should therefore contact more
+**This does not license**: quoting the ₹92,177 "saved" figure as
+independently validated — the paired counterfactual could not observe a
+single instance of it (`realised_saved = -0.0`) because the declined
+universe's exclusion of `resolved` cases removes exactly the cases where a
+saving could show up; that figure rests on the model-based estimate alone.
+Nor does it license claiming the agent should therefore contact more
 people. `model_judgement`'s net is still positive (₹28,355) — the model is
 net-correct in this bucket even though it is wrong on a non-trivial count of
 individuals, and `allocation` (attempts running out, not a modelling choice)
-is the larger cost in absolute terms. It does not license treating either
-number here (-₹40,669 or -₹111,614) as more authoritative than the other;
-they are reported as a pair precisely because they disagree. And it does not
-license any claim about real-world effect size: like every other number in
+is the larger cost in absolute terms. It does not license treating
+`realised_net` (-₹111,614) as a competing net estimate to weigh against
+`expected_net` (-₹40,669) — they are not the same estimand, one is cost-only
+and the other is cost-minus-saved, and the gap between them is that
+selection artifact, not a disagreement between two valid measurements. And
+it does not license any claim about real-world effect size: like every other
+number in
 this repo's Tier 2 experiments, this is priced entirely inside the
 simulator's invented response model (`sim/environment.py`) — it says what
 the policy's caution costs *under this simulation's assumptions*, not in

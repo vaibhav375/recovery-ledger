@@ -48,6 +48,8 @@
     "realised_cost": 111613.81308308657,
     "realised_saved": -0.0,
     "realised_net": -111613.81308308656,
-    "expected_net": -40668.54936746729
+    "expected_net": -40668.54936746729,
+    "validates": "cost side only",
+    "one_sided_because": "the universe excludes resolved cases, so paid_0 is ~0 by selection and a realised saving cannot be observed"
   }
 }

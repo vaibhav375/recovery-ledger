@@ -198,6 +198,19 @@ def main() -> None:
             "realised_saved": float(-realised[realised < 0].sum()),
             "realised_net": float(-realised.sum()),
             "expected_net": totals.net,
+            # The universe excludes `resolved` cases (they paid; nothing was
+            # forgone), which conditions it on paid_0 ~= 0 — refusing can only
+            # be observed to "save" money when paid_0=1 and paid_1=0, and
+            # those cases are gone by construction. So this check can confirm
+            # the cost side (positive tau_true, paid_1 > paid_0) but
+            # structurally cannot produce a realised saved figure to compare
+            # against `totals.saved`. Recorded here so the JSON carries the
+            # caveat, not just the prose in REPORT.md.
+            "validates": "cost side only",
+            "one_sided_because": (
+                "the universe excludes resolved cases, so paid_0 is ~0 by "
+                "selection and a realised saving cannot be observed"
+            ),
         }
         print(f"  realised net {check['realised_net']:,.0f} vs "
               f"expected net {totals.net:,.0f}")
