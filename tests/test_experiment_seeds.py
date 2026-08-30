@@ -33,27 +33,77 @@ ROOT = Path(__file__).resolve().parents[1]
 # alarm about the thing it is supposed to guard.
 EVAL_SEED_PATTERN = r"(?:BASE_EVAL_SEED|EVAL_SEED|eval_seed)\s*=\s*SEED \+ (\d+)"
 
-EVAL_SEED_SOURCES = {
-    # run_batch passes its eval seed inline rather than naming it.
-    "tier2_simulation/run_batch.py": r"seed=SEED \+ (\d+)",
-    "tier2_simulation/run_baselines.py": EVAL_SEED_PATTERN,
-    "sensitivity/run_sweep.py": EVAL_SEED_PATTERN,
-    "fleet/run_fleet.py": EVAL_SEED_PATTERN,
-    "ope_deployment/run_ope_deployment.py": EVAL_SEED_PATTERN,
-    "fairness/run_fairness.py": EVAL_SEED_PATTERN,
-    "pessimism/run_pessimism.py": EVAL_SEED_PATTERN,
-    "dnd_signal/run_dnd_signal.py": EVAL_SEED_PATTERN,
-    "horizon/run_horizon.py": EVAL_SEED_PATTERN,
-    "uplift_ab/run_uplift_ab.py": EVAL_SEED_PATTERN,
-    "uplift_calibration/run_calibration.py": EVAL_SEED_PATTERN,
+# Every experiment entry point, and what it does about evaluation
+# populations. Three declared kinds:
+#   "distinct" — draws its own population; the offset must be unique
+#   "shares"   — deliberately evaluates on another experiment's population
+#   "none"     — evaluates on a real dataset, so there is no seed to collide
+#
+# Before this registry existed, a deliberate sharer was handled by being left
+# out of the list, which is indistinguishable from having been forgotten.
+SEED_REGISTRY: dict[str, tuple[str, str]] = {
+    "tier2_simulation/run_batch.py": ("distinct", "the B1 headline population"),
+    "tier2_simulation/run_baselines.py": ("distinct", ""),
+    "sensitivity/run_sweep.py": ("distinct", ""),
+    "fleet/run_fleet.py": ("distinct", ""),
+    "ope_deployment/run_ope_deployment.py": ("distinct", ""),
+    "fairness/run_fairness.py": ("distinct", ""),
+    "pessimism/run_pessimism.py": ("distinct", ""),
+    "dnd_signal/run_dnd_signal.py": ("distinct", ""),
+    "horizon/run_horizon.py": ("distinct", ""),
+    "uplift_ab/run_uplift_ab.py": ("distinct", ""),
+    "uplift_calibration/run_calibration.py": ("distinct", ""),
+    "churn_lambda/run_lambda_sweep.py": (
+        "shares", "tier2_simulation/run_baselines.py — the curve is a "
+                  "decomposition of the baselines table, so it must be "
+                  "measured on the baselines cases"),
+    "tier1_criteo/run_validation.py": ("none", "real RCT data (Criteo, Hillstrom)"),
+    "tier1_criteo/run_dr_diagnosis.py": ("none", "real RCT data"),
+    "listener_eval/run_eval.py": ("none", "a hand-authored gold set"),
+    "negotiation/run_negotiation.py": ("none", "a scripted showpiece, no eval batch"),
 }
+
+
+def test_every_experiment_declares_what_population_it_evaluates_on():
+    """The check that closes exemption-by-omission. A new experiment that
+    does not declare its seed intent fails here, instead of silently being
+    exempt from the collision test by not being listed."""
+    found = {
+        f"{path.parent.name}/{path.name}"
+        for path in (ROOT / "experiments").glob("*/run_*.py")
+    }
+    undeclared = sorted(found - set(SEED_REGISTRY))
+    stale = sorted(set(SEED_REGISTRY) - found)
+    assert not undeclared, (
+        "these experiments do not say whether they draw their own evaluation "
+        "population, share another's, or use a real dataset:\n  "
+        + "\n  ".join(undeclared)
+    )
+    assert not stale, "registry names files that no longer exist:\n  " + "\n  ".join(stale)
+
+
+def test_declared_sharers_name_an_experiment_that_exists():
+    for rel, (kind, note) in SEED_REGISTRY.items():
+        if kind != "shares":
+            continue
+        target = note.split(" ")[0]
+        assert (ROOT / "experiments" / target).exists(), (
+            f"{rel} says it shares with {target!r}, which does not exist"
+        )
 
 
 def _offsets() -> dict[str, int]:
     found: dict[str, int] = {}
-    for rel, pattern in EVAL_SEED_SOURCES.items():
+    for rel, (kind, _note) in SEED_REGISTRY.items():
+        if kind != "distinct":
+            continue
         path = ROOT / "experiments" / rel
-        assert path.exists(), f"{rel} moved; update this test"
+        assert path.exists(), f"{rel} moved; update SEED_REGISTRY"
+        pattern = (
+            r"seed=SEED \+ (\d+)"
+            if rel == "tier2_simulation/run_batch.py"
+            else EVAL_SEED_PATTERN
+        )
         m = re.search(pattern, path.read_text())
         assert m, f"could not find the eval-seed offset in {rel}"
         found[rel] = int(m.group(1))
