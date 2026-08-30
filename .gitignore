@@ -26,3 +26,6 @@ experiments/tier2_simulation/batch_ledger.json
 # frontend build artefacts
 frontend/node_modules/
 dashboard/dist/
+
+# subagent-driven-development scratch (ledger, briefs, review packages)
+.superpowers/
