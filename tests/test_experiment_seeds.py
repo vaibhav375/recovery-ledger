@@ -86,6 +86,22 @@ def test_every_experiment_declares_what_population_it_evaluates_on():
     assert not stale, "registry names files that no longer exist:\n  " + "\n  ".join(stale)
 
 
+def _offset_for(rel: str) -> int:
+    """The eval-seed offset a single registry entry's file declares,
+    regardless of its registered `kind` — used to compare a sharer's offset
+    against its target's, not just to collision-check the "distinct" set."""
+    path = ROOT / "experiments" / rel
+    assert path.exists(), f"{rel} moved; update SEED_REGISTRY"
+    pattern = (
+        r"seed=SEED \+ (\d+)"
+        if rel == "tier2_simulation/run_batch.py"
+        else EVAL_SEED_PATTERN
+    )
+    m = re.search(pattern, path.read_text())
+    assert m, f"could not find the eval-seed offset in {rel}"
+    return int(m.group(1))
+
+
 def test_declared_sharers_name_an_experiment_that_exists():
     for rel, (kind, note) in SEED_REGISTRY.items():
         if kind != "shares":
@@ -93,6 +109,32 @@ def test_declared_sharers_name_an_experiment_that_exists():
         target = note.split(" ")[0]
         assert (ROOT / "experiments" / target).exists(), (
             f"{rel} says it shares with {target!r}, which does not exist"
+        )
+
+
+def test_declared_sharers_name_a_registered_target_with_a_matching_offset():
+    """A sharer only means what it claims if the thing it names is itself
+    accountable in this registry, and if the two files actually evaluate on
+    the same seed. Before this test, `run_regret.py`'s `EVAL_SEED = SEED +
+    1000` matching `run_batch.py`'s own eval seed was unverified — a typo or
+    a drifted refactor in either file would silently break the comparability
+    the whole regret-ledger experiment rests on, with nothing here to catch
+    it."""
+    for rel, (kind, note) in SEED_REGISTRY.items():
+        if kind != "shares":
+            continue
+        target = note.split(" ")[0]
+        assert target in SEED_REGISTRY, (
+            f"{rel} says it shares with {target!r}, which is not itself a "
+            f"registered entry — a sharer must name something this file is "
+            f"actually watching, not an experiment exempt by omission"
+        )
+        sharer_offset = _offset_for(rel)
+        target_offset = _offset_for(target)
+        assert sharer_offset == target_offset, (
+            f"{rel} claims to share {target}'s population (SEED + "
+            f"{target_offset}) but its own eval-seed offset is SEED + "
+            f"{sharer_offset} — they are not measuring the same customers"
         )
 
 
@@ -113,21 +155,11 @@ def test_every_registry_entry_has_a_valid_kind():
 
 
 def _offsets() -> dict[str, int]:
-    found: dict[str, int] = {}
-    for rel, (kind, _note) in SEED_REGISTRY.items():
-        if kind != "distinct":
-            continue
-        path = ROOT / "experiments" / rel
-        assert path.exists(), f"{rel} moved; update SEED_REGISTRY"
-        pattern = (
-            r"seed=SEED \+ (\d+)"
-            if rel == "tier2_simulation/run_batch.py"
-            else EVAL_SEED_PATTERN
-        )
-        m = re.search(pattern, path.read_text())
-        assert m, f"could not find the eval-seed offset in {rel}"
-        found[rel] = int(m.group(1))
-    return found
+    return {
+        rel: _offset_for(rel)
+        for rel, (kind, _note) in SEED_REGISTRY.items()
+        if kind == "distinct"
+    }
 
 
 def test_every_experiment_uses_a_distinct_evaluation_seed():

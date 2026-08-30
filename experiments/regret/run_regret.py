@@ -83,16 +83,37 @@ def treatment_arm(cases, *, seed: int):
     return [c for c, t in zip(cases, is_treatment) if t]
 
 
-def declined_cases(ledger, treatment, traits) -> tuple[list[DeclinedCase], int]:
+def declined_cases(
+    ledger, treatment, traits, *, cases, seed: int
+) -> tuple[list[DeclinedCase], int, int]:
     """Every treatment-arm case that never received a message.
 
     The holdout arm is deliberately absent: it was left alone by design, as the
     experimental control, not by a refusal. Including it would roughly double
-    the reported regret, which is why `treatment` is passed in rather than the
-    full batch and why the caller asserts the arm size.
+    the reported regret.
+
+    Previously the only guard against a holdout case entering this function
+    was an assert in `main()` on `len(treatment) / len(cases)` — a ratio
+    computed independently of whatever collection was actually passed as
+    `treatment` below. Swapping that argument for `cases` (both arms) left the
+    ratio assert untouched and still passing, while silently doubling the
+    priced universe. `cases` and `seed` are now required so this function can
+    recompute the true treatment arm itself (via `treatment_arm()`, the exact
+    same reconstruction `main()` uses) and refuse anything given to it that
+    is not a member of that arm — the guard now constrains the collection
+    that is actually priced, not a number computed alongside it.
     """
+    expected_ids = {c.case_id for c in treatment_arm(cases, seed=seed)}
+    given_ids = {c.case_id for c in treatment}
+    outside_arm = given_ids - expected_ids
+    assert not outside_arm, (
+        f"declined_cases() was given {len(outside_arm)} case(s) not in the "
+        f"reconstructed treatment arm — the holdout arm must never enter "
+        f"the priced universe"
+    )
     declined: list[DeclinedCase] = []
     worked = 0
+    resolved_excluded = 0
     for case in treatment:
         case_id = case.case_id
         entries = ledger.entries_for_case(case_id)
@@ -102,7 +123,15 @@ def declined_cases(ledger, treatment, traits) -> tuple[list[DeclinedCase], int]:
         stops = [e for e in entries if e.entry_type == "stop"]
         reason = stops[-1].payload.get("reason") if stops else None
         if reason == "resolved":
-            continue  # they paid; nothing was forgone
+            # They paid; nothing was forgone. This is not bookkeeping noise —
+            # it is the selection mechanism the counterfactual check's
+            # one-sidedness rests on (see estimator_diagnostics() and
+            # REPORT.md): every case where paid_0 = 1 is routed out here,
+            # before the declined universe is built, which is why the
+            # universe is conditioned on paid_0 ~= 0 by construction. Counted
+            # so the treatment arm's partition adds up in the artifact.
+            resolved_excluded += 1
+            continue
         # Decision serialises as "DENY", not "deny". Compared against the
         # enum's own value rather than a literal: a lowercase literal here
         # would silently never match, filing every compliance-blocked refusal
@@ -121,7 +150,7 @@ def declined_cases(ledger, treatment, traits) -> tuple[list[DeclinedCase], int]:
             bucket=classify(reason, kernel_denied_contact=kernel_denied),
             stop_reason=reason or "unknown",
         ))
-    return declined, worked
+    return declined, worked, resolved_excluded
 
 
 def realised_pair(case, traits, *, seed: int) -> tuple[float, float]:
@@ -144,6 +173,39 @@ def realised_incremental(case, traits, *, seed: int) -> float:
     """The paired counterfactual for one declined case, in rupees."""
     paid_0, paid_1 = realised_pair(case, traits, seed=seed)
     return float(case.amount_at_risk) * (paid_1 - paid_0)
+
+
+def bootstrap_cost_interval(
+    costs: np.ndarray, *, n_boot: int, seed: int
+) -> tuple[float, float]:
+    """A 95% bootstrap interval on the model-based cost total.
+
+    The spec named `counterfactual_check.inside_headline_interval` before
+    anyone knew the check is one-sided by selection (see the module
+    docstring and REPORT.md): `declined_cases()` excludes every `resolved`
+    case, so `realised_saved` can only ever be `-0.0` here and comparing
+    `realised_net` against `expected_net` compares a one-sided quantity to a
+    two-sided one. That comparison is invalid; this implements the same
+    intent on the half of the ledger the check actually can validate.
+
+    `costs` is the per-case model-based `forgone` amount for every in-scope
+    declined case (mirrors `totals.cost`, which is `costs.sum()`).
+    Resampling with replacement at the same n and summing each draw gives a
+    bootstrap distribution of the total cost estimate; the 2.5/97.5th
+    percentiles of that distribution are the interval the realised
+    (simulated) cost is checked against. Same technique as
+    `tier2_simulation/run_batch.py`'s `_bootstrap_ci` and
+    `dnd_signal/run_dnd_signal.py`'s `bootstrap_ci` — percentile bootstrap,
+    no parametric assumption about the shape of `costs`.
+    """
+    rng = np.random.default_rng(seed)
+    n = len(costs)
+    boot = np.empty(n_boot)
+    for b in range(n_boot):
+        sample = rng.choice(costs, size=n, replace=True)
+        boot[b] = sample.sum()
+    lo, hi = np.quantile(boot, [0.025, 0.975])
+    return float(lo), float(hi)
 
 
 # A third, disjoint offset: not the training seed (SEED + 0), not the shared
@@ -246,11 +308,22 @@ def main() -> None:
         f"treatment arm is {len(treatment)}/{len(cases)}; run_eval's 50/50 "
         f"assignment no longer matches treatment_arm()"
     )
-    declined, worked = declined_cases(ledger, treatment, traits)
+    print(f"Treatment arm: {len(treatment)} of {len(cases)} cases "
+          f"({len(treatment) / len(cases) * 100:.2f}%)")
+    declined, worked, n_resolved_excluded = declined_cases(
+        ledger, treatment, traits, cases=cases, seed=EVAL_SEED
+    )
 
     totals = regret_totals(declined)
     by_bucket = totals_by_bucket(declined)
     n_deferred = sum(1 for d in declined if d.bucket is Bucket.DEFERRED)
+
+    print(
+        f"  worked {worked}, deferred {n_deferred}, resolved (excluded) "
+        f"{n_resolved_excluded}, declined (priced) {totals.n} "
+        f"-> {worked + n_deferred + n_resolved_excluded + totals.n} of "
+        f"{len(treatment)}"
+    )
 
     print(f"\n{'bucket':<18}{'n':>6}{'cost':>14}{'saved':>14}{'net':>14}{'errors':>8}")
     for bucket, t in sorted(by_bucket.items(), key=lambda kv: -kv[1].cost):
@@ -270,13 +343,20 @@ def main() -> None:
     if args.counterfactual:
         print(f"\nPaired counterfactual over {len(declined)} declined cases...")
         by_id = {c.case_id: c for c in treatment}
+        in_scope = [d for d in declined if d.bucket is not Bucket.DEFERRED]
         realised = np.array([
             realised_incremental(by_id[d.case_id], traits, seed=EVAL_SEED + 2)
-            for d in declined if d.bucket is not Bucket.DEFERRED
+            for d in in_scope
         ])
+        costs = np.array([d.forgone for d in in_scope])
+        realised_cost = float(realised[realised > 0].sum())
+        cost_lo, cost_hi = bootstrap_cost_interval(
+            costs, n_boot=2000, seed=EVAL_SEED + 3
+        )
+        inside_interval = cost_lo <= realised_cost <= cost_hi
         check = {
             "n": int(realised.size),
-            "realised_cost": float(realised[realised > 0].sum()),
+            "realised_cost": realised_cost,
             "realised_saved": float(-realised[realised < 0].sum()),
             "realised_net": float(-realised.sum()),
             "expected_net": totals.net,
@@ -293,9 +373,23 @@ def main() -> None:
                 "the universe excludes resolved cases, so paid_0 is ~0 by "
                 "selection and a realised saving cannot be observed"
             ),
+            # The spec named `inside_headline_interval` before anyone knew
+            # the check is one-sided; implemented here on the half of the
+            # ledger it actually validates — see bootstrap_cost_interval()'s
+            # docstring. This is a real, computed verdict: if the realised
+            # cost lands outside the interval, that is published as-is, not
+            # tuned away.
+            "cost_interval_low": round(cost_lo, 2),
+            "cost_interval_high": round(cost_hi, 2),
+            "realised_cost_inside_interval": bool(inside_interval),
         }
         print(f"  realised net {check['realised_net']:,.0f} vs "
               f"expected net {totals.net:,.0f}")
+        print(
+            f"  realised cost {realised_cost:,.0f} vs 95% bootstrap interval "
+            f"[{cost_lo:,.0f}, {cost_hi:,.0f}] on the model-based cost -> "
+            f"{'INSIDE' if inside_interval else 'OUTSIDE'}"
+        )
 
     diagnostics = None
     if args.diagnostics:
@@ -324,9 +418,11 @@ def main() -> None:
         "n_eval": args.n_eval,
         "eval_seed": EVAL_SEED,
         "shares_population_with": "tier2_simulation/run_batch.py",
+        "n_treatment_arm": len(treatment),
         "n_declined": totals.n,
         "n_worked": worked,
         "n_deferred": n_deferred,
+        "n_resolved_excluded": n_resolved_excluded,
         # Written above the results so it cannot be read as post-hoc.
         "prediction": {
             "rule": MODEL_ERROR_PREDICTION,

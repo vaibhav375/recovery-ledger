@@ -78,11 +78,33 @@ non-trivial count of `tau_true > 0` refusals. Near zero would mean the two
 experiments contradict each other, and that contradiction was to be
 published as a finding, not quietly reconciled by adjusting either one.
 
+**What the code actually checks, stated plainly.** The registered threshold
+in `run_regret.py` is `MODEL_ERRORS_EXPECTED_ABOVE = 0` — the rule the code
+enforces is `model_errors > 0`, which any non-zero count clears. That is
+weaker than "a non-trivial count" above implies: the code has no way to
+distinguish one model error from many. This is not being tightened now that
+the result is in — raising a pre-registered threshold after seeing it pass
+would be moving the goalposts, and exactly as much a violation of
+pre-registration as loosening one to force a pass would be. Stated as
+registered, not as it reads in prose: the rule is `> 0`, and the observed
+count — 170 of 286 model-judgement refusals, 59% — clears that weak
+threshold by a wide margin. The stronger "non-trivial count" framing above
+is also satisfied by 170, but that framing is not what the committed code
+checks.
+
 ## Result
 
 2,000 eval cases, treatment arm 1,037. Of those: 234 were actually
-contacted ("worked"), 6 were handed to a human and excluded, and 554 were
-declined and priced:
+contacted ("worked"), 6 were handed to a human and excluded, 243 resolved
+without ever being contacted (they paid; nothing was forgone, so they are
+excluded from cost/saved the same way the 6 deferred cases are), and 554
+were declined and priced. That partition adds up:
+234 + 6 + 243 + 554 = 1,037. The 243 resolved-without-contact cases are not
+bookkeeping — they
+are the selection mechanism the "Counterfactual check" section's one-sided
+argument rests on: excluding them is what conditions the declined universe
+on `paid_0 ~= 0`, which is exactly why that check cannot see a realised
+saving (see below).
 
 ```
 bucket                 n          cost         saved           net  errors
@@ -130,12 +152,31 @@ Paired counterfactual over 560 declined cases...
 print statement in the brief's code counts before the deferred filter; the
 comparison itself — `check["n"] = 554` — matches `totals.n` exactly.)
 
-**The realised and expected costs agree closely; the realised and expected
-savings do not, because the check cannot see savings at all.**
-`realised_cost` is ₹111,614 against `totals.cost` of ₹134,347 — same order,
-same sign, the kind of gap ordinary sampling variance produces. But
+**`realised_cost` disagrees with the model-based cost estimate by more than
+resampling variance explains — a real finding on the one side of the ledger
+this check can validate at all.** The spec named
+`counterfactual_check.inside_headline_interval` before anyone knew this
+check is one-sided by selection; implemented here on the half it actually
+validates: a 95% bootstrap interval on the model-based cost total, built by
+resampling the 554 in-scope declined cases' own `forgone` amounts with
+replacement (2,000 replicates) — this captures how much the total cost
+estimate would move across comparable draws of this same declined sample.
+That interval is **[₹119,877, ₹148,032]**
+(`cost_interval_low`/`cost_interval_high` in `results_regret.json`).
+`realised_cost` — ₹111,614, from the paired WAIT/NUDGE simulation replay —
+falls **outside** it, below the low end
+(`realised_cost_inside_interval: false`). This is published as computed,
+not suppressed or tuned: even on the side of the ledger this check is
+capable of validating, the realised replay and the model-based estimate
+disagree by more than the sampling variance of the cost total accounts
+for. It is not evidence that `totals.cost` is fabricated — both numbers
+come from the same committed, deterministic code, run twice and confirmed
+byte-identical — but it means this section's earlier framing ("the
+realised and expected costs agree closely") overstated the agreement, and
+is corrected here rather than repeated.
+
 `realised_saved` is exactly **`-0.0`** — not a small or noisy number, a
-literal zero — against `totals.saved` of **₹92,177** baked into
+literal zero — against `totals.saved` of **₹93,679** baked into
 `totals.net`. Across all 554 declined cases, the paired simulation replay
 never once produced an instance where nudging looked worse than waiting.
 
@@ -145,11 +186,14 @@ universe, over 6,000 fresh cases (`estimator_diagnostics()` in
 `run_regret.py`, seed disjoint from both the training seed and the shared
 evaluation batch above), 32 of 1,003 true do-not-disturbs (3.2%) showed a
 genuine negative realised draw (paid under WAIT, not paid under NUDGE), and
-the headline expectation estimator itself checks out closely: mean `tau` and
-mean realised `(paid_1 - paid_0)` agree at a ratio of **1.035** over those
-6,000 cases, so `amount x tau_true` is on the same scale as the realised
-effect and nothing is wrong with `totals.cost` or `totals.saved` on their own
-terms.
+the headline expectation estimator itself checks out closely on that
+*unselected* 6,000-case population: mean `tau` and mean realised
+`(paid_1 - paid_0)` agree at a ratio of **1.035**, so `amount x tau_true` is
+on the same scale as the realised effect there. That population-level
+calibration does not, on its own, explain the gap documented above between
+`realised_cost` and its own bootstrap interval on *this* selected 554-case
+sample — the two checks measure different things, and both are reported
+rather than letting the friendlier one stand in for the other.
 
 *(These three figures were previously computed out-of-band and quoted here
 as 46 of 973 (4.7%), ratio 1.000, and 5.5% respectively — numbers nothing in
@@ -173,17 +217,22 @@ declined universe, `paid_0` is therefore ~0 by construction, so
 `realised_saved` has no way to be anything but zero here regardless of how
 many true do-not-disturbs are in it.
 
-**Consequence: `realised_net` and `expected_net` are not the same estimand.**
-The paired counterfactual validates the *cost* side of the ledger only — and
-does so well, ratio 1.035 on the underlying per-case effect and the same
-order of magnitude on `realised_cost` vs `totals.cost` — but it structurally
-cannot validate the *saved* side. The 2.7x gap between `realised_net`
-(-₹111,614) and `expected_net` (-₹40,669) is an artifact of comparing a
-one-sided quantity (cost only) against a two-sided one (cost minus saved),
-not evidence that either figure in `totals` is wrong. `results_regret.json`
-records this directly on `counterfactual_check`: `"validates": "cost side
-only"` and `"one_sided_because"` naming the selection mechanism above, so
-the caveat travels with the artifact and not only with this prose.
+**Consequence: `realised_net` and `expected_net` are not the same estimand,
+and the cost side is not cleanly validated either.** The paired
+counterfactual can only speak to the *cost* side of the ledger at all — it
+structurally cannot validate *saved* — and the bootstrap check above shows
+it does not corroborate cleanly even there: `realised_cost` sits below its
+own model-based interval, a real, published disagreement on the one side
+this check can address. The 2.7x gap between `realised_net` (-₹111,614) and
+`expected_net` (-₹40,669) remains an artifact of comparing a one-sided
+quantity (cost only) against a two-sided one (cost minus saved) — that part
+is not evidence `totals.net` is wrong — but it is no longer accurate to
+call the cost-only comparison itself clean agreement. `results_regret.json`
+records both facts directly on `counterfactual_check`: `"validates": "cost
+side only"`, `"one_sided_because"` naming the selection mechanism above, and
+now `cost_interval_low`/`cost_interval_high`/`realised_cost_inside_interval`
+recording the bootstrap test and its outcome, so the caveat and the finding
+both travel with the artifact and not only with this prose.
 
 ## What this does and does not license
 
@@ -191,22 +240,28 @@ the caveat travels with the artifact and not only with this prose.
 its own cost of declining, on the same customers, for the first time. It
 licenses saying that of the 554 treatment-arm cases the agent declined to
 contact, the model-based estimate is a net -₹40,669 (₹134,347 forgone against
-₹93,679 avoided), that the *cost* half of that figure is independently
-validated by the paired simulation (₹111,614 realised against ₹134,347
-expected, ratio 1.035 on the underlying per-case effect), and that within
-the bucket the agent itself controls (`model_judgement`), 170 of 286
-refusals were later shown to be customers who would have responded
-positively to contact — a real, non-zero error rate that the calibration
-experiment's decile analysis predicted must exist. It licenses treating this
-as a genuine, structural cost of the policy's caution, not noise.
+₹93,679 avoided), and that within the bucket the agent itself controls
+(`model_judgement`), 170 of 286 refusals were later shown to be customers
+who would have responded positively to contact — a real, non-zero error
+rate that the calibration experiment's decile analysis predicted must
+exist. It licenses treating this as a genuine, structural cost of the
+policy's caution, not noise. It also licenses reporting, plainly, that the
+paired-simulation check on the cost side (₹111,614 realised) was tested
+against a 95% bootstrap interval built from the same 554-case sample
+(₹119,877–₹148,032) and landed outside it — a real disagreement, published
+rather than tuned away, not a validation of `totals.cost`.
 
-**This does not license**: quoting the ₹92,177 "saved" figure as
+**This does not license**: quoting the ₹93,679 "saved" figure as
 independently validated — the paired counterfactual could not observe a
 single instance of it (`realised_saved = -0.0`) because the declined
 universe's exclusion of `resolved` cases removes exactly the cases where a
 saving could show up; that figure rests on the model-based estimate alone.
-Nor does it license claiming the agent should therefore contact more
-people. `model_judgement`'s net is still positive (₹28,355) — the model is
+It also does not license quoting the ₹134,347 "cost" figure as
+independently validated — the same paired counterfactual's realised cost
+fell *outside* the 95% bootstrap interval built around that figure, which
+is a documented disagreement, not a confirmation. Nor does it license
+claiming the agent should therefore contact more people.
+`model_judgement`'s net is still positive (₹28,355) — the model is
 net-correct in this bucket even though it is wrong on a non-trivial count of
 individuals, and `allocation` (attempts running out, not a modelling choice)
 is the larger cost in absolute terms. It does not license treating

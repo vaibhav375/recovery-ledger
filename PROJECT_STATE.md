@@ -74,7 +74,7 @@ All from committed artifacts, all reproducible from the listed target.
 | Compliance kernel | **13 rules**, all with provenance citations | `make redteam` |
 | Ledger | 34,304 entries, chain valid | `make eval` |
 | Regret — what the silences cost | 554 declined cases: cost ₹134,347, saved ₹93,679, **net ₹-40,669**; pre-registered prediction (170 model errors) HOLDS | `make regret` |
-| Tests | **441 passing** across 41 files | `make test` |
+| Tests | **455 passing** across 42 files | `make test` |
 
 ---
 
@@ -109,8 +109,8 @@ loop visible.
 ### Frontend
 React + TypeScript + Vite, three.js 3D policy-space, inline SVG charts
 generated from `data.json` (never embedded images, so charts cannot drift from
-artifacts). `make dashboard` builds it; `make verify-page` asserts 10 sections
-and 6 artifact-backed claims render with WebGL both on and off.
+artifacts). `make dashboard` builds it; `make verify-page` asserts 11 sections
+and 7 artifact-backed claims render with WebGL both on and off.
 
 The calibration section is the newest and the only one that argues against the
 system it documents: a two-panel chart — the ranking above, the residual at its
@@ -291,7 +291,7 @@ and a frontend build that deleted the page's data with no error anywhere.
 Run in this order. Every one must pass.
 
 ```bash
-make test          # 441 tests
+make test          # 455 tests
 make eval          # B1 headline
 make baselines     # 8-policy comparison
 make sensitivity   # 75/75 both criteria across 3 draws
@@ -300,7 +300,7 @@ make regret        # what the silences cost, beside what contacting recovered
 make redteam       # 100% block rate, 0 leaks
 make tier1-criteo  # IPS/SNIPS recover the arm-mean ATE
 make dashboard     # rebuild page from artifacts
-make verify-page   # 9 sections, 5 artifact-backed claims, both paths
+make verify-page   # 11 sections, 7 artifact-backed claims, both paths
 make demo          # agent loop visible end to end
 ```
 

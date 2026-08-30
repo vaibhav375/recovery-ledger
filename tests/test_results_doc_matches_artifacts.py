@@ -646,6 +646,135 @@ def test_regret_was_measured_on_the_headline_population():
     assert _load(REGRET)["shares_population_with"] == "tier2_simulation/run_batch.py"
 
 
+def test_regret_treatment_arm_size_matches_the_artifact(results_md, regret_report):
+    """Finding 4: `n_treatment_arm` (1,037) and its 51.85% share of the
+    2,000-case batch were quoted in both documents with nothing loading or
+    asserting them from the artifact. `n_treatment_arm` is now a real
+    artifact field (`results_regret.json`); this pins both renderings to it."""
+    d = _load(REGRET)
+    n_arm, n_eval = d["n_treatment_arm"], d["n_eval"]
+    pct = f"{n_arm / n_eval * 100:.2f}%"
+    assert f"{n_arm:,}" in results_md
+    assert f"{n_arm:,}" in regret_report
+    assert pct in regret_report, (
+        f"REPORT.md does not state the treatment arm's share of the batch "
+        f"as {pct}, computed from n_treatment_arm/n_eval in the artifact"
+    )
+
+
+def test_regret_resolved_excluded_matches_the_artifact(results_md, regret_report):
+    """Finding 5: the published partition of the 1,037-case treatment arm
+    (234 contacted + 6 deferred + 554 declined = 794) used to be 243 cases
+    short of 1,037, with nothing naming where they went. `declined_cases()`
+    now counts them as `n_resolved_excluded` (cases that resolved without
+    ever being contacted) and both documents must state the number and show
+    the partition adding up."""
+    d = _load(REGRET)
+    n_resolved = d["n_resolved_excluded"]
+    total = d["n_worked"] + d["n_deferred"] + n_resolved + d["n_declined"]
+    assert total == d["n_treatment_arm"], (
+        "the artifact's own partition does not sum to n_treatment_arm — "
+        "this would mean the fix for finding 5 has a bug, not just a doc gap"
+    )
+    for doc_name, doc in (("RESULTS.md", results_md), ("REPORT.md", regret_report)):
+        assert str(n_resolved) in doc, (
+            f"{doc_name} does not state n_resolved_excluded ({n_resolved})"
+        )
+        partition = (
+            f"{d['n_worked']} + {d['n_deferred']} + {n_resolved} + "
+            f"{d['n_declined']} = {d['n_treatment_arm']:,}"
+        )
+        assert partition in doc, (
+            f"{doc_name} does not show the partition adding up: {partition!r}"
+        )
+
+
+def test_regret_saved_caveat_names_the_published_total_not_the_bucket(
+    results_md, regret_report
+):
+    """Finding 1 (critical): the caveat that a "saved" figure must not be
+    quoted as independently validated used to name ₹92,177 —
+    `buckets[model_judgement].saved` — while the figure readers actually see
+    published as *the* saved figure (in the Total row, the headline
+    sentence, and PROJECT_STATE.md) is `totals.saved`, ₹93,679. A reader
+    could note the caveat names a different number and quote ₹93,679 as
+    validated — the exact overclaim the caveat exists to prevent. This pins
+    the caveat to `totals.saved` as rendered, in both documents."""
+    saved = f"₹{_load(REGRET)['totals']['saved']:,.0f}"
+    assert saved == "₹93,679"
+    assert f"{saved} saved figure must not be quoted as" in results_md, (
+        f"RESULTS.md's caveat does not name {saved} (totals.saved) as the "
+        f"figure that must not be quoted as independently validated"
+    )
+    assert f'quoting the {saved} "saved" figure as' in regret_report, (
+        f"REPORT.md's caveat does not name {saved} (totals.saved) as the "
+        f"figure that must not be quoted as independently validated"
+    )
+
+
+def test_regret_cost_interval_matches_the_artifact(results_md, regret_report):
+    """Ruling B: the spec named `counterfactual_check.inside_headline_interval`
+    before anyone knew the check is one-sided by selection. Implemented on
+    the cost side only: a bootstrap interval and a real verdict against it,
+    both now artifact fields. If the realised cost lands outside the
+    interval, that must be published as a finding, not tuned away or
+    quietly reworded back into agreement — this pins the interval bounds
+    and the boolean verdict in both documents, and fails if the interval
+    ever moves without the prose being revisited."""
+    c = _load(REGRET)["counterfactual_check"]
+    lo = f"₹{c['cost_interval_low']:,.0f}"
+    hi = f"₹{c['cost_interval_high']:,.0f}"
+    for doc_name, doc in (("RESULTS.md", results_md), ("REPORT.md", regret_report)):
+        assert lo in doc, f"{doc_name} does not state the cost-interval low bound {lo}"
+        assert hi in doc, f"{doc_name} does not state the cost-interval high bound {hi}"
+        assert "cost_interval" in doc, (
+            f"{doc_name} does not name the cost_interval_low/high artifact "
+            f"fields the interval above is read from"
+        )
+        assert "realised_cost_inside_interval" in doc, (
+            f"{doc_name} does not name the realised_cost_inside_interval "
+            f"artifact field carrying the verdict"
+        )
+    verdict_word = "inside" if c["realised_cost_inside_interval"] else "outside"
+    assert verdict_word in results_md.lower()
+    assert verdict_word in regret_report.lower()
+    # Ruling B is explicit: if the realised cost lands outside, publish it
+    # as a finding rather than reusing agreement language. Fail loudly if
+    # the verdict is False (outside) but the document still claims clean
+    # agreement on the cost side.
+    if not c["realised_cost_inside_interval"]:
+        for doc_name, doc in (("RESULTS.md", results_md), ("REPORT.md", regret_report)):
+            assert "ordinary sampling variance" not in doc, (
+                f"{doc_name} still calls the realised/expected cost gap "
+                f"'ordinary sampling variance' after the bootstrap test "
+                f"showed the realised cost falls outside its own interval"
+            )
+
+
+def test_regret_prediction_threshold_is_disclosed_as_registered(results_md, regret_report):
+    """Ruling A (finding 7): `MODEL_ERRORS_EXPECTED_ABOVE = 0` is the
+    registered rule — `model_errors > 0` — which is weaker than the
+    "non-trivial count" language in the prose. The code is not being
+    tightened after seeing the result (that would be moving the goalposts);
+    instead both documents must state the rule as actually registered and
+    disclose that 170 clears it by a wide margin."""
+    p = _load(REGRET)["prediction"]
+    threshold = p["model_errors_expected_above"]
+    assert threshold == 0, (
+        "MODEL_ERRORS_EXPECTED_ABOVE has changed — Ruling A says this must "
+        "not be raised after seeing the result; if it moved, that is exactly "
+        "the goalpost-moving this ruling forbids"
+    )
+    for doc_name, doc in (("RESULTS.md", results_md), ("REPORT.md", regret_report)):
+        assert f"model_errors > {threshold}" in doc, (
+            f"{doc_name} does not state the registered rule as "
+            f"'model_errors > {threshold}'"
+        )
+        assert "MODEL_ERRORS_EXPECTED_ABOVE" in doc, (
+            f"{doc_name} does not name the actual registered constant"
+        )
+
+
 def test_regret_counterfactual_check_matches_the_artifact(results_md):
     """`counterfactual_check` was quoted in RESULTS.md's Counterfactual-check
     subsection with nothing loading or asserting it — found in review, and

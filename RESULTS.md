@@ -133,6 +133,14 @@ wrong. This experiment prices the 554 declined cases in the same
 `persuadability(traits)` as the true per-case effect: positive true uplift
 priced as forgone, negative true uplift priced as avoided.
 
+Of the 1,037-case treatment arm: 234 were actually contacted ("worked"), 6
+were handed to a human (excluded, not yet decided), 243 resolved without
+ever being contacted (they paid; nothing was forgone, so they too are
+excluded), and 554 were declined and priced below. That partition adds up:
+234 + 6 + 243 + 554 = 1,037. The 243 resolved-without-contact cases are the
+selection mechanism behind the counterfactual check's one-sidedness further
+down: excluding them is what conditions the priced universe on `paid_0 ~= 0`.
+
 | Bucket | n | Cost | Saved | Net | Model errors |
 |---|---:|---:|---:|---:|---:|
 | allocation | 264 | ₹69,247 | ₹1,502 | ₹-67,746 | 0 |
@@ -167,16 +175,39 @@ avoided in true do-not-disturbs outweighs the ₹63,822 forgone from the 170
 customers the model judged wrong — the model is right more often by rupees
 saved even while wrong on a non-trivial count of people.
 
+**The registered rule is weaker than "non-trivial count" implies, stated
+plainly.** The threshold actually coded (`MODEL_ERRORS_EXPECTED_ABOVE = 0`
+in `run_regret.py`) is `model_errors > 0` — any non-zero count passes. It is
+not being raised now that the result is in: tightening a pre-registered
+threshold after seeing it clear would be moving the goalposts, same as
+loosening one to force a pass would be. As registered, the rule clears at
+170 by a wide margin (170 of 286 model-judgement refusals, 59%); the
+stronger "non-trivial count" framing above is also satisfied, but is not
+what the code enforces.
+
 **Caveat, load-bearing:** the headline estimator is an expectation under
 simulator truth, not a realised measurement.
 
-### Counterfactual check — validates the cost side only
+### Counterfactual check — validates the cost side only, and disagrees even there
 
 A second, independent estimate replays each of the same 554 cases under
 `WAIT` (what happened) and `NUDGE` (the counterfactual) with common random
-numbers: realised cost ₹111,614 against the expected ₹134,347 (same order,
-same sign — ordinary sampling variance), realised net ₹-111,614 against
-expected net ₹-40,669.
+numbers: realised cost ₹111,614 against the expected ₹134,347, realised net
+₹-111,614 against expected net ₹-40,669.
+
+**Tested, not assumed to agree: a 95% bootstrap interval on the model-based
+cost total is [₹119,877, ₹148,032], and the realised cost (₹111,614) falls
+outside it.** The interval resamples the 554 in-scope declined cases' own
+`forgone` amounts with replacement (2,000 replicates), capturing how much
+the total cost estimate would move across comparable draws of this same
+sample. `results_regret.json` records the interval and the verdict directly:
+`cost_interval_low`, `cost_interval_high`, `realised_cost_inside_interval:
+false`. This is published as computed — even on the one side of the ledger
+this check can validate at all, the realised replay and the model-based
+estimate disagree by more than the sampling variance of the cost total
+accounts for. It is not evidence `totals.cost` is fabricated (both figures
+come from the same committed, deterministic code), but it is a real,
+unresolved disagreement, not agreement to be waved past.
 
 **`realised_saved` is exactly `-0.0`, not a small or noisy number.** This is
 selection, not variance: `declined_cases()` excludes `resolved` cases (they
@@ -184,8 +215,11 @@ paid; nothing was forgone), which conditions the declined universe on *not*
 having paid under `WAIT` — a saving can only be observed where `paid_0 = 1`
 and `paid_1 = 0`, and every such case was already routed out as `resolved`
 before it could enter this universe. **This check validates the cost side of
-the ledger only, and the ₹92,177 saved figure must not be quoted as
-independently validated** — it rests on the model-based estimate alone.
+the ledger only — and, per the bootstrap result above, does not cleanly
+corroborate it — so the ₹93,679 saved figure must not be quoted as
+independently validated** — it rests on the model-based estimate alone; nor
+should the ₹134,347 cost figure be quoted as independently validated, since
+the realised replay landed outside its own interval.
 `results_regret.json` records this directly on `counterfactual_check`:
 `"validates": "cost side only"`. See `experiments/regret/REPORT.md` for the
 full design and the estimator diagnostics that back this claim, including

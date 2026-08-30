@@ -2,9 +2,11 @@
   "n_eval": 2000,
   "eval_seed": 20261823,
   "shares_population_with": "tier2_simulation/run_batch.py",
+  "n_treatment_arm": 1037,
   "n_declined": 554,
   "n_worked": 234,
   "n_deferred": 6,
+  "n_resolved_excluded": 243,
   "prediction": {
     "rule": "make calibration reports the bottom tau_hat bin as 43.8% true do-not-disturbs, so it is also ~56% customers with positive true uplift. The model-judgement bucket must therefore contain a non-trivial count of tau_true > 0 refusals. Near zero refutes one of the two experiments.",
     "model_errors_expected_above": 0,
@@ -50,7 +52,10 @@
     "realised_net": -111613.81308308656,
     "expected_net": -40668.54936746729,
     "validates": "cost side only",
-    "one_sided_because": "the universe excludes resolved cases, so paid_0 is ~0 by selection and a realised saving cannot be observed"
+    "one_sided_because": "the universe excludes resolved cases, so paid_0 is ~0 by selection and a realised saving cannot be observed",
+    "cost_interval_low": 119877.45,
+    "cost_interval_high": 148032.22,
+    "realised_cost_inside_interval": false
   },
   "estimator_diagnostics": {
     "n": 6000,
