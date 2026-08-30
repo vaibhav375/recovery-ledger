@@ -1,6 +1,7 @@
 import InView from "../motion/InView";
 import UpliftQuadrant from "../components/UpliftQuadrant";
 import PolicySpaceGuard from "../components/PolicySpaceGuard";
+import RegretLedger from "../components/RegretLedger";
 
 /** The agent's most interesting decisions are the ones where it does nothing.
  *
@@ -9,7 +10,7 @@ import PolicySpaceGuard from "../components/PolicySpaceGuard";
  * no message sent — for three genuinely different reasons. */
 export default function Silence({
   dndCases, promiseWindows, futileRetries, contactsSent, totalCases, scatter,
-  scatterCorrelation,
+  scatterCorrelation, regret,
 }: {
   dndCases: number;
   promiseWindows: number;
@@ -26,6 +27,10 @@ export default function Silence({
    * is, so quoting a number from a different population would be describing
    * some other chart. */
   scatterCorrelation?: number;
+  /** The Task 3 regret-ledger artifact — the price tag on this section's
+   * argument. Optional because a checkout without the experiment run should
+   * still render the rest of the page. */
+  regret?: any;
 }) {
   const items = [
     {
@@ -67,6 +72,8 @@ export default function Silence({
             </InView>
           ))}
         </div>
+
+        {regret && <RegretLedger regret={regret} />}
 
         {scatter && scatter.length > 0 && (
           <InView index={3}>

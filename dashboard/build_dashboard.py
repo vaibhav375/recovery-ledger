@@ -445,6 +445,9 @@ def build_data(ledger_path: Path, max_cases: int) -> dict:
         # the matplotlib PNG next to it, so the chart on the page cannot drift
         # away from the artifact the doc tests pin.
         "calibration": load_optional(ROOT / "experiments" / "uplift_calibration" / "results_uplift_calibration.json"),
+        # What the silences cost. Served from the artifact rather than
+        # retyped, like every other figure on the page.
+        "regret": load_optional(ROOT / "experiments" / "regret" / "results_regret.json"),
         # Where each rule comes from. Embedded rather than fetched, so the
         # static dashboard can answer "says who?" with no server running —
         # the live console gets the same registry from /api/provenance.

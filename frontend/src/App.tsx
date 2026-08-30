@@ -119,6 +119,7 @@ export default function App() {
           totalCases={data.summary.cases}
           scatter={data.fairness?.scatter_sample}
           scatterCorrelation={data.fairness?.uplift_correlation}
+          regret={data.regret}
         />
         <Calibration cal={data.calibration} />
         <Kernel data={data} />
