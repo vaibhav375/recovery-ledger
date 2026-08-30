@@ -589,8 +589,10 @@ sys.path.insert(0, str(HERE.parent / "tier2_simulation"))
 from run_batch import NOW, SEED, run_eval, train_models  # noqa: E402
 
 from recovery_ledger.events.actions import ActionType  # noqa: E402
+from recovery_ledger.kernel.certificate import Decision  # noqa: E402
 from recovery_ledger.policy.regret import (  # noqa: E402
     Bucket,
+    CONTACT_ACTIONS,
     DeclinedCase,
     classify,
     regret_totals,
@@ -651,10 +653,15 @@ def declined_cases(ledger, treatment, traits) -> tuple[list[DeclinedCase], int]:
         reason = stops[-1].payload.get("reason") if stops else None
         if reason == "resolved":
             continue  # they paid; nothing was forgone
+        # Decision serialises as "DENY", not "deny". Compared against the
+        # enum's own value rather than a literal: a lowercase literal here
+        # would silently never match, filing every compliance-blocked refusal
+        # as a model judgement and inflating the model-error count that the
+        # pre-registered prediction turns on.
         kernel_denied = any(
             e.entry_type == "certificate"
-            and e.payload.get("decision") == "deny"
-            and e.payload.get("action_type") in {ActionType.NUDGE.value, ActionType.NEGOTIATE.value}
+            and e.payload.get("decision") == Decision.DENY.value
+            and e.payload.get("action_type") in CONTACT_ACTIONS
             for e in entries
         )
         declined.append(DeclinedCase(
