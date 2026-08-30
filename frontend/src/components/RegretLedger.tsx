@@ -8,7 +8,7 @@ export default function RegretLedger({ regret }: { regret: any }) {
   if (!regret?.buckets?.length) return null;
   const t = regret.totals;
   const widest = Math.max(...regret.buckets.flatMap((b: any) => [b.cost, b.saved]), 1);
-  const pct = (v: number) => `${(v / widest) * 50}%`;
+  const pct = (v: number) => `${(v / widest) * 100}%`;
   const inr = (v: number) => `₹${Math.round(v).toLocaleString("en-IN")}`;
 
   return (
@@ -25,10 +25,12 @@ export default function RegretLedger({ regret }: { regret: any }) {
         {regret.buckets.map((b: any) => (
           <li key={b.bucket}>
             <span className="rl-regret-name">{b.bucket.replace(/_/g, " ")}</span>
+            <span className="rl-regret-fig rl-regret-fig-cost">{inr(b.cost)}</span>
             <span className="rl-regret-bar">
               <span className="rl-regret-cost" style={{ width: pct(b.cost) }} />
               <span className="rl-regret-saved" style={{ width: pct(b.saved) }} />
             </span>
+            <span className="rl-regret-fig rl-regret-fig-saved">{inr(b.saved)}</span>
             <span className="rl-regret-net">{inr(b.net)}</span>
           </li>
         ))}
