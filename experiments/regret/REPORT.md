@@ -238,6 +238,78 @@ now `cost_interval_low`/`cost_interval_high`/`realised_cost_inside_interval`
 recording the bootstrap test and its outcome, so the caveat and the finding
 both travel with the artifact and not only with this prose.
 
+## Replicating the cost-side disagreement
+
+The section above reports `realised_cost` (₹111,614) falling outside the 95%
+bootstrap interval on the model-based cost total ([₹119,877, ₹148,032]) —
+but that was measured on a **single draw** of the evaluation population,
+the same `EVAL_SEED = SEED + 1000` population everything else in this
+report is measured on. This repo's governing rule, established across five
+separate findings elsewhere in this project that did not survive a second
+draw, is that a single-draw result is a claim about that draw, not about
+the method. The published limitation above was, until this section existed,
+exactly the kind of claim this project tells everyone else not to make.
+
+**The rule, fixed before running the replication (see also the module
+docstring's "THE REPLICATION RULE"):** the cost-side disagreement is a
+replicated finding only if the realised cost falls **outside** the
+model-based interval in **every** draw. If it falls outside in some draws
+and inside in others, the disagreement is **not** established and must be
+reported as unresolved — a property of the headline draw rather than of the
+method. If it falls inside in every draw, the headline draw was the outlier
+and that must be published as such.
+
+Quoted verbatim from `results_regret.json`'s `disagreement_replication.rule`
+(the same string `DISAGREEMENT_REPLICATION_RULE` in `run_regret.py` enforces
+and prints, so the prose above and the string the code actually carries
+cannot drift apart unnoticed):
+
+> The cost-side disagreement is a replicated finding only if the realised cost falls outside the model-based interval in every draw. If it falls outside in some draws and inside in others, the disagreement is not established and must be reported as unresolved -- a property of the headline draw rather than of the method. If it falls inside in every draw, the headline draw was the outlier and that must be published as such.
+
+`run_regret.py --replication-draws 5` (the default) reruns the *entire*
+pipeline — `run_eval`, `treatment_arm`, `declined_cases`, the paired
+WAIT/NUDGE replay, and the bootstrap interval — on the headline draw plus 5
+independent populations at `SEED + 13000 + 100*d`, using the same trained
+models. Each draw is a full, independent rerun of the same committed code,
+not a resample of the same 554 cases.
+
+```
+draw   seed        n    realised cost   interval [low, high]              verdict
+0      20261823   554         111,614   [119,877, 148,032]                OUTSIDE  (headline)
+1      20273823   515         114,427   [123,447, 157,131]                OUTSIDE
+2      20273923   509         118,775   [124,172, 155,328]                OUTSIDE
+3      20274023   537         135,868   [133,511, 170,117]                INSIDE
+4      20274123   534         137,980   [133,315, 163,177]                INSIDE
+5      20274223   489         132,954   [106,555, 136,041]                INSIDE
+```
+
+**Verdict: UNRESOLVED.** The realised cost fell outside the model-based
+interval in 3 of the 6 draws (including the headline) and inside in the
+other 3. Neither of the two clean outcomes obtains: it is not outside in
+every draw (so it does not replicate as a finding), and it is not inside in
+every draw (so the headline draw cannot be dismissed as a simple outlier
+either). This is exactly the middle case the pre-registered rule described
+and required to be reported as unresolved rather than forced into either
+clean bucket. `results_regret.json`'s `disagreement_replication.replicates`
+is `false`, and `disagreement_replication.verdict` records this sentence's
+substance verbatim for the artifact to carry it directly.
+
+**What this means for the limitation published above.** The "Counterfactual
+check" section's headline claim — that `realised_cost` disagrees with its
+own model-based interval by more than sampling variance explains — no
+longer stands as a general property of the method. It stood on one draw.
+Across 6 draws it is outside half the time and inside half the time, which
+is the signature of a boundary case, not of a real, general disagreement
+between the paired-replay estimator and the model-based one. The correct
+published statement is: **on the headline draw specifically**, the realised
+cost fell outside its bootstrap interval; **whether that reflects a real
+property of the estimators or is itself an artifact of which population was
+drawn is unresolved**, and this report no longer asserts the stronger claim
+that it does reflect a real, general disagreement. This is not a retraction
+of the original observation on the headline draw — that number did fall
+outside its interval, and still does — it is a retraction of the
+generalisation from that one observation to "the check disagrees."
+
 ## What this does and does not license
 
 **This licenses**: reporting the B1 headline (₹272,281 / 1,000 cases) beside
@@ -249,11 +321,16 @@ contact, the model-based estimate is a net -₹40,669 (₹134,347 forgone agains
 who would have responded positively to contact — a real, non-zero error
 rate that the calibration experiment's decile analysis predicted must
 exist. It licenses treating this as a genuine, structural cost of the
-policy's caution, not noise. It also licenses reporting, plainly, that the
-paired-simulation check on the cost side (₹111,614 realised) was tested
-against a 95% bootstrap interval built from the same 554-case sample
-(₹119,877–₹148,032) and landed outside it — a real disagreement, published
-rather than tuned away, not a validation of `totals.cost`.
+policy's caution, not noise. It also licenses reporting, plainly, that on
+the headline draw the paired-simulation check on the cost side (₹111,614
+realised) was tested against a 95% bootstrap interval built from that
+draw's 554-case sample (₹119,877–₹148,032) and landed outside it — but,
+per "Replicating the cost-side disagreement" above, **not** that this is a
+general, replicated disagreement between the two estimators: across 6
+independent draws (the headline plus 5 replications) the realised cost
+fell outside its own interval in 3 and inside in the other 3, so the
+pre-registered replication rule requires this be reported as unresolved,
+not as an established finding.
 
 **This does not license**: quoting the ₹93,679 "saved" figure as
 independently validated — the paired counterfactual could not observe a
@@ -262,8 +339,11 @@ universe's exclusion of `resolved` cases removes exactly the cases where a
 saving could show up; that figure rests on the model-based estimate alone.
 It also does not license quoting the ₹134,347 "cost" figure as
 independently validated — the same paired counterfactual's realised cost
-fell *outside* the 95% bootstrap interval built around that figure, which
-is a documented disagreement, not a confirmation. Nor does it license
+fell *outside* the 95% bootstrap interval built around that figure on the
+headline draw, which is a documented observation on that draw, not a
+confirmation — and, per the replication above, not a documented
+disagreement of the method in general, since the same check landed
+*inside* its interval on 3 of the 6 draws examined. Nor does it license
 claiming the agent should therefore contact more people.
 `model_judgement`'s net is still positive (₹28,355) — the model is
 net-correct in this bucket even though it is wrong on a non-trivial count of

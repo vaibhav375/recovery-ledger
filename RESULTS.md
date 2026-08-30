@@ -188,7 +188,7 @@ what the code enforces.
 **Caveat, load-bearing:** the headline estimator is an expectation under
 simulator truth, not a realised measurement.
 
-### Counterfactual check — validates the cost side only, and disagrees even there
+### Counterfactual check — validates the cost side only, and disagrees on the headline draw
 
 A second, independent estimate replays each of the same 554 cases under
 `WAIT` (what happened) and `NUDGE` (the counterfactual) with common random
@@ -202,12 +202,38 @@ outside it.** The interval resamples the 554 in-scope declined cases' own
 the total cost estimate would move across comparable draws of this same
 sample. `results_regret.json` records the interval and the verdict directly:
 `cost_interval_low`, `cost_interval_high`, `realised_cost_inside_interval:
-false`. This is published as computed — even on the one side of the ledger
-this check can validate at all, the realised replay and the model-based
-estimate disagree by more than the sampling variance of the cost total
-accounts for. It is not evidence `totals.cost` is fabricated (both figures
-come from the same committed, deterministic code), but it is a real,
-unresolved disagreement, not agreement to be waved past.
+false`. It is not evidence `totals.cost` is fabricated (both figures come
+from the same committed, deterministic code).
+
+**But that was one draw, and this project's rule is that a single-draw
+result is a claim about that draw, not about the method — so it was
+replicated rather than published as a standing disagreement.**
+`run_regret.py --replication-draws 5` reruns the entire pipeline on 5
+independent populations (`SEED + 13000 + 100*d`) plus the headline draw
+itself, 6 draws total, and checks the same bootstrap test on each:
+
+| draw | seed | realised cost | interval | verdict |
+|---|---:|---:|---|---|
+| 0 (headline) | 20261823 | ₹111,614 | [₹119,877, ₹148,032] | outside |
+| 1 | 20273823 | ₹114,427 | [₹123,447, ₹157,131] | outside |
+| 2 | 20273923 | ₹118,775 | [₹124,172, ₹155,328] | outside |
+| 3 | 20274023 | ₹135,868 | [₹133,511, ₹170,117] | inside |
+| 4 | 20274123 | ₹137,980 | [₹133,315, ₹163,177] | inside |
+| 5 | 20274223 | ₹132,954 | [₹106,555, ₹136,041] | inside |
+
+**Verdict: UNRESOLVED** (`disagreement_replication.replicates: false`).
+Outside in 3 of 6 draws, inside in the other 3 — neither "outside in every
+draw" (which would make this a replicated finding) nor "inside in every
+draw" (which would mean the headline draw was simply the outlier). The
+pre-registered rule (see `experiments/regret/REPORT.md`, "Replicating the
+cost-side disagreement") requires exactly this outcome be reported as
+unresolved. **The published limitation is therefore weaker than it was
+before this replication ran: on the headline draw specifically, the
+realised cost did fall outside its bootstrap interval, but whether that
+reflects a real property of the two estimators or is itself an artifact of
+which population got drawn is unresolved — it is not established as a
+general disagreement between the paired-replay and model-based cost
+estimates.**
 
 **`realised_saved` is exactly `-0.0`, not a small or noisy number.** This is
 selection, not variance: `declined_cases()` excludes `resolved` cases (they
@@ -215,16 +241,18 @@ paid; nothing was forgone), which conditions the declined universe on *not*
 having paid under `WAIT` — a saving can only be observed where `paid_0 = 1`
 and `paid_1 = 0`, and every such case was already routed out as `resolved`
 before it could enter this universe. **This check validates the cost side of
-the ledger only — and, per the bootstrap result above, does not cleanly
-corroborate it — so the ₹93,679 saved figure must not be quoted as
-independently validated** — it rests on the model-based estimate alone; nor
-should the ₹134,347 cost figure be quoted as independently validated, since
-the realised replay landed outside its own interval.
-`results_regret.json` records this directly on `counterfactual_check`:
-`"validates": "cost side only"`. See `experiments/regret/REPORT.md` for the
-full design and the estimator diagnostics that back this claim, including
-that negative realised draws are not structurally impossible — they simply
-do not occur inside this selected universe.
+the ledger only — and, per the replication above, does not establish
+agreement or disagreement there either — so the ₹93,679 saved figure must not be quoted as
+independently validated** — it rests on the model-based
+estimate alone; nor should the ₹134,347 cost figure be quoted as
+independently validated, since the realised replay landed outside its own
+interval on the headline draw and the replication left the general question
+unresolved. `results_regret.json` records this directly on
+`counterfactual_check`: `"validates": "cost side only"`, and the six-draw
+replication on `disagreement_replication`. See `experiments/regret/REPORT.md`
+for the full design and the estimator diagnostics that back this claim,
+including that negative realised draws are not structurally impossible —
+they simply do not occur inside this selected universe.
 
 Every figure in this section is read straight out of
 `experiments/regret/results_regret.json`, pinned by

@@ -22,6 +22,19 @@ if they were not. If that result is true, the model-judgement bucket MUST
 contain a non-trivial count of cases with tau_true > 0. If that cell comes back
 at or near zero, the two experiments contradict each other and one of them is
 wrong. That gets published as a contradiction, not reconciled.
+
+THE REPLICATION RULE, fixed before the run. The counterfactual check found
+that the realised cost disagrees with the model-based cost interval — but
+that was measured on a single draw of the evaluation population, and this
+project's governing rule is that a single-draw conclusion is a claim about
+that draw, not about the method. The cost-side disagreement is a replicated
+finding only if the realised cost falls outside the model-based interval in
+EVERY draw. If it falls outside in some draws and inside in others, the
+disagreement is NOT established and must be reported as unresolved — a
+property of the headline draw rather than of the method. If it falls inside
+in every draw, the headline draw was the outlier and that must be published
+as such. Whatever comes out gets published as it is: seeds, draw counts and
+interval widths are not tuned to reach a preferred answer.
 """
 
 from __future__ import annotations
@@ -67,6 +80,16 @@ MODEL_ERROR_PREDICTION = (
     "tau_true > 0 refusals. Near zero refutes one of the two experiments."
 )
 MODEL_ERRORS_EXPECTED_ABOVE = 0
+
+DISAGREEMENT_REPLICATION_RULE = (
+    "The cost-side disagreement is a replicated finding only if the "
+    "realised cost falls outside the model-based interval in every draw. "
+    "If it falls outside in some draws and inside in others, the "
+    "disagreement is not established and must be reported as unresolved -- "
+    "a property of the headline draw rather than of the method. If it "
+    "falls inside in every draw, the headline draw was the outlier and "
+    "that must be published as such."
+)
 
 
 def treatment_arm(cases, *, seed: int):
@@ -222,6 +245,17 @@ DIAGNOSTICS_SEED = SEED + 12000
 DIAGNOSTICS_N = 6000
 DIAGNOSTICS_WAIT_SAMPLE_N = 400
 
+# A fourth, disjoint offset -- SEED + 13000 is unused by every other
+# experiment's declared offset (see tests/test_experiment_seeds.py), same
+# precedent as DIAGNOSTICS_SEED above: an internal seed used to check a
+# claim this module makes about its own result, not a second evaluation of
+# the headline, so it does not need its own SEED_REGISTRY entry. Each
+# replication draw d in 0..replication_draws-1 reseeds the *entire* pipeline
+# (run_eval, treatment_arm, declined_cases, the paired replay, the
+# bootstrap) at DISAGREEMENT_REPLICATION_SEED + 100*d -- an independent
+# population the headline draw never saw, using the same trained models.
+DISAGREEMENT_REPLICATION_SEED = SEED + 13000
+
 
 def estimator_diagnostics(
     *,
@@ -282,6 +316,93 @@ def estimator_diagnostics(
     }
 
 
+def cost_side_disagreement_draw(
+    uplift, churn, *, seed: int, n_eval: int
+) -> dict:
+    """One independent replication draw of the cost-side counterfactual
+    check, on a population the headline draw (EVAL_SEED) never saw.
+
+    This is the exact same computation as the `counterfactual_check` block
+    in `main()` -- `run_eval`, `treatment_arm`, `declined_cases`, the paired
+    WAIT/NUDGE replay, and the bootstrap interval -- reseeded from `seed`
+    instead of `EVAL_SEED`, on the same trained `uplift`/`churn` models.
+    "Replicate the disagreement" means rerun the identical code on a fresh
+    population, not write a second, bespoke computation that could silently
+    diverge from what draw 0 does.
+    """
+    cases = generate_cases(n_eval, seed=seed, now=NOW)
+    traits = generate_population(cases, seed=seed)
+    _results, ledger = run_eval(n_eval, uplift, seed=seed, churn_model=churn)
+    treatment = treatment_arm(cases, seed=seed)
+    assert 0.4 < len(treatment) / len(cases) < 0.6, (
+        f"treatment arm is {len(treatment)}/{len(cases)} at seed {seed}; "
+        f"run_eval's 50/50 assignment no longer matches treatment_arm()"
+    )
+    declined, _worked, _n_resolved_excluded = declined_cases(
+        ledger, treatment, traits, cases=cases, seed=seed
+    )
+    by_id = {c.case_id: c for c in treatment}
+    in_scope = [d for d in declined if d.bucket is not Bucket.DEFERRED]
+    realised = np.array([
+        realised_incremental(by_id[d.case_id], traits, seed=seed + 2)
+        for d in in_scope
+    ])
+    costs = np.array([d.forgone for d in in_scope])
+    realised_cost = float(realised[realised > 0].sum())
+    cost_lo, cost_hi = bootstrap_cost_interval(costs, n_boot=2000, seed=seed + 3)
+    inside = cost_lo <= realised_cost <= cost_hi
+    return {
+        "seed": seed,
+        "n": int(realised.size),
+        "realised_cost": realised_cost,
+        "cost_interval_low": round(cost_lo, 2),
+        "cost_interval_high": round(cost_hi, 2),
+        "realised_cost_inside_interval": bool(inside),
+    }
+
+
+def disagreement_verdict(rows: list[dict]) -> tuple[bool, str]:
+    """Apply THE REPLICATION RULE (see the module docstring) to a list of
+    per-draw rows, each carrying `realised_cost_inside_interval`.
+
+    Three outcomes, and only three: outside in every draw (replicates),
+    inside in every draw (the headline draw was the outlier), or a mix
+    (unresolved). There is no fourth branch that reweights or averages the
+    draws into a softer verdict -- the rule is a straight per-draw
+    unanimity check, on purpose.
+    """
+    n_total = len(rows)
+    n_outside = sum(1 for r in rows if not r["realised_cost_inside_interval"])
+    n_replications = n_total - 1
+    if n_outside == n_total:
+        return True, (
+            f"REPLICATES: the realised cost fell OUTSIDE the model-based "
+            f"cost interval in all {n_total} draws (the headline draw plus "
+            f"{n_replications} independent replication draw"
+            f"{'s' if n_replications != 1 else ''}). The cost-side "
+            f"disagreement is a property of the method, not an artifact of "
+            f"the headline draw."
+        )
+    if n_outside == 0:
+        return False, (
+            f"NOT REPLICATED -- THE HEADLINE DRAW WAS THE OUTLIER: the "
+            f"realised cost fell INSIDE the model-based cost interval in "
+            f"all {n_total} draws. The headline draw's disagreement did not "
+            f"recur in any of the {n_replications} independent replication "
+            f"draw{'s' if n_replications != 1 else ''}; the headline draw "
+            f"was the outlier, and that is published as such rather than "
+            f"as a property of the method."
+        )
+    return False, (
+        f"UNRESOLVED: the realised cost fell outside the model-based cost "
+        f"interval in {n_outside} of {n_total} draws (including the "
+        f"headline). The cost-side disagreement is NOT established as a "
+        f"replicated finding -- it is a property of which draw is examined, "
+        f"not of the method -- and must be reported as unresolved rather "
+        f"than as either a confirmed finding or a resolved non-finding."
+    )
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--n-train", type=int, default=5000)
@@ -290,6 +411,12 @@ def main() -> None:
     ap.add_argument("--no-counterfactual", dest="counterfactual", action="store_false")
     ap.add_argument("--diagnostics", action="store_true", default=True)
     ap.add_argument("--no-diagnostics", dest="diagnostics", action="store_false")
+    ap.add_argument(
+        "--replication-draws", type=int, default=5,
+        help="independent draws (beyond the headline draw) used to check "
+             "whether the cost-side disagreement replicates; see THE "
+             "REPLICATION RULE in the module docstring",
+    )
     args = ap.parse_args()
 
     print(f"Training on {args.n_train} randomised-contact cases...")
@@ -391,6 +518,59 @@ def main() -> None:
             f"{'INSIDE' if inside_interval else 'OUTSIDE'}"
         )
 
+    disagreement_replication = None
+    if check is not None:
+        print(
+            f"\nReplicating the cost-side disagreement over "
+            f"{args.replication_draws} independent draw(s), seed "
+            f"{DISAGREEMENT_REPLICATION_SEED} + 100*d..."
+        )
+        draw0 = {
+            "draw": 0,
+            "seed": EVAL_SEED,
+            "n": check["n"],
+            "realised_cost": check["realised_cost"],
+            "cost_interval_low": check["cost_interval_low"],
+            "cost_interval_high": check["cost_interval_high"],
+            "realised_cost_inside_interval": check["realised_cost_inside_interval"],
+        }
+        print(
+            f"  draw 0 (seed {EVAL_SEED}, headline): realised cost "
+            f"{draw0['realised_cost']:,.0f} vs interval "
+            f"[{draw0['cost_interval_low']:,.0f}, "
+            f"{draw0['cost_interval_high']:,.0f}] -> "
+            f"{'INSIDE' if draw0['realised_cost_inside_interval'] else 'OUTSIDE'}"
+        )
+        rows = [draw0]
+        for d in range(args.replication_draws):
+            seed = DISAGREEMENT_REPLICATION_SEED + 100 * d
+            row = {
+                "draw": d + 1,
+                **cost_side_disagreement_draw(
+                    uplift, churn, seed=seed, n_eval=args.n_eval
+                ),
+            }
+            rows.append(row)
+            print(
+                f"  draw {d + 1} (seed {seed}): realised cost "
+                f"{row['realised_cost']:,.0f} vs interval "
+                f"[{row['cost_interval_low']:,.0f}, "
+                f"{row['cost_interval_high']:,.0f}] -> "
+                f"{'INSIDE' if row['realised_cost_inside_interval'] else 'OUTSIDE'}"
+            )
+        n_outside = sum(1 for r in rows if not r["realised_cost_inside_interval"])
+        replicates, verdict = disagreement_verdict(rows)
+        print(f"\n{verdict}")
+        disagreement_replication = {
+            "rule": DISAGREEMENT_REPLICATION_RULE,
+            "n_draws": len(rows),
+            "replication_draws": args.replication_draws,
+            "draws": rows,
+            "n_outside": n_outside,
+            "replicates": replicates,
+            "verdict": verdict,
+        }
+
     diagnostics = None
     if args.diagnostics:
         print(
@@ -445,6 +625,7 @@ def main() -> None:
             for b, t in sorted(by_bucket.items(), key=lambda kv: -kv[1].cost)
         ],
         "counterfactual_check": check,
+        "disagreement_replication": disagreement_replication,
         "estimator_diagnostics": diagnostics,
     }
     (HERE / "results_regret.json").write_text(json.dumps(out, indent=2))

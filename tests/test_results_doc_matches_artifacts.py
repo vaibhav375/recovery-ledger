@@ -851,3 +851,123 @@ def test_regret_report_wait_side_pay_rate_diagnostic_matches_the_artifact(regret
         f"REPORT.md does not state the WAIT-side pay rate as {rate!r} from "
         f"results_regret.json's estimator_diagnostics"
     )
+
+
+# ── Replicating the cost-side disagreement: the counterfactual check's
+# realised-cost-vs-interval disagreement was originally measured on a single
+# draw of the evaluation population. This project's governing rule is that a
+# single-draw conclusion is a claim about that draw, not the method — so the
+# disagreement itself had to be replicated across independent draws before
+# being published as a standing finding. `disagreement_replication` in
+# results_regret.json carries the per-draw rows and the verdict; these tests
+# pin both documents to it exactly, the same way the rest of this file pins
+# every other regret figure.
+
+def test_disagreement_replication_headline_draw_matches_counterfactual_check(): # noqa: E501
+    """Draw 0 of `disagreement_replication` must be the same headline draw
+    `counterfactual_check` already reports — not a second, independently
+    computed number that could silently drift from it. This is the guard
+    against the replication path quietly re-deriving draw 0 instead of
+    reusing the one true computation."""
+    d = _load(REGRET)
+    check = d["counterfactual_check"]
+    draw0 = d["disagreement_replication"]["draws"][0]
+    assert draw0["draw"] == 0
+    assert draw0["seed"] == d["eval_seed"]
+    assert draw0["n"] == check["n"]
+    assert draw0["realised_cost"] == check["realised_cost"]
+    assert draw0["cost_interval_low"] == check["cost_interval_low"]
+    assert draw0["cost_interval_high"] == check["cost_interval_high"]
+    assert (
+        draw0["realised_cost_inside_interval"]
+        == check["realised_cost_inside_interval"]
+    )
+
+
+def test_disagreement_replication_draw_rows_match_the_artifact(results_md, regret_report):
+    """Every draw's seed, realised cost, interval bounds and inside/outside
+    verdict must appear in both documents exactly as the artifact computed
+    them — a rerun that moves any one draw (a non-deterministic pipeline, a
+    changed seed offset, a changed n_boot) must fail this test rather than
+    let the prose keep quoting a stale table."""
+    draws = _load(REGRET)["disagreement_replication"]["draws"]
+    for row in draws:
+        seed = str(row["seed"])
+        cost = f"{row['realised_cost']:,.0f}"
+        lo = f"{row['cost_interval_low']:,.0f}"
+        hi = f"{row['cost_interval_high']:,.0f}"
+        for doc_name, doc in (("RESULTS.md", results_md), ("REPORT.md", regret_report)):
+            assert seed in doc, (
+                f"{doc_name} does not state draw {row['draw']}'s seed {seed}"
+            )
+            assert cost in doc, (
+                f"{doc_name} does not state draw {row['draw']}'s realised "
+                f"cost {cost}"
+            )
+            assert lo in doc, (
+                f"{doc_name} does not state draw {row['draw']}'s interval "
+                f"low bound {lo}"
+            )
+            assert hi in doc, (
+                f"{doc_name} does not state draw {row['draw']}'s interval "
+                f"high bound {hi}"
+            )
+
+
+def test_disagreement_replication_verdict_matches_the_artifact(results_md, regret_report):
+    """Ruling: the replicated verdict is one of three outcomes (replicates /
+    the headline was the outlier / unresolved), computed fresh by
+    `disagreement_verdict()` on every run — it must not be hand-typed into
+    the docs independently of what the artifact says, and it must not be
+    silently reworded into a friendlier or harsher outcome than the one the
+    code actually reached."""
+    rep = _load(REGRET)["disagreement_replication"]
+    n_outside = rep["n_outside"]
+    n_draws = rep["n_draws"]
+    assert n_outside == sum(
+        1 for r in rep["draws"] if not r["realised_cost_inside_interval"]
+    ), "n_outside does not match the draws it is supposed to summarise"
+    if n_outside == n_draws:
+        verdict_word = "REPLICATES"
+        assert rep["replicates"] is True
+    elif n_outside == 0:
+        verdict_word = "NOT REPLICATED"
+        assert rep["replicates"] is False
+    else:
+        verdict_word = "UNRESOLVED"
+        assert rep["replicates"] is False
+    for doc_name, doc in (("RESULTS.md", results_md), ("REPORT.md", regret_report)):
+        assert verdict_word in doc, (
+            f"{doc_name} does not state the disagreement_replication verdict "
+            f"as {verdict_word!r} (n_outside={n_outside} of {n_draws})"
+        )
+        assert str(n_outside) in doc and str(n_draws) in doc, (
+            f"{doc_name} does not state the {n_outside} of {n_draws} draw "
+            f"count the verdict is based on"
+        )
+
+
+def test_disagreement_replication_rule_is_stated_in_both_documents(regret_report):
+    """The verdict rule itself (fixed before running the replication, in the
+    style of MODEL_ERROR_PREDICTION) must be quoted in REPORT.md, not just
+    enforced silently in code — otherwise a reader has no way to check the
+    verdict against the rule that produced it."""
+    rule = _load(REGRET)["disagreement_replication"]["rule"]
+    assert rule in regret_report, (
+        "REPORT.md does not quote the disagreement_replication rule from "
+        "results_regret.json verbatim"
+    )
+
+
+def test_disagreement_replication_does_not_move_the_pinned_headline_totals():
+    """The four figures stable since the first regret run --
+    134347.46 / 93678.91 / -40668.55 / 170 -- must not move because
+    replication was added. If they do, something non-deterministic (or a
+    changed seed) entered the pipeline, which is a much bigger problem than
+    this feature."""
+    d = _load(REGRET)
+    t = d["totals"]
+    assert t["cost"] == 134347.46
+    assert t["saved"] == 93678.91
+    assert t["net"] == -40668.55
+    assert t["model_errors"] == 170

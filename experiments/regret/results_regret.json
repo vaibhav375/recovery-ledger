@@ -57,6 +57,70 @@
     "cost_interval_high": 148032.22,
     "realised_cost_inside_interval": false
   },
+  "disagreement_replication": {
+    "rule": "The cost-side disagreement is a replicated finding only if the realised cost falls outside the model-based interval in every draw. If it falls outside in some draws and inside in others, the disagreement is not established and must be reported as unresolved -- a property of the headline draw rather than of the method. If it falls inside in every draw, the headline draw was the outlier and that must be published as such.",
+    "n_draws": 6,
+    "replication_draws": 5,
+    "draws": [
+      {
+        "draw": 0,
+        "seed": 20261823,
+        "n": 554,
+        "realised_cost": 111613.81308308657,
+        "cost_interval_low": 119877.45,
+        "cost_interval_high": 148032.22,
+        "realised_cost_inside_interval": false
+      },
+      {
+        "draw": 1,
+        "seed": 20273823,
+        "n": 515,
+        "realised_cost": 114427.47142988647,
+        "cost_interval_low": 123446.73,
+        "cost_interval_high": 157130.72,
+        "realised_cost_inside_interval": false
+      },
+      {
+        "draw": 2,
+        "seed": 20273923,
+        "n": 509,
+        "realised_cost": 118775.3258292693,
+        "cost_interval_low": 124171.9,
+        "cost_interval_high": 155328.04,
+        "realised_cost_inside_interval": false
+      },
+      {
+        "draw": 3,
+        "seed": 20274023,
+        "n": 537,
+        "realised_cost": 135867.58454563055,
+        "cost_interval_low": 133511.14,
+        "cost_interval_high": 170116.6,
+        "realised_cost_inside_interval": true
+      },
+      {
+        "draw": 4,
+        "seed": 20274123,
+        "n": 534,
+        "realised_cost": 137980.28355364094,
+        "cost_interval_low": 133314.82,
+        "cost_interval_high": 163177.36,
+        "realised_cost_inside_interval": true
+      },
+      {
+        "draw": 5,
+        "seed": 20274223,
+        "n": 489,
+        "realised_cost": 132953.9829045932,
+        "cost_interval_low": 106554.53,
+        "cost_interval_high": 136040.74,
+        "realised_cost_inside_interval": true
+      }
+    ],
+    "n_outside": 3,
+    "replicates": false,
+    "verdict": "UNRESOLVED: the realised cost fell outside the model-based cost interval in 3 of 6 draws (including the headline). The cost-side disagreement is NOT established as a replicated finding -- it is a property of which draw is examined, not of the method -- and must be reported as unresolved rather than as either a confirmed finding or a resolved non-finding."
+  },
   "estimator_diagnostics": {
     "n": 6000,
     "seed": 20272823,
