@@ -119,6 +119,85 @@ commits.
 
 ---
 
+## Regret — what the silences cost, beside what contacting recovered
+
+```
+make regret       # the same 2,000-case population as make eval
+```
+
+Every section above reports what the policy's silence *saved*. Nothing in
+this document, until now, reported what it *cost* — every refusal to contact
+is a bet that contacting would not have paid, and some of those bets are
+wrong. This experiment prices the 554 declined cases in the same
+1,037-case treatment arm ₹272,281 was measured on, using the simulator's own
+`persuadability(traits)` as the true per-case effect: positive true uplift
+priced as forgone, negative true uplift priced as avoided.
+
+| Bucket | n | Cost | Saved | Net | Model errors |
+|---|---:|---:|---:|---:|---:|
+| allocation | 264 | ₹69,247 | ₹1,502 | ₹-67,746 | 0 |
+| model_judgement | 286 | ₹63,822 | ₹92,177 | ₹28,355 | 170 |
+| case_state | 4 | ₹1,278 | ₹0 | ₹-1,278 | 0 |
+| **Total** | **554** | **₹134,347** | **₹93,679** | **₹-40,669** | **170** |
+
+**Beside the headline: recovered ₹272,281 per 1,000, and on the same cases
+the silences cost ₹134,347, saved ₹93,679, net ₹-40,669.** Net is negative
+— the silences cost more than they saved. That is unflattering and it is
+published as it is.
+
+**The allocation bucket is the largest single cost, and it was not
+predicted.** `allocation` — cases that simply ran out of allocated contact
+attempts, not a modelling choice — carries ₹69,247, more than
+`model_judgement`'s ₹63,822. The pre-registered prediction below only ever
+concerned `model_judgement`; `allocation` being the bigger cost is a finding
+of its own, not a refutation of anything, and is worth stating rather than
+folding quietly into the total.
+
+**Pre-registered prediction, fixed before this run:** `make calibration`
+reports the bottom `tau_hat` bin as 43.8% true do-not-disturbs against 17.3%
+of the population, so it is also ~56% customers with positive true uplift.
+The `model_judgement` bucket — cases the agent itself chose not to contact —
+must therefore contain a non-trivial count of `tau_true > 0` refusals. Near
+zero would refute one of the two experiments.
+
+**170 model errors were observed → the prediction HOLDS.** The regret result
+and `make calibration` corroborate rather than contradict each other. Within
+`model_judgement`, net is still positive (₹28,355): the ₹92,177 correctly
+avoided in true do-not-disturbs outweighs the ₹63,822 forgone from the 170
+customers the model judged wrong — the model is right more often by rupees
+saved even while wrong on a non-trivial count of people.
+
+**Caveat, load-bearing:** the headline estimator is an expectation under
+simulator truth, not a realised measurement.
+
+### Counterfactual check — validates the cost side only
+
+A second, independent estimate replays each of the same 554 cases under
+`WAIT` (what happened) and `NUDGE` (the counterfactual) with common random
+numbers: realised cost ₹111,614 against the expected ₹134,347 (same order,
+same sign — ordinary sampling variance), realised net ₹-111,614 against
+expected net ₹-40,669.
+
+**`realised_saved` is exactly `-0.0`, not a small or noisy number.** This is
+selection, not variance: `declined_cases()` excludes `resolved` cases (they
+paid; nothing was forgone), which conditions the declined universe on *not*
+having paid under `WAIT` — a saving can only be observed where `paid_0 = 1`
+and `paid_1 = 0`, and every such case was already routed out as `resolved`
+before it could enter this universe. **This check validates the cost side of
+the ledger only, and the ₹92,177 saved figure must not be quoted as
+independently validated** — it rests on the model-based estimate alone.
+`results_regret.json` records this directly on `counterfactual_check`:
+`"validates": "cost side only"`. See `experiments/regret/REPORT.md` for the
+full design and the estimator diagnostics that back this claim, including
+that negative realised draws are not structurally impossible — they simply
+do not occur inside this selected universe.
+
+Every figure in this section is read straight out of
+`experiments/regret/results_regret.json`, pinned by
+`tests/test_results_doc_matches_artifacts.py`.
+
+---
+
 ## Baselines — spec section 11.3, plus a falsification control
 
 ```

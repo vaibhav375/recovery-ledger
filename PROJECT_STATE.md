@@ -73,7 +73,8 @@ All from committed artifacts, all reproducible from the listed target.
 | Stopping rules | **11 defined, 8 fired** in the headline batch | `make eval` |
 | Compliance kernel | **13 rules**, all with provenance citations | `make redteam` |
 | Ledger | 34,304 entries, chain valid | `make eval` |
-| Tests | **412 passing** across 40 files | `make test` |
+| Regret — what the silences cost | 554 declined cases: cost ₹134,347, saved ₹93,679, **net ₹-40,669**; pre-registered prediction (170 model errors) HOLDS | `make regret` |
+| Tests | **441 passing** across 41 files | `make test` |
 
 ---
 
@@ -100,10 +101,10 @@ loop visible.
 | N5 | Two-tier validation | **Held.** Criteo + Hillstrom before simulator transfer. |
 | N6 | Contact-free recovery | **Held.** Issuer-outage detection suppresses futile retries; no customer messaged. |
 
-### Experiments (14, each with an artifact and a make target)
+### Experiments (15, each with an artifact and a make target)
 `tier1_criteo` · `tier2_simulation` · `sensitivity` · `fleet` · `negotiation` ·
 `listener_eval` · `ope_deployment` · `fairness` · `pessimism` · `dnd_signal` ·
-`horizon` · `uplift_ab` · `churn_lambda` · `uplift_calibration`
+`horizon` · `uplift_ab` · `churn_lambda` · `uplift_calibration` · `regret`
 
 ### Frontend
 React + TypeScript + Vite, three.js 3D policy-space, inline SVG charts
@@ -290,11 +291,12 @@ and a frontend build that deleted the page's data with no error anywhere.
 Run in this order. Every one must pass.
 
 ```bash
-make test          # 412 tests
+make test          # 441 tests
 make eval          # B1 headline
 make baselines     # 8-policy comparison
 make sensitivity   # 75/75 both criteria across 3 draws
 make calibration   # uplift by decile: ranking 3/3, near-monotone, slope 0.758
+make regret        # what the silences cost, beside what contacting recovered
 make redteam       # 100% block rate, 0 leaks
 make tier1-criteo  # IPS/SNIPS recover the arm-mean ATE
 make dashboard     # rebuild page from artifacts
@@ -305,7 +307,11 @@ make demo          # agent loop visible end to end
 Then confirm the invariants that have actually broken before:
 
 - [ ] `tests/test_results_doc_matches_artifacts.py` passes — no prose/artifact drift.
-- [ ] `tests/test_experiment_seeds.py` passes — no two experiments share an evaluation population.
+- [ ] `tests/test_experiment_seeds.py` passes — no two experiments share an evaluation population,
+      except a declared `"shares"` entry in `SEED_REGISTRY` (`regret/run_regret.py`
+      deliberately shares `tier2_simulation/run_batch.py`'s population, and
+      `churn_lambda/run_lambda_sweep.py` shares `run_baselines.py`'s — both by
+      design, not by omission).
 - [ ] `tests/test_css_class_collisions.py` passes — no silent layout collisions.
 - [ ] `tests/test_frontend_build_preserves_data.py` passes — `data.json` survives a frontend build.
 - [ ] `tests/test_deployed_policy_is_named_correctly.py` passes — no document names a policy the code does not run.

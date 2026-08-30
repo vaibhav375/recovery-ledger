@@ -141,13 +141,24 @@ never once produced an instance where nudging looked worse than waiting.
 
 That is not because the simulator or the common-random-numbers design makes
 negative draws structurally impossible — sampled outside this declined
-universe, over 6,000 fresh cases, 46 of 973 true do-not-disturbs (4.7%)
-showed a genuine negative realised draw (paid under WAIT, not paid under
-NUDGE), and the headline expectation estimator itself checks out exactly:
-mean `tau` and mean realised `(paid_1 - paid_0)` agree at a ratio of
-**1.000** over those 6,000 cases, so `amount x tau_true` is on the same
-scale as the realised effect and nothing is wrong with `totals.cost` or
-`totals.saved` on their own terms.
+universe, over 6,000 fresh cases (`estimator_diagnostics()` in
+`run_regret.py`, seed disjoint from both the training seed and the shared
+evaluation batch above), 32 of 1,003 true do-not-disturbs (3.2%) showed a
+genuine negative realised draw (paid under WAIT, not paid under NUDGE), and
+the headline expectation estimator itself checks out closely: mean `tau` and
+mean realised `(paid_1 - paid_0)` agree at a ratio of **1.035** over those
+6,000 cases, so `amount x tau_true` is on the same scale as the realised
+effect and nothing is wrong with `totals.cost` or `totals.saved` on their own
+terms.
+
+*(These three figures were previously computed out-of-band and quoted here
+as 46 of 973 (4.7%), ratio 1.000, and 5.5% respectively — numbers nothing in
+the repo regenerated. `estimator_diagnostics()` now computes all three on
+every `make regret` run and writes them into `results_regret.json` under
+`estimator_diagnostics`; the figures above are what that committed code
+actually produces, not the prettier out-of-band ones, and
+`tests/test_results_doc_matches_artifacts.py::test_regret_report_ratio_diagnostic_matches_the_artifact`
+pins the ratio so this paragraph cannot drift from the artifact again.)*
 
 **The actual cause is selection, not variance.** `declined_cases()` (by
 design, not by accident — see "Design" above) excludes `resolved` cases:
@@ -155,16 +166,16 @@ they paid, so nothing was forgone. But that conditions the declined universe
 on *not having paid under WAIT* — a refusal can only be observed to "save"
 money when `paid_0 = 1` and `paid_1 = 0`, and every case where `paid_0 = 1`
 was already routed to the resolved-skip before it could enter this universe.
-Measured directly: the treatment arm's overall WAIT-side pay rate is 5.5%
-(22 of 400 sampled), and those are exactly the cases removed as `resolved`
-before the declined universe is built. Inside the declined universe,
-`paid_0` is therefore ~0 by construction, so `realised_saved` has no way to
-be anything but zero here regardless of how many true do-not-disturbs are in
-it.
+Measured directly, on the same fresh unselected population: the WAIT-side
+pay rate is 4.0% (16 of 400 sampled), and cases like those are exactly what
+gets removed as `resolved` before the declined universe is built. Inside the
+declined universe, `paid_0` is therefore ~0 by construction, so
+`realised_saved` has no way to be anything but zero here regardless of how
+many true do-not-disturbs are in it.
 
 **Consequence: `realised_net` and `expected_net` are not the same estimand.**
 The paired counterfactual validates the *cost* side of the ledger only — and
-does so well, ratio 1.000 on the underlying per-case effect and the same
+does so well, ratio 1.035 on the underlying per-case effect and the same
 order of magnitude on `realised_cost` vs `totals.cost` — but it structurally
 cannot validate the *saved* side. The 2.7x gap between `realised_net`
 (-₹111,614) and `expected_net` (-₹40,669) is an artifact of comparing a
@@ -182,7 +193,7 @@ licenses saying that of the 554 treatment-arm cases the agent declined to
 contact, the model-based estimate is a net -₹40,669 (₹134,347 forgone against
 ₹93,679 avoided), that the *cost* half of that figure is independently
 validated by the paired simulation (₹111,614 realised against ₹134,347
-expected, ratio 1.000 on the underlying per-case effect), and that within
+expected, ratio 1.035 on the underlying per-case effect), and that within
 the bucket the agent itself controls (`model_judgement`), 170 of 286
 refusals were later shown to be customers who would have responded
 positively to contact — a real, non-zero error rate that the calibration

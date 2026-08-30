@@ -51,5 +51,17 @@
     "expected_net": -40668.54936746729,
     "validates": "cost side only",
     "one_sided_because": "the universe excludes resolved cases, so paid_0 is ~0 by selection and a realised saving cannot be observed"
+  },
+  "estimator_diagnostics": {
+    "n": 6000,
+    "seed": 20272823,
+    "mean_tau": 0.128644,
+    "mean_realised_effect": 0.133167,
+    "ratio_realised_to_tau": 1.035,
+    "n_true_dnd": 1003,
+    "n_true_dnd_negative_draw": 32,
+    "wait_side_pay_rate_n": 400,
+    "wait_side_pay_rate_paid": 16,
+    "wait_side_pay_rate": 0.04
   }
 }
