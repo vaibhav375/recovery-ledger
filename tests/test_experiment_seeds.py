@@ -92,6 +92,22 @@ def test_declared_sharers_name_an_experiment_that_exists():
         )
 
 
+def test_every_registry_entry_has_a_valid_kind():
+    """Each registry entry's kind must be one of the three declared values.
+    A typo'd kind silently drops that experiment from collision detection
+    without any test failing — the same failure the task exists to close,
+    just one level down."""
+    valid_kinds = {"distinct", "shares", "none"}
+    invalid = []
+    for rel, (kind, _note) in SEED_REGISTRY.items():
+        if kind not in valid_kinds:
+            invalid.append(f"{rel}: {kind!r} (must be one of {sorted(valid_kinds)})")
+    assert not invalid, (
+        "these registry entries have invalid kind values:\n  "
+        + "\n  ".join(invalid)
+    )
+
+
 def _offsets() -> dict[str, int]:
     found: dict[str, int] = {}
     for rel, (kind, _note) in SEED_REGISTRY.items():
