@@ -22,6 +22,7 @@ These pin the pairing and the replication, not the verdict.
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -31,6 +32,10 @@ from recovery_ledger.policy.ope.estimators import dr_contributions
 
 ROOT = Path(__file__).resolve().parents[1]
 ARTIFACT = ROOT / "experiments" / "tier1_criteo" / "results_dr_diagnosis.json"
+FOLDSWEEP_ARTIFACT = ROOT / "experiments" / "tier1_criteo" / "results_dr_foldsweep.json"
+
+sys.path.insert(0, str(ROOT / "experiments" / "tier1_criteo"))
+from run_dr_diagnosis import fold_sweep_verdict  # noqa: E402
 
 
 def _artifact() -> dict:
@@ -116,3 +121,71 @@ def test_dr_is_not_claimed_more_precise_than_ips():
     that: 15% of rows in the control arm at a 6.7x weight is the whole story."""
     data = _artifact()
     assert data["dr_mean_ci_width"] > 0 and data["ips_mean_ci_width"] > 0
+
+
+# ── fold_sweep_verdict()'s three branches ─────────────────────────────────
+#
+# The real sweep only ever produced REFUTED, so nothing in the committed
+# artifact exercises the CONFIRMED or UNRESOLVED branches -- a bug in either
+# (a flipped comparator, an inverted threshold direction) could sit
+# undetected indefinitely. These drive the function directly with
+# constructed rows, the same way `test_run_regret.py` drives
+# `disagreement_verdict()` rather than re-deriving its branches in a
+# doc-matching test.
+
+def _fold_row(n_folds: int, coverage: int, mean_abs_gap: float, n_draws: int = 3) -> dict:
+    return {
+        "n_folds": n_folds, "coverage": coverage, "n_draws": n_draws,
+        "mean_gap": -mean_abs_gap, "mean_abs_gap": mean_abs_gap,
+    }
+
+
+def test_fold_sweep_verdict_confirms_when_coverage_rises_to_full():
+    """A rise anywhere in the sweep that ends at full coverage is the
+    pattern the cross-fitting hypothesis predicts -- CONFIRMED, even though
+    the rise happens at an interior fold count (10), not the first step."""
+    rows = [
+        _fold_row(2, coverage=1, mean_abs_gap=0.0080),
+        _fold_row(5, coverage=1, mean_abs_gap=0.0060),
+        _fold_row(10, coverage=3, mean_abs_gap=0.0020),
+        _fold_row(20, coverage=3, mean_abs_gap=0.0005),
+    ]
+    assert fold_sweep_verdict(rows) == "CONFIRMED"
+
+
+def test_fold_sweep_verdict_refutes_when_coverage_and_gap_are_flat():
+    """The real result: coverage never moves and the gap wanders within a
+    few percent across the whole 2->20 range."""
+    rows = [
+        _fold_row(2, coverage=1, mean_abs_gap=0.00282),
+        _fold_row(5, coverage=1, mean_abs_gap=0.00272),
+        _fold_row(10, coverage=1, mean_abs_gap=0.00281),
+        _fold_row(20, coverage=1, mean_abs_gap=0.00278),
+    ]
+    assert fold_sweep_verdict(rows) == "REFUTED"
+
+
+def test_fold_sweep_verdict_is_unresolved_on_a_middle_bump_endpoints_would_miss():
+    """The defect an endpoints-only rule has: coverage bumps up at an
+    interior fold count and drops back by the last one. rows[0] and rows[-1]
+    both read coverage=1, which an endpoints-only comparison would call
+    "flat" -- REFUTED. Considering every row catches the bump and calls it
+    UNRESOLVED instead, because it is neither a clean rise to full coverage
+    nor a flat sweep."""
+    rows = [
+        _fold_row(2, coverage=1, mean_abs_gap=0.0028),
+        _fold_row(5, coverage=3, mean_abs_gap=0.0001),
+        _fold_row(10, coverage=1, mean_abs_gap=0.0027),
+        _fold_row(20, coverage=1, mean_abs_gap=0.0028),
+    ]
+    assert fold_sweep_verdict(rows) == "UNRESOLVED"
+
+
+def test_fold_sweep_verdict_matches_the_committed_artifact():
+    """Sanity check that the function, called on the actual committed sweep,
+    reproduces the artifact's own stored verdict -- guards against the
+    artifact and the function silently drifting apart."""
+    if not FOLDSWEEP_ARTIFACT.exists():
+        pytest.skip("results_dr_foldsweep.json not generated; run `make dr-foldsweep`")
+    data = json.loads(FOLDSWEEP_ARTIFACT.read_text())
+    assert fold_sweep_verdict(data["rows"]) == data["verdict"]

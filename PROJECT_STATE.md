@@ -74,7 +74,7 @@ All from committed artifacts, all reproducible from the listed target.
 | Compliance kernel | **13 rules**, all with provenance citations | `make redteam` |
 | Ledger | 34,304 entries, chain valid | `make eval` |
 | Regret — what the silences cost | 554 declined cases: cost ₹134,347, saved ₹93,679, **net ₹-40,669**; pre-registered prediction (170 model errors) HOLDS | `make regret` |
-| Tests | **468 passing** across 42 files | `make test` |
+| Tests | **472 passing** across 42 files | `make test` |
 
 ---
 
@@ -223,11 +223,19 @@ definition of done — that is §7.
       {2, 5, 10, 20} on the same three disjoint blocks
       `make dr-diagnosis` uses, under a rule fixed before running (coverage
       rising to 3/3 confirms; coverage and mean gap essentially flat across
-      the range refutes). Result: coverage flat at 1/3 and the mean gap flat
-      within 4% (0.00272–0.00282) across the whole range — **REFUTED**.
-      Cross-fitting is not the mechanism; the bias itself is unchanged and
-      still "inconclusive, leaning bias." See
-      `experiments/tier1_criteo/REPORT.md` and `RESULTS.md`.
+      the range refutes). Result: coverage flat at 1/3 at every fold count —
+      coarse evidence with only 3 blocks, since coverage is an integer out of
+      3 and cannot by itself distinguish no-effect from not-enough-power. The
+      continuous mean gap carries the real weight: flat within 4%
+      (0.00272–0.00282) across the whole 2→20 range, exactly where a real
+      minority-arm-starvation effect should have shown at least partial
+      movement. It didn't. **REFUTED** — the hypothesis predicted a shrink
+      that appeared at no fold count; cross-fitting is not established as the
+      cause. Not claimed: that the mechanism is closed with more certainty
+      than a 3-block, 4-point sweep buys — the residual bias's actual cause
+      remains open, and the bias itself is unchanged, still "inconclusive,
+      leaning bias." See `experiments/tier1_criteo/REPORT.md` and
+      `RESULTS.md`.
 - [ ] **Recalibrate τ̂ and A/B it.** New, and now the best-supported item here:
       the decile chart measured the over-spread (0.758) rather than inferring
       it, so the fix is a known quantity. Fit isotonic regression (or a single
@@ -301,7 +309,7 @@ and a frontend build that deleted the page's data with no error anywhere.
 Run in this order. Every one must pass.
 
 ```bash
-make test          # 455 tests
+make test          # 472 tests
 make eval          # B1 headline
 make baselines     # 8-policy comparison
 make sensitivity   # 75/75 both criteria across 3 draws

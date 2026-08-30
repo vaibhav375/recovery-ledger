@@ -88,13 +88,19 @@ the same three blocks with `dr_contributions`' fold count swept over
 **{2, 5, 10, 20}**, under a rule fixed before the run: confirmed if coverage
 rises to 3/3 at higher fold counts, refuted if coverage and the mean gap are
 essentially flat across the range. Coverage sits at **1/3 at every fold
-count**, and the mean gap wanders in a **0.00272–0.00282** band with no trend
-— a 10x increase in fold count moves neither number. **Verdict: REFUTED.**
-Cross-fitting starving the minority arm's fold-local training data is not
-the mechanism; PROJECT_STATE.md's Tier B item is closed on that finding. The
-bias itself is unchanged by this — it is still there, still low in all three
-blocks, still "inconclusive, leaning bias" under the rule above — only its
-proposed cause is now ruled out alongside sampling noise. IPS remains the
+count** — but with only 3 blocks, coverage is an integer out of 3 and cannot
+by itself distinguish "no effect" from "not enough power to see one" at that
+resolution. The evidence that carries weight is the continuous mean gap,
+which wanders in a **0.00272–0.00282** band with no trend across the entire
+10x fold range — exactly where a real minority-arm-starvation effect should
+have shown at least partial movement, since more folds directly means more
+of the scarce control arm available to train each fold's model. It shows
+none. **Verdict: REFUTED**, on that basis, not on coverage alone. Cross-fitting
+starving the minority arm's fold-local training data is not established as
+the cause; the bias itself is unchanged by this — it is still there, still
+low in all three blocks, still "inconclusive, leaning bias" under the rule
+above — only its proposed cause is now ruled out alongside sampling noise,
+and the residual bias's actual mechanism remains open. IPS remains the
 estimator to trust on this dataset. See
 `experiments/tier1_criteo/REPORT.md`.
 

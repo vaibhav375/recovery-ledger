@@ -210,26 +210,35 @@ def fold_sweep(X, T, Y, prop, blocks, fold_counts: list[int], *, n_boot: int) ->
 
 
 def fold_sweep_verdict(rows: list[dict]) -> str:
-    """Apply FOLD_SWEEP_RULE to the sweep's two extremes (lowest and highest
-    n_folds), fixed here before the sweep is run so the same rule always
-    yields the same verdict for the same numbers -- no eyeballing a curve
-    after seeing it.
+    """Apply FOLD_SWEEP_RULE across every row in the sweep, not just its two
+    endpoints. An endpoints-only rule cannot see a bump-then-drop confined
+    to the middle fold counts -- coverage or the gap moving at n_folds=5 or
+    10 and then returning to where it started at n_folds=20 would still read
+    as "flat" if only rows[0] and rows[-1] are compared. Fixed here before
+    the sweep is run, so the same rule always yields the same verdict for
+    the same numbers -- no eyeballing a curve after seeing it.
 
-    CONFIRMED  coverage at the highest fold count is a clean 3/3, and that is
-               a rise from the lowest fold count (the monotone pattern
-               cross-fitting predicts).
-    REFUTED    coverage is identical at both extremes, and the mean absolute
-               gap at the highest fold count has not shrunk by more than 20%
-               relative to the lowest -- "essentially flat" operationalised
-               as a threshold fixed before the run, not tuned after it.
-    UNRESOLVED anything else.
+    CONFIRMED  the highest fold count reaches a clean 3/3 coverage, and
+               coverage is not identical across every row in the sweep --
+               i.e. a rise happened somewhere in the range, ending at full
+               coverage (the pattern cross-fitting predicts).
+    REFUTED    coverage is identical across every row in the sweep, AND the
+               spread between the largest and smallest mean absolute gap
+               anywhere in the sweep is under 20% of the smallest --
+               "essentially flat" operationalised as a threshold fixed
+               before the run, applied across the whole range rather than
+               its two ends.
+    UNRESOLVED anything else -- including a change confined to the middle of
+               the sweep that an endpoints-only comparison would have missed.
     """
-    lo, hi = rows[0], rows[-1]
-    n_draws = lo["n_draws"]
-    if hi["coverage"] == n_draws and hi["coverage"] > lo["coverage"]:
+    coverages = [r["coverage"] for r in rows]
+    gaps = [r["mean_abs_gap"] for r in rows]
+    n_draws = rows[0]["n_draws"]
+    coverage_flat = max(coverages) == min(coverages)
+
+    if coverages[-1] == n_draws and not coverage_flat:
         return "CONFIRMED"
-    if (hi["coverage"] == lo["coverage"] and lo["mean_abs_gap"] > 0
-            and abs(hi["mean_abs_gap"] - lo["mean_abs_gap"]) < 0.2 * lo["mean_abs_gap"]):
+    if coverage_flat and min(gaps) > 0 and (max(gaps) - min(gaps)) < 0.2 * min(gaps):
         return "REFUTED"
     return "UNRESOLVED"
 

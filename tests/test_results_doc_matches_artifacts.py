@@ -200,25 +200,25 @@ def test_fold_sweep_rows_match_the_artifact(dr_report):
 
 
 def test_fold_sweep_verdict_is_recomputed_from_the_rows_not_hand_typed(dr_report, results_md):
-    """The verdict stored in the artifact must match what the pre-registered
-    rule actually yields on the rows beside it in the same artifact -- this
-    reimplements the rule independently of `run_dr_diagnosis.py` so a
-    hand-edited or stale 'verdict' field cannot silently drift from the
-    numbers, and pins the verdict word into both documents."""
+    """The verdict stored in the artifact must match what `fold_sweep_verdict()`
+    -- the actual pre-registered rule in `run_dr_diagnosis.py` -- yields on
+    the rows beside it in the same artifact. This imports and calls the real
+    function rather than re-deriving its branches here: a re-derivation can
+    only ever check itself, and with the real sweep landing on REFUTED, a
+    hand-typed copy of the CONFIRMED/UNRESOLVED branches would never be
+    exercised by anything. `test_dr_diagnosis.py` drives all three branches
+    of the real function directly with constructed rows; this test only
+    needs to confirm the artifact and the function agree, and pins the
+    verdict word into both documents."""
+    import sys
+    sys.path.insert(0, str(ROOT / "experiments" / "tier1_criteo"))
+    from run_dr_diagnosis import fold_sweep_verdict
+
     d = _load(DR_FOLDSWEEP)
-    rows = d["rows"]
-    lo, hi = rows[0], rows[-1]
-    n_draws = lo["n_draws"]
-    if hi["coverage"] == n_draws and hi["coverage"] > lo["coverage"]:
-        expected = "CONFIRMED"
-    elif (hi["coverage"] == lo["coverage"] and lo["mean_abs_gap"] > 0
-          and abs(hi["mean_abs_gap"] - lo["mean_abs_gap"]) < 0.2 * lo["mean_abs_gap"]):
-        expected = "REFUTED"
-    else:
-        expected = "UNRESOLVED"
+    expected = fold_sweep_verdict(d["rows"])
     assert d["verdict"] == expected, (
-        f"artifact verdict {d['verdict']!r} does not match what the "
-        f"pre-registered rule yields ({expected!r}) on rows[0]/rows[-1]"
+        f"artifact verdict {d['verdict']!r} does not match what "
+        f"fold_sweep_verdict() yields ({expected!r}) on the artifact's own rows"
     )
     assert expected in dr_report, f"REPORT.md does not state the verdict {expected!r}"
     assert expected in results_md, f"RESULTS.md does not state the verdict {expected!r}"
@@ -1076,27 +1076,45 @@ def test_disagreement_replication_n_and_label_match_their_own_row(results_md, re
 
 
 def test_disagreement_replication_verdict_matches_the_artifact(results_md, regret_report):
-    """Ruling: the replicated verdict is one of three outcomes (replicates /
-    the headline was the outlier / unresolved), computed fresh by
-    `disagreement_verdict()` on every run — it must not be hand-typed into
-    the docs independently of what the artifact says, and it must not be
-    silently reworded into a friendlier or harsher outcome than the one the
-    code actually reached."""
+    """Ruling: the replicated verdict is one of four outcomes (insufficient
+    draws / replicates / the headline was the outlier / unresolved),
+    computed fresh by `disagreement_verdict()` on every run — it must not be
+    hand-typed into the docs independently of what the artifact says, and it
+    must not be silently reworded into a friendlier or harsher outcome than
+    the one the code actually reached.
+
+    This imports and calls the real `disagreement_verdict()` on the
+    artifact's own draws rather than re-deriving its n_outside/n_total
+    branches here — a re-derivation only ever checks itself against itself.
+    `test_run_regret.py` drives all four branches of the real function
+    directly with constructed rows, including the below-floor branch this
+    artifact's data (>= MIN_DRAWS_FOR_VERDICT) never exercises; this test
+    only needs to confirm the artifact and the function agree, and pins the
+    verdict word into both documents."""
+    import sys
+    sys.path.insert(0, str(ROOT / "experiments" / "regret"))
+    from run_regret import disagreement_verdict
+
     rep = _load(REGRET)["disagreement_replication"]
     n_outside = rep["n_outside"]
     n_draws = rep["n_draws"]
     assert n_outside == sum(
         1 for r in rep["draws"] if not r["realised_cost_inside_interval"]
     ), "n_outside does not match the draws it is supposed to summarise"
-    if n_outside == n_draws:
-        verdict_word = "REPLICATES"
-        assert rep["replicates"] is True
-    elif n_outside == 0:
-        verdict_word = "NOT REPLICATED"
-        assert rep["replicates"] is False
+
+    replicates, message = disagreement_verdict(rep["draws"])
+    assert replicates == rep["replicates"], (
+        f"disagreement_verdict() on the artifact's own draws returns "
+        f"replicates={replicates}, but the artifact's stored 'replicates' "
+        f"field says {rep['replicates']}"
+    )
+    for word in ("INSUFFICIENT", "REPLICATES", "NOT REPLICATED", "UNRESOLVED"):
+        if word in message:
+            verdict_word = word
+            break
     else:
-        verdict_word = "UNRESOLVED"
-        assert rep["replicates"] is False
+        raise AssertionError(f"disagreement_verdict() message names no known verdict: {message!r}")
+
     for doc_name, doc in (("RESULTS.md", results_md), ("REPORT.md", regret_report)):
         assert verdict_word in doc, (
             f"{doc_name} does not state the disagreement_replication verdict "

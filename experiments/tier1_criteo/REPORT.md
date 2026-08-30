@@ -236,28 +236,48 @@ here and the string the code actually carries cannot drift apart unnoticed):**
 | 10 | 1/3 | -0.00281 | 0.00281 |
 | 20 | 1/3 | -0.00278 | 0.00278 |
 
-**Verdict: REFUTED.** Coverage sits at exactly 1/3 at every fold count from 2
-to 20 — a 10x increase in fold count does not move it even once. The mean
-gap magnitude wanders between 0.00272 and 0.00282, a spread of 4% around its
-own mean, with no monotone trend in either direction as folds increase — not
-the shrinking-toward-zero the cross-fitting hypothesis predicts. Per-draw,
+**Verdict: REFUTED.** Two statistics sit in that table and they do not carry
+equal evidentiary weight.
+
+Coverage is coarse by construction. With only 3 disjoint blocks it is an
+integer out of 3 — 0/3, 1/3, 2/3 or 3/3 — and cannot register anything finer
+than a third-of-a-block step. Coverage sitting at exactly 1/3 at every fold
+count from 2 to 20 is consistent with "the fold count has no effect," but on
+its own it is equally consistent with "the sweep lacks the power to see an
+effect on a statistic this coarse" — a 3-block sweep cannot distinguish those
+two on coverage alone, the same caution the bias-vs-noise diagnosis above
+already applies to its own 3-block "wins every interval or loses every
+interval" measure.
+
+The evidence that actually carries weight here is `mean_abs_gap`, which is
+continuous and has no such floor: it wanders between 0.00272 and 0.00282 — a
+spread of 4% around its own mean — with no monotone trend as folds increase
+10x from 2 to 20. If cross-fitting starving the minority arm's fold-local
+training rows were the real mechanism, more folds means a smaller held-out
+slice and more of the scarce control arm available to train each fold's
+model — a directly increasing effect, and a continuous statistic has the
+resolution to show even a partial version of it well before coverage would
+ever flip a block's bit. It shows nothing. That is what a coverage number
+alone could not have established, and it is why REFUTED, not UNRESOLVED, is
+the right word here despite coverage's coarseness.
+
+So: the hypothesis predicted a shrink, and no shrink appeared at any fold
+count on the statistic best positioned to show one — that is what closes as
+REFUTED. What a 3-block, 4-point sweep does *not* license is calling the
+mechanism closed with more certainty than that: the residual bias's actual
+cause remains open. Ruled out are (1) sampling noise (the bias-vs-noise
+diagnosis above) and now (2) cross-fitting starving the minority arm as
+stated — not every conceivable cross-fitting-adjacent explanation. Per-draw,
 the same block (seed 20260823) misses the direct ATE by roughly the same
 margin (−0.0042 to −0.0045) at every fold count, and the block that already
-covered truth (seed 20261323) keeps covering it at every fold count too. The
-fold count is not moving anything.
-
-This closes the mechanism PROJECT_STATE.md's Tier B item named. The gap is
-real (see the bias-vs-noise diagnosis above), but it is not caused by
-cross-fitting starving the minority arm on fold-local training data — if it
-were, refitting with more folds would have shown at least some movement in
-either coverage or the gap, and it shows none. The residual bias's actual
-cause remains open; ruled out are (1) sampling noise (the bias-vs-noise
-diagnosis above), and now (2) the cross-fitting fold count. What has not
-been tested: the outcome model class itself (`GradientBoostingClassifier`,
-80 trees, uncalibrated) on the minority arm's absolute row count — the fold
-count changes what fraction of the control arm each fold model trains on
-within one block, but the block's total control-arm row count (∼15% of
-~93,000) doesn't move with it, and that total may be the actual constraint.
+covered truth (seed 20261323) keeps covering it at every fold count too —
+consistent with the aggregate reading, not an artifact of averaging over
+blocks. What has not been tested: the outcome model class itself
+(`GradientBoostingClassifier`, 80 trees, uncalibrated) on the minority arm's
+absolute row count — the fold count changes what fraction of the control arm
+each fold model trains on within one block, but the block's total
+control-arm row count (∼15% of ~93,000) doesn't move with it, and that total
+may be the actual constraint.
 
 ### Runtime
 
