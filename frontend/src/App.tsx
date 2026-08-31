@@ -12,6 +12,7 @@ import {
 
 import { useLenis } from "./motion/useLenis";
 import Scene from "./components/Scene";
+import Telemetry from "./components/Telemetry";
 import Opening from "./sections/Opening";
 import Subtraction from "./sections/Subtraction";
 import Frontier from "./sections/Frontier";
@@ -94,6 +95,7 @@ export default function App() {
   return (
     <>
       <Scene litFraction={figures.holdoutRate} />
+      <Telemetry />
 
       <main>
         <Opening holdoutRate={figures.holdoutRate} />

@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { motion, useInView } from "motion/react";
+import { motion, useInView, useReducedMotion } from "motion/react";
 
 /** Reveals children once, when scrolled into view. `index` staggers a grid
  *  without needing a parent variant. */
@@ -12,6 +12,13 @@ export default function InView({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
+  const reduce = useReducedMotion();
+
+  // Asked for less motion, given none: the reveal is a flourish, and starting
+  // content at opacity 0 to animate it in is exactly what someone with
+  // prefers-reduced-motion has opted out of.
+  if (reduce) return <div className={className}>{children}</div>;
+
   return (
     <motion.div
       ref={ref}
