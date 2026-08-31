@@ -73,10 +73,11 @@ All from committed artifacts, all reproducible from the listed target.
 | Stopping rules | **11 defined, 8 fired** in the headline batch | `make eval` |
 | Compliance kernel | **13 rules**, all with provenance citations | `make redteam` |
 | Ledger | 34,304 entries, chain valid | `make eval` |
+| Claims registry | **4 held · 3 refuted · 1 unresolved**, generated from artifacts | `make claims` |
 | Independent audit | **0 violations** over 5,712 certificates / 467 executed contacts, no agent involved | `make verify-ledger` |
 | N6 detection latency | **50 attempts** median at a 78% collapse, monotone in severity, 0 false alarms in 30 controls | `make fleet-latency` |
 | Regret — what the silences cost | 554 declined cases: cost ₹134,347, saved ₹93,679, **net ₹-40,669**; pre-registered prediction (170 model errors) HOLDS | `make regret` |
-| Tests | **483 passing** across 43 files | `make test` |
+| Tests | **505 passing** across 45 files | `make test` |
 
 ---
 
@@ -239,6 +240,11 @@ definition of done — that is §7.
       remains open, and the bias itself is unchanged, still "inconclusive,
       leaning bias." See `experiments/tier1_criteo/REPORT.md` and
       `RESULTS.md`.
+- [x] **Claims registry.** Done — `make claims`, `CLAIMS.md`, `claims.json`,
+      `src/recovery_ledger/claims.py`. Pre-registration stops being a habit
+      and becomes a mechanism: a refuted claim cannot be asserted in the
+      documents, an artifact carrying a rule cannot go unregistered, and the
+      suite fails if every claim ever comes back held.
 - [ ] **Recalibrate τ̂ and A/B it.** New, and now the best-supported item here:
       the decile chart measured the over-spread (0.758) rather than inferring
       it, so the fix is a known quantity. Fit isotonic regression (or a single
@@ -323,7 +329,7 @@ and a frontend build that deleted the page's data with no error anywhere.
 Run in this order. Every one must pass.
 
 ```bash
-make test          # 483 tests
+make test          # 505 tests
 make eval          # B1 headline
 make baselines     # 8-policy comparison
 make sensitivity   # 75/75 both criteria across 3 draws
@@ -331,6 +337,8 @@ make calibration   # uplift by decile: ranking 3/3, near-monotone, slope 0.758
 make fleet-latency  # detection latency + false-alarm rate for N6
 make regret        # what the silences cost, beside what contacting recovered
 make redteam       # 100% block rate, 0 leaks
+make claims        # pre-registration registry: 4 held, 3 refuted, 1 unresolved
+make verify-ledger # third-party audit: 0 violations, chain valid
 make tier1-criteo  # IPS/SNIPS recover the arm-mean ATE
 make dashboard     # rebuild page from artifacts
 make verify-page   # 11 sections, 7 artifact-backed claims, both paths

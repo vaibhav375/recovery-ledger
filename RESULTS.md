@@ -1055,6 +1055,50 @@ kernel denying every available action; and `promise_to_pay_active` — which is 
 
 ---
 
+## The claims registry — pre-registration as a mechanism
+
+```
+make claims
+```
+
+Every result in this document was pre-registered: a rule fixed before the run,
+the outcome reported whichever way it fell. That discipline lived in eight
+separate experiment scripts and was kept by hand, which means the only thing
+stopping a future run from quietly reporting the flattering half was somebody
+remembering. **A habit nobody can check is a claim about the author, not about
+the work.**
+
+`CLAIMS.md` and `claims.json` are generated from the artifacts themselves.
+Nothing in them is written by hand, so a claim cannot be recorded as holding by
+anyone's decision — the registry says where to look and what would count, and
+the run says what happened.
+
+**4 held · 3 refuted · 1 unresolved.**
+
+Three tests hold lines that good intentions cannot:
+
+- **A registered claim must resolve against a real artifact field**, so the
+  registry cannot drift into fiction.
+- **An artifact carrying a pre-registered rule must be registered**, so a new
+  experiment cannot slip a rule past by not mentioning it.
+- **A claim the evidence refuted or left unresolved may not be asserted as
+  established** anywhere in RESULTS.md, README.md or PROJECT_STATE.md.
+
+That third test is the one worth having, and it is checked against this
+project's own worst near-miss. `λ_churn = 4.0 strictly dominates 2.0` was
+published from a run that no longer reproduced; the artifact now records
+`dominance_4_over_2.holds: false`, and the phrase is forbidden in the
+documents. Appending that sentence to RESULTS.md fails the build.
+
+It permits one thing deliberately: a refuted claim may be **quoted** while
+being retracted, just not asserted. This repo publishes its own mistakes in
+their original words, and a check that forbade the quoted form would push it to
+delete its history rather than record it — which is the opposite of the point.
+
+The registry is also tested for not being all good news. If every registered
+claim ever comes back held, that is evidence of selection rather than rigour,
+and the suite says so.
+
 ## Honest exception list
 
 655 cases in the last batch did not recover. They are enumerated with
@@ -1074,6 +1118,8 @@ make demo         # agent loop, 20 cases, no external services needed
 make eval         # B1 headline
 make baselines    # policy comparison
 make sensitivity  # ranking stability
+make claims       # the pre-registration registry
+make verify-ledger # third-party audit of the trail
 make calibration  # uplift by decile
 make redteam      # adversarial suite
 ```

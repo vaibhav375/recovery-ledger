@@ -1,4 +1,4 @@
-.PHONY: verify-ledger setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet fleet-latency negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
+.PHONY: claims verify-ledger setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet fleet-latency negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
 
 # `uv pip install` honours an ambient VIRTUAL_ENV over the venv it was just
 # told to create. Anyone who runs `make setup` with another virtualenv active
@@ -209,6 +209,12 @@ dnd-signal:
 # An outsider's audit of the trail: re-derives every certificate's verdict from
 # the rule outcomes recorded inside it and confirms nothing reached a customer
 # without one. No agent, no kernel, no simulator — just the ledger file.
+# Every pre-registered claim, its rule, and what the evidence said - read from
+# the artifacts, never written by hand. A claim cannot be recorded as holding
+# by anyone's decision.
+claims:
+	PYTHONPATH=src .venv/bin/python3 -m recovery_ledger.claims
+
 verify-ledger:
 	PYTHONPATH=src .venv/bin/python3 -m recovery_ledger.kernel.verifier \
 		experiments/tier2_simulation/batch_ledger.json

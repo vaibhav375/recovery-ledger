@@ -1,0 +1,74 @@
+[
+  {
+    "id": "N2.dnd-signal",
+    "statement": "Do-not-disturbs opt out more than everyone else when contacted, so churn risk is a signal independent of predicted uplift.",
+    "artifact": "experiments/dnd_signal/results_dnd_signal.json",
+    "verdict_path": "effect_excludes_one",
+    "status": "HELD",
+    "observed": true,
+    "note": "The supporting signal for N2. Published at 1.29x after the original 1.93x was found to be a single small-sample draw."
+  },
+  {
+    "id": "calibration.ranking",
+    "statement": "The uplift model's top decile realises more uplift than its bottom decile, in every draw.",
+    "artifact": "experiments/uplift_calibration/results_uplift_calibration.json",
+    "verdict_path": "verdict.ranking_holds",
+    "status": "HELD",
+    "observed": true,
+    "note": ""
+  },
+  {
+    "id": "calibration.monotone",
+    "statement": "Decile uplift is monotone: Spearman >= 0.9 in every draw.",
+    "artifact": "experiments/uplift_calibration/results_uplift_calibration.json",
+    "verdict_path": "verdict.monotone_all_draws",
+    "status": "REFUTED",
+    "observed": false,
+    "note": "Fails at 0.879 on one draw. Reported as failed rather than rounded up; near-monotone is tracked as the weaker claim."
+  },
+  {
+    "id": "regret.model-errors",
+    "statement": "The model-judgement bucket contains a non-trivial count of refusals of customers who would have paid, as the calibration result requires.",
+    "artifact": "experiments/regret/results_regret.json",
+    "verdict_path": "prediction.holds",
+    "status": "HELD",
+    "observed": true,
+    "note": ""
+  },
+  {
+    "id": "regret.cost-disagreement",
+    "statement": "The counterfactual's cost-side disagreement with the model-based estimate is a replicated finding.",
+    "artifact": "experiments/regret/results_regret.json",
+    "verdict_path": "disagreement_replication.verdict",
+    "status": "UNRESOLVED",
+    "observed": "UNRESOLVED: the realised cost fell outside the model-based cost interval in 3 of 6 draws (including the headline). The cost-side disagreement is NOT established as a replicated finding -- it is a property of which draw is examined, not of the method -- and must be reported as unresolved rather than as either a confirmed finding or a resolved non-finding.",
+    "note": "Outside the interval in 3 of 6 draws. Unresolved, and published as unresolved \u2014 the limitation itself did not replicate."
+  },
+  {
+    "id": "dr.cross-fitting",
+    "statement": "DR's low reading on Criteo is caused by cross-fitting starving the 15% minority arm, so more folds should shrink the gap.",
+    "artifact": "experiments/tier1_criteo/results_dr_foldsweep.json",
+    "verdict_path": "verdict",
+    "status": "REFUTED",
+    "observed": "REFUTED",
+    "note": "Refuted: coverage and mean gap are flat across a 10x fold range."
+  },
+  {
+    "id": "N6.detection-latency",
+    "statement": "Detection latency is claimable: the detector fires in every draw at the largest effect size, reported with its false-alarm rate.",
+    "artifact": "experiments/fleet/results_fleet_latency.json",
+    "verdict_path": "claimable",
+    "status": "HELD",
+    "observed": true,
+    "note": ""
+  },
+  {
+    "id": "lambda.dominance",
+    "statement": "lambda_churn = 4.0 strictly dominates 2.0.",
+    "artifact": "experiments/churn_lambda/results_lambda_sweep.json",
+    "verdict_path": "dominance_4_over_2.holds",
+    "status": "REFUTED",
+    "observed": false,
+    "note": "The project's worst near-miss. Published as dominance from a run that no longer reproduced; it trades, it does not dominate."
+  }
+]
