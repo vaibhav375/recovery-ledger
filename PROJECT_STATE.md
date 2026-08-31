@@ -73,6 +73,7 @@ All from committed artifacts, all reproducible from the listed target.
 | Stopping rules | **11 defined, 8 fired** in the headline batch | `make eval` |
 | Compliance kernel | **13 rules**, all with provenance citations | `make redteam` |
 | Ledger | 34,304 entries, chain valid | `make eval` |
+| Independent audit | **0 violations** over 5,712 certificates / 467 executed contacts, no agent involved | `make verify-ledger` |
 | N6 detection latency | **50 attempts** median at a 78% collapse, monotone in severity, 0 false alarms in 30 controls | `make fleet-latency` |
 | Regret — what the silences cost | 554 declined cases: cost ₹134,347, saved ₹93,679, **net ₹-40,669**; pre-registered prediction (170 model errors) HOLDS | `make regret` |
 | Tests | **483 passing** across 43 files | `make test` |
@@ -264,6 +265,12 @@ definition of done — that is §7.
       evidence as divergence grows, and it does.
 
 ### Tier C — scope worth having if time allows
+- [x] **Independent certificate verifier.** Done — `make verify-ledger`,
+      `src/recovery_ledger/kernel/verifier.py`. Re-derives every certificate's
+      verdict from the rule outcomes recorded inside it and confirms one
+      allowing certificate per executed contact, from the ledger file alone.
+      Bounded honestly: the context is not recorded, so it proves the kernel's
+      reasoning self-consistent and obeyed, not correct.
 - [ ] Global contact-budget allocator (knapsack across the fleet, not per-case).
 - [ ] Model drift detection on the uplift model.
 - [ ] Cost-sensitive channel choice (SMS vs WhatsApp vs voice by expected value).

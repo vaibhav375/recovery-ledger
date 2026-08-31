@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet fleet-latency negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
+.PHONY: verify-ledger setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet fleet-latency negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
 
 # `uv pip install` honours an ambient VIRTUAL_ENV over the venv it was just
 # told to create. Anyone who runs `make setup` with another virtualenv active
@@ -206,5 +206,12 @@ dnd-signal:
 
 # Adversarial suite against the compliance kernel (spec section 9.5).
 # Named attacks + a hostile policy end to end + randomised fuzz.
+# An outsider's audit of the trail: re-derives every certificate's verdict from
+# the rule outcomes recorded inside it and confirms nothing reached a customer
+# without one. No agent, no kernel, no simulator — just the ledger file.
+verify-ledger:
+	PYTHONPATH=src .venv/bin/python3 -m recovery_ledger.kernel.verifier \
+		experiments/tier2_simulation/batch_ledger.json
+
 redteam:
 	PYTHONPATH=src:redteam .venv/bin/python3 redteam/run_redteam.py --fuzz-samples 5000

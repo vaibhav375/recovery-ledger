@@ -994,6 +994,48 @@ that denied everything would score a perfect 100% and be useless.
 
 ---
 
+### Auditable by someone who does not trust us
+
+```
+make verify-ledger
+```
+
+The dashboard makes the trail browsable. Browsing is not auditing: it shows you
+what the system says about itself, in the system's own words, rendered by the
+system's own code. An auditor needs to check it *without* the agent.
+
+`recovery_ledger.kernel.verifier` takes a ledger file and nothing else — no
+agent, no kernel, no simulator — and checks four things, each a way the trail
+could be lying:
+
+- **The chain is intact.** Entries commit to the one before them, so a
+  retrospective edit breaks the hash. Flipping a single recorded DENY to ALLOW
+  is caught by `tests/test_certificate_verifier.py`.
+- **Every decision follows from its own evidence.** A certificate carries the
+  per-rule outcomes it was issued on, so ALLOW must mean every rule passed and
+  DENY must mean at least one did not. A certificate reading ALLOW while
+  holding a failed rule is a rubber stamp, not a compliance record.
+- **Every certificate evaluated the whole rule set.** A rule that quietly stops
+  being evaluated is how a kernel loses a regulation, and it looks identical to
+  a rule that always passes.
+- **Nothing reached a customer without an allowing certificate**, one per
+  execution, issued before it. Not merely "some certificate exists for this
+  case and action" — a case is contacted several times, and matching loosely
+  would let a correctly certified third contact retrospectively certify the
+  first. That is exactly the hole an auditor looks for, and building this found
+  it in the first draft of the verifier itself.
+
+On the shipped batch ledger: **34,304 entries, 5,712 certificates, 467 executed
+contacts, 13 rules evaluated per certificate, chain valid, no violations.**
+
+**What it cannot do, and why that matters.** The ledger records each rule's
+*outcome*, not the `RuleContext` it was evaluated against. So this verifies
+that a certificate is internally consistent, complete and honoured — not that
+the rules computed the right answer from the world's actual state. An auditor
+gets "the kernel's reasoning is self-consistent and was obeyed", which is worth
+having and is strictly less than "the kernel was right". Closing that gap means
+recording the context beside the outcome, which this repo does not do.
+
 ## B3 — stopping rules
 
 ```
