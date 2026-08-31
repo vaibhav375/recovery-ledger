@@ -1,0 +1,446 @@
+{
+  "healthy_auth_rate": 0.9,
+  "outage_auth_rate": 0.12,
+  "attempts_per_hour": 25,
+  "lead_in_hours": 192,
+  "max_hours_checked": 48,
+  "n_draws": 8,
+  "n_control_draws": 30,
+  "effect_sizes": [
+    {
+      "post_rate": 0.7,
+      "drop": 0.2,
+      "n_draws": 8,
+      "n_detected": 8,
+      "n_missed": 0,
+      "miss_rate": 0.0,
+      "median_latency_attempts": 125.0,
+      "min_latency_attempts": 100,
+      "max_latency_attempts": 150,
+      "draws": [
+        {
+          "seed": 20274823,
+          "detected": true,
+          "latency_hours": 5,
+          "latency_attempts": 125
+        },
+        {
+          "seed": 20274824,
+          "detected": true,
+          "latency_hours": 4,
+          "latency_attempts": 100
+        },
+        {
+          "seed": 20274825,
+          "detected": true,
+          "latency_hours": 6,
+          "latency_attempts": 150
+        },
+        {
+          "seed": 20274826,
+          "detected": true,
+          "latency_hours": 4,
+          "latency_attempts": 100
+        },
+        {
+          "seed": 20274827,
+          "detected": true,
+          "latency_hours": 6,
+          "latency_attempts": 150
+        },
+        {
+          "seed": 20274828,
+          "detected": true,
+          "latency_hours": 6,
+          "latency_attempts": 150
+        },
+        {
+          "seed": 20274829,
+          "detected": true,
+          "latency_hours": 5,
+          "latency_attempts": 125
+        },
+        {
+          "seed": 20274830,
+          "detected": true,
+          "latency_hours": 4,
+          "latency_attempts": 100
+        }
+      ]
+    },
+    {
+      "post_rate": 0.55,
+      "drop": 0.35,
+      "n_draws": 8,
+      "n_detected": 8,
+      "n_missed": 0,
+      "miss_rate": 0.0,
+      "median_latency_attempts": 75.0,
+      "min_latency_attempts": 50,
+      "max_latency_attempts": 100,
+      "draws": [
+        {
+          "seed": 20275823,
+          "detected": true,
+          "latency_hours": 4,
+          "latency_attempts": 100
+        },
+        {
+          "seed": 20275824,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        },
+        {
+          "seed": 20275825,
+          "detected": true,
+          "latency_hours": 3,
+          "latency_attempts": 75
+        },
+        {
+          "seed": 20275826,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        },
+        {
+          "seed": 20275827,
+          "detected": true,
+          "latency_hours": 3,
+          "latency_attempts": 75
+        },
+        {
+          "seed": 20275828,
+          "detected": true,
+          "latency_hours": 4,
+          "latency_attempts": 100
+        },
+        {
+          "seed": 20275829,
+          "detected": true,
+          "latency_hours": 3,
+          "latency_attempts": 75
+        },
+        {
+          "seed": 20275830,
+          "detected": true,
+          "latency_hours": 3,
+          "latency_attempts": 75
+        }
+      ]
+    },
+    {
+      "post_rate": 0.4,
+      "drop": 0.5,
+      "n_draws": 8,
+      "n_detected": 8,
+      "n_missed": 0,
+      "miss_rate": 0.0,
+      "median_latency_attempts": 50.0,
+      "min_latency_attempts": 50,
+      "max_latency_attempts": 75,
+      "draws": [
+        {
+          "seed": 20276823,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        },
+        {
+          "seed": 20276824,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        },
+        {
+          "seed": 20276825,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        },
+        {
+          "seed": 20276826,
+          "detected": true,
+          "latency_hours": 3,
+          "latency_attempts": 75
+        },
+        {
+          "seed": 20276827,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        },
+        {
+          "seed": 20276828,
+          "detected": true,
+          "latency_hours": 3,
+          "latency_attempts": 75
+        },
+        {
+          "seed": 20276829,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        },
+        {
+          "seed": 20276830,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        }
+      ]
+    },
+    {
+      "post_rate": 0.12,
+      "drop": 0.78,
+      "n_draws": 8,
+      "n_detected": 8,
+      "n_missed": 0,
+      "miss_rate": 0.0,
+      "median_latency_attempts": 50.0,
+      "min_latency_attempts": 25,
+      "max_latency_attempts": 50,
+      "draws": [
+        {
+          "seed": 20277823,
+          "detected": true,
+          "latency_hours": 1,
+          "latency_attempts": 25
+        },
+        {
+          "seed": 20277824,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        },
+        {
+          "seed": 20277825,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        },
+        {
+          "seed": 20277826,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        },
+        {
+          "seed": 20277827,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        },
+        {
+          "seed": 20277828,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        },
+        {
+          "seed": 20277829,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        },
+        {
+          "seed": 20277830,
+          "detected": true,
+          "latency_hours": 2,
+          "latency_attempts": 50
+        }
+      ]
+    }
+  ],
+  "false_alarm": {
+    "n_draws": 30,
+    "n_false_alarms": 0,
+    "false_alarm_rate": 0.0,
+    "draws": [
+      {
+        "seed": 20275323,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275324,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275325,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275326,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275327,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275328,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275329,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275330,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275331,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275332,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275333,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275334,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275335,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275336,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275337,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275338,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275339,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275340,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275341,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275342,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275343,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275344,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275345,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275346,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275347,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275348,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275349,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275350,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275351,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      },
+      {
+        "seed": 20275352,
+        "detected": false,
+        "latency_hours": null,
+        "latency_attempts": null
+      }
+    ]
+  },
+  "largest_effect_post_rate": 0.12,
+  "claim_rule": "Latency is claimable only if it replicates: the median latency must be finite and the detector must fire in every draw at the largest effect size. If the detector misses the change-point in any draw at that size, report the miss rate rather than a latency. A latency figure is only meaningful alongside the false-alarm rate measured on no-change control runs, so both are reported together or neither is claimed.",
+  "claimable": true,
+  "verdict": "CLAIMABLE: the detector fired in all 8 draws at the largest effect size swept (median latency 50 attempts), reported alongside a false-alarm rate of 0.0% measured on no-change control runs under the same polling procedure."
+}

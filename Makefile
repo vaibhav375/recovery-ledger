@@ -1,4 +1,4 @@
-.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
+.PHONY: setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet fleet-latency negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
 
 # `uv pip install` honours an ambient VIRTUAL_ENV over the venv it was just
 # told to create. Anyone who runs `make setup` with another virtualenv active
@@ -102,6 +102,13 @@ negotiate:
 fleet:
 	PYTHONPATH=src:experiments/tier2_simulation .venv/bin/python3 \
 		experiments/fleet/run_fleet.py --n-train 5000 --n-eval 2000
+
+# N6, measured rather than demonstrated: detection latency against a known
+# injected change-point, swept over effect size, beside the false-alarm rate
+# on no-change controls (PROJECT_STATE.md Tier B). See experiments/fleet/REPORT.md.
+fleet-latency:
+	PYTHONPATH=src:experiments/tier2_simulation .venv/bin/python3 \
+		experiments/fleet/run_fleet_latency.py
 
 # Reply-intent classification accuracy vs a hand-authored labelled set
 # (spec section 8.5 requires this validation). Needs a local Ollama.

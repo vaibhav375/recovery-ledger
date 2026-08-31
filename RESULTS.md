@@ -576,6 +576,47 @@ observed slice rather than judge it badly**. That is the correct direction:
 a false positive suppresses retries into a *working* issuer and destroys
 recovery outright, while a missed detection merely forgoes an optimisation.
 
+### How fast, and how often it cries wolf
+
+```
+make fleet-latency
+```
+
+`make fleet` shows the detector working on one planted outage. That is a
+demonstration, not a measurement — it says nothing about speed, about how speed
+varies with severity, or about how often the detector fires on a healthy rail.
+A latency figure without a false-alarm rate is meaningless, because a detector
+that triggers on noise has zero latency and no value.
+
+A change-point is injected at a known attempt index and the detector polled
+until it flags that issuer. 8 independent draws per effect size, and the
+severity is swept — the issuer's success rate falls from 90% to each of four
+post-change rates. False alarms are measured separately on 30 control draws
+with no change-point at all.
+
+| issuer rate falls to | drop | detected | median latency (attempts) | range |
+|---:|---:|:--|---:|---|
+| 0.70 | 0.20 | 8/8 | 125 | 100–150 |
+| 0.55 | 0.35 | 8/8 | 75 | 50–100 |
+| 0.40 | 0.50 | 8/8 | 50 | 50–75 |
+| 0.12 | 0.78 | 8/8 | 50 | 25–50 |
+
+**False alarms: 0 of 30 control draws (0.0%).**
+
+The detector fired in every draw at every severity, so there is no miss rate to
+report. Latency scales monotonically with severity — a 20-point drop takes a
+median of 125 attempts, a 78% collapse takes 50 — which is the shape a
+two-proportion z-test should produce, and seeing it come out that way is a
+check on the detector rather than a restatement of it. At 25 attempts an hour
+a severe outage costs roughly two hours of futile retries before the rail is
+ruled out.
+
+This measures the detector against an injected change-point in the simulator,
+where ground truth is known by construction. It does not transfer to a real
+payment rail, where degradations are gradual, partial and tangled with
+seasonality the simulator does not model. What changed is that N6's speed is
+now measured instead of demonstrated.
+
 ## Off-policy evaluation in the deployment loop
 
 ```

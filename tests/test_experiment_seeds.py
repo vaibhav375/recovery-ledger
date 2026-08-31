@@ -46,6 +46,7 @@ SEED_REGISTRY: dict[str, tuple[str, str]] = {
     "tier2_simulation/run_baselines.py": ("distinct", ""),
     "sensitivity/run_sweep.py": ("distinct", ""),
     "fleet/run_fleet.py": ("distinct", ""),
+    "fleet/run_fleet_latency.py": ("distinct", ""),
     "ope_deployment/run_ope_deployment.py": ("distinct", ""),
     "fairness/run_fairness.py": ("distinct", ""),
     "pessimism/run_pessimism.py": ("distinct", ""),

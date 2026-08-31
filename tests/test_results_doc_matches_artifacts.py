@@ -1150,3 +1150,60 @@ def test_disagreement_replication_does_not_move_the_pinned_headline_totals():
     assert t["saved"] == 93678.91
     assert t["net"] == -40668.55
     assert t["model_errors"] == 170
+
+
+# ── N6: detection latency ────────────────────────────────────────────────
+#
+# The claim these pin is that N6's speed is measured rather than demonstrated.
+# A latency without its false-alarm rate is not a result, so the rate is pinned
+# beside the table it qualifies — the document must not be able to quote one
+# without the other.
+
+FLEET_LATENCY = ROOT / "experiments" / "fleet" / "results_fleet_latency.json"
+
+
+def test_fleet_latency_rows_match_the_artifact(results_md):
+    for e in _load(FLEET_LATENCY)["effect_sizes"]:
+        row = (
+            f"| {e['post_rate']:.2f} | {e['drop']:.2f} | "
+            f"{e['n_detected']}/{e['n_draws']} | "
+            f"{e['median_latency_attempts']:.0f} | "
+            f"{e['min_latency_attempts']}–{e['max_latency_attempts']} |"
+        )
+        assert row in results_md, f"latency row missing or stale: {row!r}"
+
+
+def test_fleet_false_alarm_rate_is_published_with_the_latency(results_md):
+    fa = _load(FLEET_LATENCY)["false_alarm"]
+    stated = (
+        f"**False alarms: {fa['n_false_alarms']} of {fa['n_draws']} control draws "
+        f"({fa['false_alarm_rate']:.1%}).**"
+    )
+    assert stated in results_md, (
+        "RESULTS.md quotes latency without the false-alarm rate that makes it "
+        f"meaningful. Expected {stated!r}"
+    )
+
+
+def test_fleet_latency_claim_is_reported_as_the_rule_judged_it():
+    """The rule requires the detector to fire in EVERY draw at the largest
+    effect size before a latency is claimable. If a future run misses one, the
+    document must stop quoting a latency and report the miss rate instead."""
+    d = _load(FLEET_LATENCY)
+    largest = min(d["effect_sizes"], key=lambda e: e["post_rate"])
+    assert largest["n_missed"] == 0, (
+        "the detector missed the change-point at the largest effect size — "
+        "RESULTS.md must report the miss rate, not a latency"
+    )
+    assert d["claimable"] is True
+
+
+def test_fleet_latency_is_monotone_in_severity():
+    """A bigger collapse must not take longer to notice than a small one. If
+    this inverts, the detector is not behaving like a two-proportion test and
+    the report's explanation of its own numbers is wrong."""
+    rows = sorted(_load(FLEET_LATENCY)["effect_sizes"], key=lambda e: e["drop"])
+    medians = [r["median_latency_attempts"] for r in rows]
+    assert medians == sorted(medians, reverse=True), (
+        f"latency is not monotone in severity: {medians}"
+    )

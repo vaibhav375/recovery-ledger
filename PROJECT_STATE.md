@@ -73,8 +73,9 @@ All from committed artifacts, all reproducible from the listed target.
 | Stopping rules | **11 defined, 8 fired** in the headline batch | `make eval` |
 | Compliance kernel | **13 rules**, all with provenance citations | `make redteam` |
 | Ledger | 34,304 entries, chain valid | `make eval` |
+| N6 detection latency | **50 attempts** median at a 78% collapse, monotone in severity, 0 false alarms in 30 controls | `make fleet-latency` |
 | Regret — what the silences cost | 554 declined cases: cost ₹134,347, saved ₹93,679, **net ₹-40,669**; pre-registered prediction (170 model errors) HOLDS | `make regret` |
-| Tests | **472 passing** across 42 files | `make test` |
+| Tests | **483 passing** across 43 files | `make test` |
 
 ---
 
@@ -104,7 +105,8 @@ loop visible.
 ### Experiments (15, each with an artifact and a make target)
 `tier1_criteo` · `tier2_simulation` · `sensitivity` · `fleet` · `negotiation` ·
 `listener_eval` · `ope_deployment` · `fairness` · `pessimism` · `dnd_signal` ·
-`horizon` · `uplift_ab` · `churn_lambda` · `uplift_calibration` · `regret`
+`horizon` · `uplift_ab` · `churn_lambda` · `uplift_calibration` ·
+`regret` · `dr_foldsweep` · `fleet_latency` · `regret`
 
 ### Frontend
 React + TypeScript + Vite, three.js 3D policy-space, inline SVG charts
@@ -252,9 +254,14 @@ definition of done — that is §7.
       *Expected validation:* if shipped, `tests/test_uplift_ab.py` requires the
       A/B to support it — so the justification must be written as a
       harm-reduction claim, not a revenue one.
-- [ ] **Fleet change-point over time.** N6 currently detects an outage; showing
-      detection latency against a known injected change-point would make it
-      measurable rather than demonstrated.
+- [x] **Fleet change-point over time.** Done — `make fleet-latency`,
+      `experiments/fleet/REPORT.md`. The detector fired in **8/8 draws at every
+      severity swept**, with latency monotone in severity (median 125 attempts
+      for a 20% drop, 50 for a 78% collapse) and **0 false alarms in
+      30 control draws**. N6's speed is now measured rather than
+      demonstrated. The monotonicity is a check on the detector, not just a
+      description: a two-proportion test should clear its threshold on less
+      evidence as divergence grows, and it does.
 
 ### Tier C — scope worth having if time allows
 - [ ] Global contact-budget allocator (knapsack across the fleet, not per-case).
@@ -309,11 +316,12 @@ and a frontend build that deleted the page's data with no error anywhere.
 Run in this order. Every one must pass.
 
 ```bash
-make test          # 472 tests
+make test          # 483 tests
 make eval          # B1 headline
 make baselines     # 8-policy comparison
 make sensitivity   # 75/75 both criteria across 3 draws
 make calibration   # uplift by decile: ranking 3/3, near-monotone, slope 0.758
+make fleet-latency  # detection latency + false-alarm rate for N6
 make regret        # what the silences cost, beside what contacting recovered
 make redteam       # 100% block rate, 0 leaks
 make tier1-criteo  # IPS/SNIPS recover the arm-mean ATE
