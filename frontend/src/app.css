@@ -1196,7 +1196,7 @@ main, .rl-footer { position: relative; z-index: 1; }
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
   gap: clamp(24px, 3.5vw, 52px);
-  align-items: center;
+  align-items: start;
   margin: clamp(40px, 6vw, 72px) 0 0;
   padding-top: clamp(30px, 4vw, 46px);
   border-top: 1px solid var(--line);
@@ -1221,15 +1221,22 @@ main, .rl-footer { position: relative; z-index: 1; }
 .rl-quad-zero.is-v { stroke: var(--line-soft); }
 .rl-quad-pt { fill: var(--fg-faint); opacity: 0.42; }
 .rl-quad-pt.is-contacted { fill: var(--accent); opacity: 0.92; }
-.rl-quad-annobg { fill: var(--bg); opacity: 0.82; }
-.rl-quad-anno { font-size: 10px; fill: #ff8a9b; opacity: 0.9; }
+.rl-quad-anno {
+  font-size: 10.5px;
+  fill: #ff8a9b;
+  opacity: 0.92;
+  paint-order: stroke;
+  stroke: var(--page);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
 .rl-quad-axis { font-size: 10.5px; fill: var(--fg-dim); letter-spacing: 0.03em; }
 .rl-quad figcaption {
   display: flex;
-  gap: 16px;
+  gap: 8px 18px;
   flex-wrap: wrap;
   align-items: baseline;
-  margin-top: 10px;
+  margin-top: 14px;
   font-size: 11px;
   color: var(--fg-faint);
 }
@@ -1244,7 +1251,13 @@ main, .rl-footer { position: relative; z-index: 1; }
 }
 .rl-quad-key.is-contacted::before { background: var(--accent); opacity: 1; }
 .rl-quad-out { font-family: var(--mono); font-size: 10px; }
-.rl-quad-stat { margin-left: auto; color: var(--fg-dim); }
+.rl-quad-stat {
+  flex-basis: 100%;
+  margin-top: 2px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+  color: var(--fg-dim);
+}
 
 @media (max-width: 900px) {
   .rl-silence-quad { grid-template-columns: minmax(0, 1fr); }

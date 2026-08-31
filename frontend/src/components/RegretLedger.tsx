@@ -1,3 +1,7 @@
+import { motion, useReducedMotion } from "motion/react";
+
+import AnimatedNumber from "../motion/AnimatedNumber";
+
 /** What the agent's silences cost, and what they saved.
  *
  * Two-sided per bucket because the sign is the content: a refusal of a
@@ -5,6 +9,7 @@
  * and a single-signed bar chart would add them together.
  */
 export default function RegretLedger({ regret }: { regret: any }) {
+  const reduce = useReducedMotion();
   if (!regret?.buckets?.length) return null;
   const t = regret.totals;
   const widest = Math.max(...regret.buckets.flatMap((b: any) => [b.cost, b.saved]), 1);
@@ -22,7 +27,7 @@ export default function RegretLedger({ regret }: { regret: any }) {
         refusals of customers who would have paid.
       </p>
       <ul className="rl-regret-rows">
-        {regret.buckets.map((b: any) => (
+        {regret.buckets.map((b: any, i: number) => (
           <li key={b.bucket}>
             <span className="rl-regret-name">{b.bucket.replace(/_/g, " ")}</span>
             <span className="rl-regret-fig rl-regret-fig-cost">{inr(b.cost)}</span>

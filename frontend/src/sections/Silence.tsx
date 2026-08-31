@@ -1,3 +1,4 @@
+import AnimatedNumber from "../motion/AnimatedNumber";
 import InView from "../motion/InView";
 import UpliftQuadrant from "../components/UpliftQuadrant";
 import PolicySpaceGuard from "../components/PolicySpaceGuard";
@@ -65,7 +66,7 @@ export default function Silence({
           {items.map((it, i) => (
             <InView key={it.k} index={i}>
               <article className="rl-silence-item">
-                <span className="rl-silence-num">{it.v.toLocaleString("en-IN")}</span>
+                <AnimatedNumber className="rl-silence-num" value={it.v} />
                 <h3>{it.k}</h3>
                 <p>{it.t}</p>
               </article>

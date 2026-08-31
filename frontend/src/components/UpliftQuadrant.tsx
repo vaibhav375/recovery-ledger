@@ -101,26 +101,28 @@ export default function UpliftQuadrant({ points }: { points: P[] }) {
         ))}
         </g>
 
-        {/* Bottom-left is the sparsest corner, but "sparsest" is not "empty" —
-            a few points still fall under the label. A backing plate keeps it
-            legible without moving it away from the region it describes. */}
-        <rect
-          x={PAD.l + 2} y={H - PAD.b - 21} width={318} height={17} rx={3}
-          className="rl-quad-annobg"
-        />
-        <text x={PAD.l + 8} y={H - PAD.b - 8} className="rl-quad-anno">
+        {/* Sits in the band it describes, in its emptiest corner, and is
+            outlined rather than plated — a backing rectangle sized to a guess
+            reads as a bar, not a label. */}
+        <text
+          x={W - PAD.r - 8} y={H - PAD.b - 10}
+          className="rl-quad-anno" textAnchor="end"
+        >
           below the line, contacting makes them less likely to pay
         </text>
 
-        <text x={PAD.l} y={H - 12} className="rl-quad-axis">
+        <text
+          x={PAD.l + (W - PAD.l - PAD.r) / 2} y={H - 14}
+          className="rl-quad-axis" textAnchor="middle"
+        >
           predicted uplift τ̂ →
         </text>
         <text
-          transform={`rotate(-90 14 ${(PAD.t + H - PAD.b) / 2})`}
-          x={14} y={(PAD.t + H - PAD.b) / 2}
+          transform={`rotate(-90 16 ${PAD.t + (H - PAD.t - PAD.b) / 2})`}
+          x={16} y={PAD.t + (H - PAD.t - PAD.b) / 2}
           className="rl-quad-axis" textAnchor="middle"
         >
-          ↑ true uplift
+          true uplift ↑
         </text>
       </svg>
       <figcaption>
