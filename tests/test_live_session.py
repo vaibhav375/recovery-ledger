@@ -149,3 +149,53 @@ def test_the_roster_reports_the_model_estimate_the_policy_will_act_on():
     assert started["uplift_correlation"] == pytest.approx(
         get_models().uplift_correlation, abs=1e-3
     )
+
+
+def test_the_kill_switch_stops_the_run_without_sleeping_through_the_rest_of_the_fleet():
+    """Engaging the kill switch must stop the run promptly.
+
+    The throttle exists so a human can read the loop and reach the kill switch.
+    It is applied per *ledger entry*, and a case stopped by the kill switch
+    still writes two entries — `case_ingested` and `stop` — so before this was
+    fixed, killing a paced run cost `2 x remaining_cases x pace_ms` in pure
+    `time.sleep()` after the operator had already pressed stop. Measured on a
+    120-case run at 150 ms: the kill landed at 3.0 s and the run took a further
+    37.3 s, of which 36.0 s was sleeping.
+
+    The audit record is deliberately kept — every case still gets its
+    kill-switch stop entry, because B4's claim is that the ledger accounts for
+    every case the agent saw. What is dropped is the pacing, whose only purpose
+    (letting a human intervene) is already served once they have intervened.
+    """
+    import threading
+    import time
+
+    from recovery_ledger.live.session import new_session, run_session
+
+    session = new_session(seed=7, n_cases=40, pace_ms=150)
+
+    def engage() -> None:
+        time.sleep(0.4)
+        session.kill.engage()
+
+    threading.Thread(target=engage, daemon=True).start()
+    started = time.perf_counter()
+    run_session(session)
+    elapsed = time.perf_counter() - started
+
+    killed = [
+        e for e in session.ledger._entries
+        if e.entry_type == "stop" and e.payload.get("reason") == "global_kill_switch"
+    ]
+    assert killed, "the kill switch never fired; the test proves nothing"
+
+    # Unpaced, the post-kill work is a few milliseconds. Paced per entry it was
+    # 2 x 40 x 150 ms = 12 s. Anything near that means the fix regressed.
+    assert elapsed < 5.0, (
+        f"run took {elapsed:.1f}s after a kill at 0.4s — the throttle is still "
+        f"sleeping through {len(killed)} killed cases"
+    )
+
+    # The audit record must survive the speed-up.
+    assert session.summary["killed"] is True
+    assert session.ledger.verify_chain()

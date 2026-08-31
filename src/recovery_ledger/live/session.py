@@ -245,7 +245,16 @@ class RunSession:
         return round(self._wall_ms() - self._paced_ms, 2)
 
     def _pace(self) -> None:
-        if self.pace_ms > 0:
+        # The throttle's only job is to let a human read the loop and reach the
+        # kill switch. Once they have reached it, pacing buys nothing and costs
+        # a great deal: it is applied per ledger entry, and every case the kill
+        # switch stops still writes two entries, so a killed run went on
+        # sleeping for 2 x remaining_cases x pace_ms after the operator had
+        # already pressed stop — 36 of the 37 seconds a 120-case run at 150 ms
+        # took to wind down. The stop entries are still written, because B4's
+        # claim is that the ledger accounts for every case the agent saw; only
+        # the sleeping is dropped.
+        if self.pace_ms > 0 and not self.kill.engaged:
             time.sleep(self.pace_ms / 1000.0)
             self._paced_ms += self.pace_ms
 
