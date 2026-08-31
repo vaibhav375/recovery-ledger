@@ -95,11 +95,6 @@ export default function App() {
     <>
       <Scene litFraction={figures.holdoutRate} />
 
-      <header className="rl-topline">
-        <span className="rl-wordmark">Recovery Ledger</span>
-        <span className="rl-topline-meta">{data.source}</span>
-      </header>
-
       <main>
         <Opening holdoutRate={figures.holdoutRate} />
         <Subtraction
