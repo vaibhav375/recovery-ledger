@@ -168,3 +168,27 @@ def test_each_bin_reports_which_rows_it_holds():
     for lower, upper in zip(result.bins, result.bins[1:]):
         assert tau_hat[lower.row_indices].max() <= tau_hat[upper.row_indices].min()
         assert len(lower.row_indices) == lower.n
+
+
+def test_a_model_that_predicts_a_constant_does_not_crash_the_chart():
+    """A degenerate model — one that gives every case the same uplift — has no
+    ranking to score, but it must not take the calibration down with it.
+
+    `np.polyfit` goes singular on zero-variance input and raises LinAlgError.
+    The Spearman helper immediately above already guards for exactly this case
+    and returns 0.0; the slope did not, so the same degenerate input produced a
+    clean 0.0 from one statistic and a crash from the other.
+    """
+    n = 200
+    tau_flat = np.zeros(n)
+    treatment = np.tile([1, 0], n // 2)
+    outcome = np.tile([1.0, 0.0, 0.0, 0.0], n // 4)
+
+    result = uplift_by_decile(tau_flat, treatment, outcome, n_bins=10, n_boot=0, seed=0)
+
+    assert result.spearman == 0.0
+    assert result.calibration_slope == 0.0, (
+        "a predictor with no spread has no slope to report; 0.0 says that, a "
+        "crash says nothing"
+    )
+    assert len(result.bins) == 10

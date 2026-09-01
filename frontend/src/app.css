@@ -1749,3 +1749,8 @@ main, .rl-footer { position: relative; z-index: 1; }
   max-width: 58ch;
 }
 .rl-ground-caveat b { color: var(--fg-dim); font-weight: 500; }
+
+/* The panel takes focus on open so the keyboard lands inside the dialog, but
+   it is a container rather than a control — an outline on it would read as a
+   focused widget that does nothing. Its children show their own focus. */
+.rl-drawer-panel:focus { outline: none; }

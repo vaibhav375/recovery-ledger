@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CaseCard } from "../types";
 import { money } from "../format";
 import { describeEntry, shortHash } from "../entries";
@@ -8,11 +8,33 @@ type Tab = "timeline" | "certificates" | "raw";
 export default function CaseDetail({ c, onClose }: { c: CaseCard; onClose: () => void }) {
   const [tab, setTab] = useState<Tab>("timeline");
   const certs = c.timeline.filter((t) => t.type === "certificate");
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // A role="dialog" that cannot be dismissed from the keyboard is a trap: the
+  // scrim covers the page, so a keyboard or screen-reader user who opens a case
+  // has no way back to the register. Escape closes it, focus moves into the
+  // panel on open, and the row that opened it gets focus back on close so the
+  // reader does not land at the top of the document.
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    panelRef.current?.focus();
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      opener?.focus?.();
+    };
+  }, [onClose]);
 
   return (
-    <div className="rl-drawer" role="dialog" aria-label={`Case ${c.case_id}`}>
+    <div className="rl-drawer" role="dialog" aria-modal="true" aria-label={`Case ${c.case_id}`}>
       <button className="rl-drawer-scrim" aria-label="Close" onClick={onClose} />
-      <div className="rl-drawer-panel">
+      <div className="rl-drawer-panel" ref={panelRef} tabIndex={-1}>
         <header className="rl-drawer-head">
           <div>
             <h1>{c.case_id}</h1>

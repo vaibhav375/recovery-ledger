@@ -1377,3 +1377,27 @@ def test_the_slope_correction_is_shown_working_before_it_is_shown_not_paying(res
         "the finding"
     )
     assert "not shipped" in results_md
+
+
+# ── dangling references ──────────────────────────────────────────────────
+
+def test_every_repo_path_the_docs_point_at_exists():
+    """A broken link is drift. RESULTS.md promised
+    `experiments/pessimism/REPORT.md` and the file did not exist — the docs
+    described a repository slightly richer than the one shipped, and every
+    other kind of prose/artifact drift here has a test while this did not.
+    """
+    import re
+
+    missing = []
+    for name in ("README.md", "RESULTS.md", "PROJECT_STATE.md"):
+        doc = ROOT / name
+        if not doc.exists():
+            continue
+        for path in re.findall(
+            r"`((?:experiments|src|tests|dashboard|frontend|docs)/[A-Za-z0-9_./-]+)`",
+            doc.read_text(),
+        ):
+            if not (ROOT / path).exists():
+                missing.append(f"{name} points at {path}, which does not exist")
+    assert not missing, "\n  ".join(["dangling references:"] + sorted(set(missing)))

@@ -146,7 +146,11 @@ def uplift_by_decile(
     predicted = np.array([b.mean_predicted_uplift for b in usable])
     realised = np.array([b.realised_uplift for b in usable])
 
-    if len(usable) >= 2:
+    # A predictor with no spread has no slope to report. np.polyfit goes
+    # singular on zero-variance input and raises LinAlgError, which would take
+    # down the whole chart for a degenerate model — while _spearman right above
+    # already returns 0.0 for the same input. Same input, same answer.
+    if len(usable) >= 2 and float(np.std(predicted)) > 0:
         slope, intercept = (float(v) for v in np.polyfit(predicted, realised, 1))
         spearman = _spearman(predicted, realised)
     else:
