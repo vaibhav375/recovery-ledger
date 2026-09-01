@@ -90,6 +90,15 @@
     "note": "Held on Criteo under a rule deliberately stricter than Tier 1b's: the paired interval must exclude zero, not merely have three estimators agree on a sign. 8.94 SEs from zero."
   },
   {
+    "id": "recalibration.pays",
+    "statement": "Correcting tau_hat's measured over-spread increases incremental recovery.",
+    "artifact": "experiments/uplift_recalibration/results_recalibration.json",
+    "verdict_path": "verdict",
+    "status": "UNRESOLVED",
+    "observed": "UNDETERMINED: the draws disagree on the sign, so no effect on recovered value is established. The correction is not shipped on this evidence.",
+    "note": "Undetermined: the draws disagree on sign. The correction demonstrably works as arithmetic - the held-out slope moves 0.6674 to 0.9508 - and recovered value still does not follow consistently. Improving a diagnostic is not improving the decision."
+  },
+  {
     "id": "lambda.dominance",
     "statement": "lambda_churn = 4.0 strictly dominates 2.0.",
     "artifact": "experiments/churn_lambda/results_lambda_sweep.json",

@@ -128,3 +128,25 @@ def test_each_claim_declares_where_its_verdict_comes_from(claim):
     assert claim.artifact.strip()
     assert claim.verdict_path.strip()
     assert (ROOT / claim.artifact).exists(), f"{claim.artifact} does not exist"
+
+
+@pytest.mark.parametrize("word", ["UNRESOLVED", "UNDETERMINED", "INCONCLUSIVE"])
+def test_every_word_for_an_open_question_resolves_to_unresolved(word):
+    """This repo says "the evidence did not settle it" three different ways
+    across its experiments. Recognising only two of them was a silent bug: the
+    recalibration result reads UNDETERMINED and the registry published it as
+    REFUTED — a question left open reported as a question answered no."""
+    from recovery_ledger.claims import Claim, Status
+
+    c = Claim(id="probe", statement="s", artifact="a", verdict_path="v",
+              held_values=("CLAIMABLE",))
+    assert c.resolved(f"{word}: because reasons", missing=False).status is Status.UNRESOLVED
+
+
+def test_a_genuinely_negative_verdict_still_reads_refuted():
+    """The guard above must not turn every string into UNRESOLVED."""
+    from recovery_ledger.claims import Claim, Status
+
+    c = Claim(id="probe", statement="s", artifact="a", verdict_path="v",
+              held_values=("CLAIMABLE",))
+    assert c.resolved("REFUTED: it does not hold", missing=False).status is Status.REFUTED

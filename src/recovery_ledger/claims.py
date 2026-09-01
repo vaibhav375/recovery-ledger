@@ -69,14 +69,19 @@ class Claim:
             status = Status.HELD
         elif observed in self.unresolved_values:
             status = Status.UNRESOLVED
-        elif isinstance(observed, str) and observed.upper().startswith("UNRESOLVED"):
-            status = Status.UNRESOLVED
-        elif isinstance(observed, str) and observed.upper().startswith("INCONCLUSIVE"):
+        elif isinstance(observed, str) and observed.upper().startswith(_OPEN_VERDICTS):
             status = Status.UNRESOLVED
         else:
             status = Status.REFUTED
         return Claim(**{**self.__dict__, "status": status, "observed": observed})
 
+
+#: Every word this repo uses for "the evidence did not settle it". They mean
+#: the same thing and must not collapse into REFUTED — a question left open is
+#: not a question answered no, and the registry's whole job is telling a reader
+#: which is which. Recognising two of the three was a silent bug: the
+#: recalibration result reads UNDETERMINED and was being published as REFUTED.
+_OPEN_VERDICTS = ("UNRESOLVED", "UNDETERMINED", "INCONCLUSIVE")
 
 _MISSING = object()
 
@@ -207,7 +212,11 @@ REGISTRY: tuple[Claim, ...] = (
         statement="Correcting tau_hat's measured over-spread increases "
                   "incremental recovery.",
         artifact="experiments/uplift_recalibration/results_recalibration.json",
-        verdict_path="holds",
+        # The verdict string, not `holds`: a bare boolean collapses "the draws
+        # disagreed" into "refuted", and those are different results. The draws
+        # disagreeing means the question is open, not answered no.
+        verdict_path="verdict",
+        held_values=("CLAIMABLE",),
         forbidden_when_not_held=("recalibration recovers more",),
         note="Undetermined: the draws disagree on sign. The correction demonstrably "
              "works as arithmetic - the held-out slope moves 0.6674 to 0.9508 - "
