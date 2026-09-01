@@ -52,12 +52,15 @@ expected = {
     # the page: it expected ₹300,677 where the page correctly says ₹272,281.
     f"₹{inr(d['batch']['incremental_per_1000_cases']['point'])}": "headline incremental (run_batch)",
     f"{d['calibration']['verdict']['mean_calibration_slope']:.3f} mean": "calibration: slope",
+    # The strongest claim in the project must be ON the page, not just in the docs.
+    f"{d['targeting']['standard_errors_from_zero']} standard errors out": "tier1c: targeting off the simulator",
+    f"${round(d['revenue']['effect_pooled_all_arms']['incremental_per_1000']):,}": "tier1b: real money, in dollars because the data is",
     f"₹{inr(d['regret']['totals']['net'])}": "regret: net",
 }
 required_sections = {
     ".rl-subtraction": "subtraction", ".rl-chart svg": "baselines chart",
     ".rl-frontier-reads": "baselines reads", ".rl-quad svg": "uplift quadrant",
-    ".rl-curve svg": "caution curve", ".rl-scissor svg": "decile scissor", ".rl-audit-card": "audit cards",
+    ".rl-curve svg": "caution curve", ".rl-scissor svg": "decile scissor", ".rl-grounding": "grounding (not simulated)", ".rl-audit-card": "audit cards",
     ".rl-kernel": "kernel", ".rl-livesection": "live console", ".rl-explorer": "explorer",
     ".rl-regret": "regret ledger",
 }

@@ -1638,3 +1638,79 @@ main, .rl-footer { position: relative; z-index: 1; }
 @media (prefers-reduced-motion: reduce) {
   .rl-telemetry-rule { transition: none; }
 }
+
+/* ── what is not simulated ─────────────────────────────────────────── */
+/* The boundary between figures this project generated and figures it did
+   not. The currencies are deliberately unreconciled — rupees are the
+   simulator, dollars are Hillstrom — so the cards state their own unit
+   rather than leaving a reader to assume they are comparable. */
+.rl-grounding { border-top: 1px solid var(--line-soft); }
+.rl-grounding-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: clamp(20px, 4vh, 50px) var(--gut) clamp(120px, 20vh, 240px);
+}
+.rl-grounding-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: clamp(20px, 2.6vw, 36px);
+}
+.rl-ground-card {
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+.rl-ground-card.is-lead { grid-column: 1 / -1; border-top-color: var(--accent); }
+.rl-ground-kicker {
+  margin: 0 0 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-faint);
+}
+.rl-ground-card h3 {
+  margin: 0 0 16px;
+  font-size: clamp(16px, 1.7vw, 21px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.rl-ground-figure {
+  margin: 0 0 14px;
+  font-family: var(--mono);
+  font-size: clamp(24px, 3vw, 40px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+  line-height: 1.05;
+}
+.rl-ground-figure.is-small { font-size: clamp(17px, 1.8vw, 23px); }
+.rl-ground-figure span {
+  display: block;
+  margin-top: 7px;
+  font-family: var(--sans);
+  font-size: 13px;
+  letter-spacing: 0;
+  color: var(--fg-dim);
+}
+.rl-ground-figure.is-small span { display: inline; margin: 0; color: var(--fg-faint); }
+.rl-ground-detail {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--fg-dim);
+  max-width: 60ch;
+}
+.rl-ground-detail b { color: var(--foreground); font-weight: 500; }
+/* The caveat is not small print. Every figure here carries a limit, and a
+   card that showed the number without it would be the overclaim the whole
+   project is built to avoid. */
+.rl-ground-caveat {
+  margin: 14px 0 0;
+  padding-left: 14px;
+  border-left: 1px solid var(--line);
+  font-size: 12.5px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--fg-faint);
+  max-width: 58ch;
+}
+.rl-ground-caveat b { color: var(--fg-dim); font-weight: 500; }

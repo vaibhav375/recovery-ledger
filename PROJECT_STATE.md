@@ -78,6 +78,7 @@ All from committed artifacts, all reproducible from the listed target.
 | Compliance kernel | **13 rules**, all with provenance citations | `make redteam` |
 | Ledger | 34,304 entries, chain valid | `make eval` |
 | Claims registry | **6 held · 4 refuted · 1 unresolved**, generated from artifacts | `make claims` | `make claims` | `make claims` | `make claims` | `make claims` |
+| Currency | ₹ is the simulator; $ is Hillstrom. Deliberately unreconciled — converting would mean inventing a rate for another team's data | — |
 | Independent audit | **0 violations** over 5,712 certificates / 467 executed contacts, no agent involved | `make verify-ledger` |
 | N6 detection latency | **50 attempts** median at a 78% collapse, monotone in severity, 0 false alarms in 30 controls | `make fleet-latency` |
 | Regret — what the silences cost | 554 declined cases: cost ₹134,347, saved ₹93,679, **net ₹-40,669**; pre-registered prediction (170 model errors) HOLDS | `make regret` |
@@ -117,8 +118,8 @@ loop visible.
 ### Frontend
 React + TypeScript + Vite, three.js 3D policy-space, inline SVG charts
 generated from `data.json` (never embedded images, so charts cannot drift from
-artifacts). `make dashboard` builds it; `make verify-page` asserts 11 sections
-and 7 artifact-backed claims render with WebGL both on and off.
+artifacts). `make dashboard` builds it; `make verify-page` asserts 12 sections
+and 9 artifact-backed claims render with WebGL both on and off.
 
 The calibration section is the newest and the only one that argues against the
 system it documents: a two-panel chart — the ranking above, the residual at its
@@ -353,7 +354,7 @@ make claims        # pre-registration registry: 4 held, 3 refuted, 1 unresolved
 make verify-ledger # third-party audit: 0 violations, chain valid
 make tier1-criteo  # IPS/SNIPS recover the arm-mean ATE
 make dashboard     # rebuild page from artifacts
-make verify-page   # 11 sections, 7 artifact-backed claims, both paths
+make verify-page   # 12 sections, 9 artifact-backed claims, both paths
 make demo          # agent loop visible end to end
 ```
 

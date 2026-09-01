@@ -445,6 +445,14 @@ def build_data(ledger_path: Path, max_cases: int) -> dict:
         # the matplotlib PNG next to it, so the chart on the page cannot drift
         # away from the artifact the doc tests pin.
         "calibration": load_optional(ROOT / "experiments" / "uplift_calibration" / "results_uplift_calibration.json"),
+        # The three-tier validation story, and the two experiments that closed
+        # open questions. Tier 1c is the strongest claim in the project — B1's
+        # thesis on real randomised data — and was invisible on this page.
+        "revenue": load_optional(ROOT / "experiments" / "tier1_revenue" / "results_revenue.json"),
+        "targeting": load_optional(ROOT / "experiments" / "tier1_targeting" / "results_targeting.json"),
+        "recalibration": load_optional(ROOT / "experiments" / "uplift_recalibration" / "results_recalibration.json"),
+        "fleet_latency": load_optional(ROOT / "experiments" / "fleet" / "results_fleet_latency.json"),
+        "claims": load_optional(ROOT / "claims.json"),
         # What the silences cost. Served from the artifact rather than
         # retyped, like every other figure on the page.
         "regret": load_optional(ROOT / "experiments" / "regret" / "results_regret.json"),

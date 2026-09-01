@@ -16,6 +16,7 @@ import Telemetry from "./components/Telemetry";
 import Opening from "./sections/Opening";
 import Subtraction from "./sections/Subtraction";
 import Frontier from "./sections/Frontier";
+import Grounding from "./sections/Grounding";
 import Silence from "./sections/Silence";
 import Calibration from "./sections/Calibration";
 import Kernel from "./sections/Kernel";
@@ -108,6 +109,7 @@ export default function App() {
           holdoutRate={figures.holdoutRate}
         />
         <Frontier data={data} />
+        <Grounding data={data} />
         <Silence
           dndCases={figures.dnd}
           promiseWindows={figures.promises}

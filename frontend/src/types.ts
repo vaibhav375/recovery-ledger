@@ -55,6 +55,11 @@ export type Dashboard = {
   pessimism: any | null;
   dnd_signal: any | null;
   calibration: any | null;
+  revenue: any | null;
+  targeting: any | null;
+  recalibration: any | null;
+  fleet_latency: any | null;
+  claims: any[] | null;
   regret: any | null;
   rule_provenance?: Record<string, import("./live/api").Citation>;
 };
