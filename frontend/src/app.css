@@ -1648,12 +1648,15 @@ main, .rl-footer { position: relative; z-index: 1; }
   left: 0; right: 0; top: 50%;
   height: 1px;
   background: currentColor;
-  opacity: 0.22;
+  opacity: 0.4;
   transition: opacity 160ms var(--ease), height 160ms var(--ease);
 }
-.rl-telemetry-seg.is-passed::after { opacity: 0.45; }
-.rl-telemetry-seg.is-active::after { opacity: 1; height: 2px; }
+.rl-telemetry-seg.is-passed::after { opacity: 0.62; }
 .rl-telemetry-seg:hover::after { opacity: 0.85; height: 2px; }
+/* After hover, so pointing at the section you are already in does not dim it.
+   Same specificity means source order decides, and hover was winning — the
+   current section got quieter the moment you reached for it. */
+.rl-telemetry-seg.is-active::after { opacity: 1; height: 2px; }
 .rl-telemetry-seg:focus-visible {
   outline: 1px solid var(--ring);
   outline-offset: 3px;
