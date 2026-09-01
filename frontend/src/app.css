@@ -371,8 +371,10 @@ main, .rl-footer { position: relative; z-index: 1; }
    releases to the evidence below. The travel is what makes it a beat rather
    than a heading: a claim you scroll past is a heading, a claim that owns the
    frame while you scroll is an argument. */
-.rl-kernel-stage { height: 190svh; position: relative; }
-.rl-kernel-claim {
+.rl-kernel-stage,
+.rl-claimstage { height: 190svh; position: relative; }
+.rl-kernel-claim,
+.rl-claimstage-inner {
   position: sticky;
   top: 0;
   height: 100svh;
@@ -383,7 +385,8 @@ main, .rl-footer { position: relative; z-index: 1; }
   max-width: 1160px;
   margin: 0 auto;
 }
-.rl-kernel-headline {
+.rl-kernel-headline,
+.rl-claimstage-headline {
   margin: 0;
   font-size: clamp(34px, 6.4vw, 96px);
   font-weight: 600;
@@ -392,7 +395,8 @@ main, .rl-footer { position: relative; z-index: 1; }
   max-width: 16ch;
   font-variant-numeric: tabular-nums;
 }
-.rl-kernel-claimsub {
+.rl-kernel-claimsub,
+.rl-claimstage-sub {
   margin: clamp(24px, 3vw, 40px) 0 0;
   max-width: 46ch;
   font-size: 14px;
@@ -404,7 +408,8 @@ main, .rl-footer { position: relative; z-index: 1; }
 
 @media (prefers-reduced-motion: reduce) {
   .rl-kernel-stage { height: auto; }
-  .rl-kernel-claim { position: static; height: auto; padding: clamp(90px, 14vh, 160px) var(--gut); }
+  .rl-kernel-claim,
+.rl-claimstage-inner { position: static; height: auto; padding: clamp(90px, 14vh, 160px) var(--gut); }
 }
 .rl-kernel-inner { max-width: 1160px; margin: 0 auto; }
 .rl-kernel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: clamp(20px, 3vw, 44px); margin-bottom: clamp(28px, 4vw, 46px); }

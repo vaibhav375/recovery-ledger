@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import ClaimStage from "../components/ClaimStage";
 import InView from "../motion/InView";
 import type { Dashboard } from "../types";
 import { money } from "../format";
@@ -127,17 +128,13 @@ export default function Frontier({ data }: { data: Dashboard }) {
 
   return (
     <section className="rl-frontier">
+      <ClaimStage
+        mark="the lever"
+        claim={<>Volume is not the lever.</>}
+        sub={<>The policies that send the most messages are not the ones that recover
+          the most incremental money.</>}
+      />
       <div className="rl-frontier-inner">
-        <p className="rl-sectionmark">The lever</p>
-        <InView>
-          <h2 className="rl-h2">
-            Volume is not the lever.
-            <span className="rl-dim">
-              {" "}The policies that send the most messages are not the ones
-              that recover the most incremental money.
-            </span>
-          </h2>
-        </InView>
 
         <InView index={1}>
           <figure className="rl-chart">

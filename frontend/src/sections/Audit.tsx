@@ -1,3 +1,4 @@
+import ClaimStage from "../components/ClaimStage";
 import InView from "../motion/InView";
 import type { Dashboard } from "../types";
 import { money } from "../format";
@@ -22,16 +23,14 @@ export default function Audit({ data }: { data: Dashboard }) {
 
   return (
     <section className="rl-audit">
+      <ClaimStage
+        mark="the audit"
+        claim={<>Four experiments where the system under test is this one.
+          <span className="rl-dim"> Three found something wrong with it.</span></>}
+        sub={<>An audit that only ever confirms the thing it audits is not an audit.
+          These are the ones that did not.</>}
+      />
       <div className="rl-audit-inner">
-        <p className="rl-sectionmark">The audit</p>
-        <InView>
-          <h2 className="rl-h2">
-            Four experiments where the system under test is this one.
-            <span className="rl-dim">
-              {" "}Three of them found something wrong with it.
-            </span>
-          </h2>
-        </InView>
 
         <div className="rl-audit-grid">
           {ope && <OffPolicy ope={ope} />}

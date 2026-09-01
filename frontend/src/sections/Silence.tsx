@@ -1,4 +1,5 @@
 import AnimatedNumber from "../motion/AnimatedNumber";
+import ClaimStage from "../components/ClaimStage";
 import InView from "../motion/InView";
 import UpliftQuadrant from "../components/UpliftQuadrant";
 import PolicySpaceGuard from "../components/PolicySpaceGuard";
@@ -53,14 +54,18 @@ export default function Silence({
 
   return (
     <section className="rl-silence">
+      <ClaimStage
+        mark="the work you cannot see"
+        claim={<>
+          {contactsSent.toLocaleString("en-IN")} messages.{" "}
+          {totalCases.toLocaleString("en-IN")} cases.
+          <span className="rl-dim"> Most of the value is in the silence.</span>
+        </>}
+        sub={<>Recovery is assumed to mean outreach. Three different mechanisms here
+          produce the same outcome — no message sent — for three genuinely different
+          reasons.</>}
+      />
       <div className="rl-silence-inner">
-        <p className="rl-sectionmark">The work you cannot see</p>
-        <InView>
-          <h2 className="rl-h2">
-            Recovery is assumed to mean outreach.
-            <span className="rl-dim"> Most of this agent's value is in not sending the message.</span>
-          </h2>
-        </InView>
 
         <div className="rl-silence-grid">
           {items.map((it, i) => (

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import type { CaseCard, Dashboard } from "../types";
+import ClaimStage from "../components/ClaimStage";
 import InView from "../motion/InView";
 import FleetPage from "../components/FleetPage";
 import NegotiationPage from "../components/NegotiationPage";
@@ -53,14 +54,14 @@ export default function Explorer({
 
   return (
     <section className="rl-explorer" id="evidence">
+      <ClaimStage
+        mark="the evidence"
+        claim={<>{data.summary.entries.toLocaleString("en-IN")} entries.
+          <span className="rl-dim"> Every one commits to the entry before it.</span></>}
+        sub={<>Every decision the agent made, with its provenance. Change any entry and
+          the chain stops verifying.</>}
+      />
       <div className="rl-explorer-inner">
-        <p className="rl-sectionmark">The evidence</p>
-        <InView>
-          <h2 className="rl-h2">
-            Every decision, with its provenance.
-            <span className="rl-dim"> The ledger is hash-chained; each entry commits to the one before it.</span>
-          </h2>
-        </InView>
 
         <div className="rl-tabbar">
           {TABS.map((t) => (

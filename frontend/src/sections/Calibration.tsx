@@ -1,3 +1,4 @@
+import ClaimStage from "../components/ClaimStage";
 import InView from "../motion/InView";
 import DecileScissor from "../components/DecileScissor";
 
@@ -37,14 +38,13 @@ export default function Calibration({ cal }: { cal: any }) {
 
   return (
     <section className="rl-cal">
+      <ClaimStage
+        mark="calibration"
+        claim={<>The ranking is real.<span className="rl-dim"> The magnitudes are not.</span></>}
+        sub={<>Predictions are spread about a third wider than the effects they predict —
+          calibration slope {v.mean_calibration_slope.toFixed(3)} across {cal.eval_draws} draws.</>}
+      />
       <div className="rl-cal-inner">
-        <p className="rl-sectionmark">Calibration · make calibration</p>
-        <InView>
-          <h2 className="rl-h2">
-            The ranking is real.
-            <span className="rl-dim"> The magnitudes are not.</span>
-          </h2>
-        </InView>
 
         <div className="rl-cal-body">
           <div className="rl-cal-copy">
