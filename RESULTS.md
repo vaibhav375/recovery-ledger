@@ -621,6 +621,47 @@ and it therefore needs its own A/B under the same replication rule as
 `experiments/uplift_ab` — not a patch applied here and quoted into the
 headline. See `experiments/uplift_calibration/REPORT.md`.
 
+### Correcting the slope does not recover more money
+
+```
+make recalibration
+```
+
+The decile chart measured the defect rather than inferring it — predictions
+about a third too spread out — so the fix targets a known quantity. A linear
+recalibration was fitted on a disjoint split (`τ' = +0.0256 + 0.7020 · τ̂`)
+and A/B'd against the shipped model over 3 evaluation draws.
+
+**The correction works, as arithmetic.** On a third population — held out from
+both the training and the calibration split — the slope moved **0.6674 → 0.9508**,
+which is essentially perfect. That was never the result. The correction is
+fitted to do exactly that, and reporting it as a success would be reporting
+that arithmetic works.
+
+The result is whether the money follows, and it does not:
+
+| eval draw | shipped | recalibrated | Δ |
+|---|---:|---:|---:|
+| 20276823 | ₹67,007 | ₹53,271 | -13,736 |
+| 20276923 | ₹291,121 | ₹330,722 | +39,602 |
+| 20277023 | ₹221,485 | ₹240,121 | +18,635 |
+
+Mean **+14,834**, and the draws disagree on the sign. Under the rule fixed
+before the run — every draw must agree — that is **UNDETERMINED**, and the
+correction is **not shipped**.
+
+This is the sharpest version of a lesson this project has now measured three
+times. `uplift_ab` found a model that was better as a *predictor* (correlation
+0.347 → 0.445) and no better as a decision rule. The decile chart found the
+mechanism — the policy thresholds `τ̂ × amount`, so calibration near the
+boundary is what matters, not global fit. And here a correction that demonstrably
+fixes the calibration still fails to move recovered value consistently.
+
+**Improving a diagnostic is not improving the decision.** Correlation, then
+calibration slope: two different diagnostics, both improvable, neither of which
+buys money on this simulator. A fourth attempt at the same shape should expect
+the same answer.
+
 ## Do-not-disturbs — novelty claim N2
 
 The agent's do-not-disturb contact rate was, for most of this project's

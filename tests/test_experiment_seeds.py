@@ -54,6 +54,7 @@ SEED_REGISTRY: dict[str, tuple[str, str]] = {
     "horizon/run_horizon.py": ("distinct", ""),
     "uplift_ab/run_uplift_ab.py": ("distinct", ""),
     "uplift_calibration/run_calibration.py": ("distinct", ""),
+    "uplift_recalibration/run_recalibration.py": ("distinct", ""),
     "churn_lambda/run_lambda_sweep.py": (
         "shares", "tier2_simulation/run_baselines.py — the curve is a "
                   "decomposition of the baselines table, so it must be "

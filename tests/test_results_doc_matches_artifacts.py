@@ -1341,3 +1341,39 @@ def test_the_criteo_policy_was_chosen_out_of_sample():
     d = _load(TARGETING)
     assert d["n_train"] > 0 and d["n_evaluated_out_of_sample"] > 0
     assert d["n_train"] + d["n_evaluated_out_of_sample"] == d["n_rows"]
+
+
+RECAL = ROOT / "experiments" / "uplift_recalibration" / "results_recalibration.json"
+
+
+def test_recalibration_is_reported_as_undetermined(results_md):
+    """The correction is not shipped. If a future run establishes it, that is a
+    stronger result and the document should claim it — but not while the draws
+    disagree on the sign."""
+    d = _load(RECAL)
+    assert d["every_draw_agrees"] is False, (
+        "the draws now agree — re-run and upgrade or retract the claim"
+    )
+    assert d["holds"] is False
+    assert "**UNDETERMINED**" in results_md
+    assert f"Mean **{d['mean_value_delta']:+,.0f}**" in results_md
+
+
+def test_recalibration_draw_rows_match_the_artifact(results_md):
+    for r in _load(RECAL)["draws"]:
+        row = (f"| {r['eval_seed']} | ₹{r['shipped']['incremental_per_1000_cases']:,.0f} | "
+               f"₹{r['recalibrated']['incremental_per_1000_cases']:,.0f} | {r['value_delta']:+,.0f} |")
+        assert row in results_md, f"stale recalibration row: {row!r}"
+
+
+def test_the_slope_correction_is_shown_working_before_it_is_shown_not_paying(results_md):
+    """The finding depends on both halves being stated. The correction DOES fix
+    the calibration — if the document dropped that, the reader would conclude
+    the fix simply failed, when the point is that a fix which demonstrably works
+    still does not move recovered value."""
+    sl = _load(RECAL)["slope_on_heldout_population"]
+    assert f"**{sl['before']} → {sl['after']}**" in results_md, (
+        "RESULTS.md does not show the slope correction working, which is half "
+        "the finding"
+    )
+    assert "not shipped" in results_md

@@ -1,4 +1,4 @@
-.PHONY: tier1-targeting tier1-revenue claims verify-ledger setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet fleet-latency negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
+.PHONY: recalibration tier1-targeting tier1-revenue claims verify-ledger setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet fleet-latency negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
 
 # `uv pip install` honours an ambient VIRTUAL_ENV over the venv it was just
 # told to create. Anyone who runs `make setup` with another virtualenv active
@@ -57,6 +57,11 @@ tier1-criteo:
 uplift-ab:
 	PYTHONPATH=src .venv/bin/python3 experiments/uplift_ab/run_uplift_ab.py \
 		--n-eval 2000 --eval-draws 5
+
+# Does correcting tau_hat's measured over-spread recover more money? The slope
+# moving toward 1.0 is arithmetic; the money is the result.
+recalibration:
+	PYTHONPATH=src .venv/bin/python3 experiments/uplift_recalibration/run_recalibration.py
 
 calibration:
 	PYTHONPATH=src .venv/bin/python3 experiments/uplift_calibration/run_calibration.py \

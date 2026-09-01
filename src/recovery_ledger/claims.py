@@ -203,6 +203,18 @@ REGISTRY: tuple[Claim, ...] = (
              "estimators agree on a sign. 8.94 SEs from zero.",
     ),
     Claim(
+        id="recalibration.pays",
+        statement="Correcting tau_hat's measured over-spread increases "
+                  "incremental recovery.",
+        artifact="experiments/uplift_recalibration/results_recalibration.json",
+        verdict_path="holds",
+        forbidden_when_not_held=("recalibration recovers more",),
+        note="Undetermined: the draws disagree on sign. The correction demonstrably "
+             "works as arithmetic - the held-out slope moves 0.6674 to 0.9508 - "
+             "and recovered value still does not follow consistently. Improving "
+             "a diagnostic is not improving the decision.",
+    ),
+    Claim(
         id="lambda.dominance",
         statement="lambda_churn = 4.0 strictly dominates 2.0.",
         artifact="experiments/churn_lambda/results_lambda_sweep.json",

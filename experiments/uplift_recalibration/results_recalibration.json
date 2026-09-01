@@ -1,0 +1,71 @@
+{
+  "rule": "Recalibration is claimable only if it increases incremental recovery and every draw agrees on the sign. A mean improvement across draws that disagree in sign is UNDETERMINED. The slope moving toward 1.0 is not the result \u2014 the correction is fitted to do that \u2014 the money is.",
+  "n_train": 5000,
+  "n_calib": 4000,
+  "n_eval": 2000,
+  "eval_draws": 3,
+  "calibration_seed": 20277823,
+  "base_eval_seed": 20276823,
+  "correction": {
+    "intercept": 0.025613,
+    "slope": 0.701958
+  },
+  "slope_on_heldout_population": {
+    "before": 0.6674,
+    "after": 0.9508,
+    "note": "the correction was fitted to move this; it is not the result"
+  },
+  "draws": [
+    {
+      "eval_seed": 20276823,
+      "shipped": {
+        "incremental_per_1000_cases": 67007.47766557481,
+        "contacts": 434,
+        "pct_to_do_not_disturbs": 0.06682027649769585
+      },
+      "recalibrated": {
+        "incremental_per_1000_cases": 53270.986467394774,
+        "contacts": 525,
+        "pct_to_do_not_disturbs": 0.12761904761904763
+      },
+      "value_delta": -13736.49119818004
+    },
+    {
+      "eval_seed": 20276923,
+      "shipped": {
+        "incremental_per_1000_cases": 291120.6005425105,
+        "contacts": 470,
+        "pct_to_do_not_disturbs": 0.1276595744680851
+      },
+      "recalibrated": {
+        "incremental_per_1000_cases": 330722.26119914214,
+        "contacts": 532,
+        "pct_to_do_not_disturbs": 0.16917293233082706
+      },
+      "value_delta": 39601.66065663163
+    },
+    {
+      "eval_seed": 20277023,
+      "shipped": {
+        "incremental_per_1000_cases": 221485.24413808162,
+        "contacts": 459,
+        "pct_to_do_not_disturbs": 0.0784313725490196
+      },
+      "recalibrated": {
+        "incremental_per_1000_cases": 240120.66731840593,
+        "contacts": 555,
+        "pct_to_do_not_disturbs": 0.16396396396396395
+      },
+      "value_delta": 18635.423180324316
+    }
+  ],
+  "value_deltas": [
+    -13736.49,
+    39601.66,
+    18635.42
+  ],
+  "mean_value_delta": 14833.53,
+  "every_draw_agrees": false,
+  "holds": false,
+  "verdict": "UNDETERMINED: the draws disagree on the sign, so no effect on recovered value is established. The correction is not shipped on this evidence."
+}
