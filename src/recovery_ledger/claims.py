@@ -169,6 +169,29 @@ REGISTRY: tuple[Claim, ...] = (
         forbidden_when_not_held=("median latency",),
     ),
     Claim(
+        id="tier1b.real-money-effect",
+        statement="Contact produces incremental revenue, measured on a real "
+                  "randomised experiment with real dollars rather than in the "
+                  "simulator.",
+        artifact="experiments/tier1_revenue/results_revenue.json",
+        verdict_path="effect.excludes_zero",
+        forbidden_when_not_held=("grounded outside its own simulator",),
+        note="The only money figure in this repo not produced by its own "
+             "generator: $424 per 1,000 customers, interval excluding zero.",
+    ),
+    Claim(
+        id="tier1b.targeting-on-real-money",
+        statement="Targeting beats matched-volume random targeting on real "
+                  "money, not only in simulation.",
+        artifact="experiments/tier1_revenue/results_revenue.json",
+        verdict_path="targeting.paired_interval_excludes_zero",
+        forbidden_when_not_held=("targeting beats random on real money",),
+        note="Not established. Three estimators agree on the sign - all the "
+             "registered rule asked for - but the paired interval on the "
+             "difference covers zero. The rule was weaker than the question "
+             "and is left as registered, with the interval reported beside it.",
+    ),
+    Claim(
         id="lambda.dominance",
         statement="lambda_churn = 4.0 strictly dominates 2.0.",
         artifact="experiments/churn_lambda/results_lambda_sweep.json",

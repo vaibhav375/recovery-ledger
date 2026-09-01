@@ -270,6 +270,21 @@ def doubly_robust_value(
     )
 
 
+def _q(model, X: NDArray) -> NDArray[np.float64]:
+    """E[Y | X, arm] from a fitted outcome model, for binary OR continuous Y.
+
+    Binary outcomes want `predict_proba(...)[:, 1]`; a continuous outcome — real
+    money, say — has no such method and wants `predict`. The estimator was
+    written when every outcome in this repo was binary, so it hardcoded
+    predict_proba and raised AttributeError the first time it met a spend
+    column. DR is not a binary-outcome method and there is no reason it should
+    have been restricted to one.
+    """
+    if hasattr(model, "predict_proba"):
+        return np.asarray(model.predict_proba(X))[:, 1]
+    return np.asarray(model.predict(X), dtype=np.float64)
+
+
 def dr_contributions(
     outcome: NDArray[np.float64],
     treatment: NDArray[np.int_],
@@ -308,11 +323,11 @@ def dr_contributions(
         for arm, model in arm_models.items():
             logged_mask = test_idx[treatment[test_idx] == arm]
             if len(logged_mask):
-                q_hat_logged[logged_mask] = model.predict_proba(features[logged_mask])[:, 1]
+                q_hat_logged[logged_mask] = _q(model, features[logged_mask])
 
             policy_mask = test_idx[policy_actions[test_idx] == arm]
             if len(policy_mask):
-                q_hat_policy[policy_mask] = model.predict_proba(features[policy_mask])[:, 1]
+                q_hat_policy[policy_mask] = _q(model, features[policy_mask])
 
     weights = _match_weights(treatment, propensity, policy_actions)
     correction = weights * (outcome - q_hat_logged)

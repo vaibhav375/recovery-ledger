@@ -80,7 +80,7 @@ evidence the problem is real; it is not something to claim credit for.
 | **Bonus** | **Bounded-authority negotiation with the Section 43B(h) tax clock** (spec 9.4). Invokes the counterparty's *own* tax incentive rather than only chasing. | ✅ Built. NPV solver, kernel-enforced concession envelope, and a measured decision to keep an LLM *out* of the drafting. |
 | **N7** | **A regret ledger — the agent's own false negatives, priced.** Every case it declined to contact, split into refusals a rule forced, refusals the model chose, and cases that simply ran out of attempts. No recovery product publishes what its silences cost. | ✅ Built. On the same cases as the headline: cost **₹134,347**, saved **₹93,679**, **net ₹-40,669** — the silences cost more than they saved, published as such. **170 model errors**: refusals of customers who would have paid. |
 | **N8** | **A claims registry that makes overclaiming a build failure.** Every pre-registered claim, its rule, and its verdict — generated from the artifacts, never written by hand. A claim the evidence refuted cannot be asserted in the documents. | ✅ Built. **4 held · 3 refuted · 1 unresolved.** Appending this project's own retracted "strictly dominates" sentence to RESULTS.md fails the suite. It also fails if every claim ever comes back held, because that would be evidence of selection rather than rigour. |
-| **N5** | **Two-tier validation** — causal machinery proven on real randomised public data *before* transfer to the simulator. Directly defeats "your synthetic number is circular". | ✅ Built (Criteo + Hillstrom) |
+| **N5** | **Three-tier validation** — causal machinery proven on real randomised public data, then **incremental money measured on a real randomised experiment**, then transfer to the simulator. | ✅ Built. Criteo + Hillstrom for the estimator; Hillstrom `spend` for the money: **$424 incremental revenue per 1,000 customers, 95% CI [$159, $678]**, interval excluding zero, over 42,693 real customers. The targeting claim tested the same way is **not established** — the paired interval covers zero, and that is published too. |
 | **N6** | **Contact-free recovery** — detecting issuer degradation and suppressing retries into a dead issuer. Inverts the assumption that recovery means outreach. | ✅ Built. Change-point detection per issuer/method/region with root-cause attribution; **precision 1.00 / recall 1.00** against ground truth at realistic observation volume. Cuts futile retries into a dead rail **340 → 0** and recovers **+₹50,600**, all on outage-hit cases. Detection is now *measured*, not demonstrated: fires in **8/8 draws at every severity**, median latency 125 attempts for a 20% drop down to 50 for a 78% collapse, with **0 false alarms in 30 control draws**. |
 
 Six of eight are built and measured; N4 remains a stated simplification the
@@ -452,6 +452,8 @@ make verify-ledger     # third-party audit of the trail — re-derives every
 make calibration       # uplift by decile + calibration slope on a randomised holdout
 make fleet-latency     # N6 detection latency by severity, with its false-alarm rate
 make dr-foldsweep      # tests the cross-fitting hypothesis behind DR's low reading
+make tier1-revenue     # incremental MONEY on a real randomised experiment —
+                       # the one rupee-denominated figure not from the simulator
 make calibration       # uplift by decile + calibration slope on a randomised
                        # holdout — the spec's required evaluation artifact
 make negotiate         # Section 43B(h) negotiation showpiece
@@ -479,8 +481,11 @@ successfully.
 
 ## What is NOT claimed
 
-- No real-world causal effect size. The ₹272,281-per-1,000-cases figure above
-  is a simulation result — policy dominance under stated assumptions, in
+- No real-world causal effect size **in rupees**. The ₹272,281-per-1,000-cases
+  figure above is a simulation result. The one money figure grounded outside the
+  simulator is Tier 1b's **$424 per 1,000 customers** on Hillstrom's real
+  randomised spend data — and that is e-commerce email, not Indian payment
+  recovery, so it grounds the method rather than transferring the domain — policy dominance under stated assumptions, in
   simulation. Everything in `experiments/tier2_simulation/` runs against a
   simulator calibrated to published marginal benchmarks — that calibrates
   outcome rates, not causal response to intervention. See §7 of the spec, and

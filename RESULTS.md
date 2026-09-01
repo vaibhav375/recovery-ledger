@@ -106,6 +106,78 @@ estimator to trust on this dataset. See
 
 ---
 
+## Tier 1b — incremental money, on a real randomised experiment
+
+```
+make tier1-revenue
+```
+
+Every rupee figure in this project is simulator output. Tier 1 answers the
+obvious objection by proving the causal machinery recovers known effects on
+real randomised data — but it proves it on *visit* and *conversion*, which are
+not money. So the honest statement has been: the estimator is validated on real
+data, the money is not.
+
+Hillstrom carries a column this project never used. `spend` is real dollars
+spent in the two weeks after a randomised email, over 42,693 real customers
+under a randomisation the experimenter controlled.
+
+**Incremental revenue: $424 per 1,000 customers, 95% CI
+[$159, $678].** The interval excludes zero. This is measured, not
+modelled — the arm-mean contrast a randomised experiment licenses directly, with
+no policy and no uplift model in the path.
+
+That is the one number in this repository that is both denominated in money and
+grounded outside its own simulator.
+
+### The targeting claim does not survive the same treatment
+
+B1's central argument is that targeting beats contacting the same number of
+people at random. Tested here on real money: fit the uplift model on half the
+customers, rank the other half, contact the top 30%, and value that
+policy with the IPS / SNIPS / DR estimators Tier 1 already validated on this
+dataset.
+
+| estimator | targeted | random, matched volume | difference |
+|---|---:|---:|---:|
+| ips | 0.8927 | 0.8406 | +0.0522 |
+| snips | 0.8802 | 0.8384 | +0.0418 |
+| dr | 0.9408 | 0.8524 | +0.0884 |
+
+All three agree on the sign, which is all the pre-registered rule asked for.
+**The rule was weaker than the question.** Three estimators computed from the
+same rows will usually agree on a sign whether or not the difference is real,
+and the statistic that actually decides it is a paired interval on the
+difference itself:
+
+**+0.0522 per customer, 95% CI [-0.1768, +0.2864] — covers zero.**
+
+So the targeting advantage is **not established** on real money at this sample
+size. The rule is left as it was registered and this is reported beside it,
+because moving a pre-registered bar after seeing the result is the thing
+pre-registration exists to prevent.
+
+### What the in-sample version would have claimed
+
+The first version of this experiment fitted τ̂ on all 42,693 customers and then
+ranked those same customers. It reported a targeting advantage of **+0.65 per
+customer** — roughly 80% better than random. Out of sample the same procedure
+gives **+0.05**. The in-sample figure was between seven and twelve times the
+honest one, and nothing about it looked wrong.
+
+### What this does and does not license
+
+**Licenses:** that contact produces incremental money, measured on a real
+randomised experiment with real dollars, by the same estimators this project
+uses everywhere else. The method is no longer validated only on binary
+outcomes.
+
+**Does not license:** any claim about Indian payment recovery. Hillstrom is
+e-commerce email — a real RCT about a different intervention on a different
+population. It grounds the method in real money; it does not transfer the
+domain. Nor does it establish that targeting beats random on money; the
+interval says that question is open at this sample size.
+
 ## B1 — measured money recovered across a batch
 
 ```

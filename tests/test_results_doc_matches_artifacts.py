@@ -1234,3 +1234,52 @@ def test_fleet_recovery_change_matches_the_artifact(results_md, readme):
 
 def test_the_fleet_detection_claim_still_holds():
     assert _load(FLEET)["detection_correct"] is True
+
+
+# ── Tier 1b: the one money figure grounded outside the simulator ─────────
+#
+# This is the project's only rupee-denominated claim that does not come from
+# its own generator, so it is pinned harder than most — including the part
+# that did NOT work, because a document that keeps the effect and drops the
+# failed targeting claim would be telling half the truth.
+
+REVENUE = ROOT / "experiments" / "tier1_revenue" / "results_revenue.json"
+
+
+def test_real_incremental_revenue_matches_the_artifact(results_md):
+    e = _load(REVENUE)["effect"]
+    stated = (
+        f"${e['incremental_per_1000']:,.0f} per 1,000 customers, 95% CI\n"
+        f"[${e['ci_low_per_1000']:,.0f}, ${e['ci_high_per_1000']:,.0f}]"
+    )
+    assert stated in results_md, f"RESULTS.md does not state {stated!r}"
+    assert e["excludes_zero"] is True, (
+        "the real-data revenue interval now covers zero — RESULTS.md still "
+        "claims it excludes zero"
+    )
+
+
+def test_the_targeting_claim_is_reported_as_not_established(results_md):
+    """The unflattering half. If a future run establishes targeting on real
+    money that is a stronger result and the document should say so — but it
+    must not say so while the paired interval still covers zero."""
+    t = _load(REVENUE)["targeting"]
+    assert t["paired_interval_excludes_zero"] is False, (
+        "the paired interval now excludes zero — targeting IS established on "
+        "real money, and RESULTS.md should be upgraded to claim it"
+    )
+    stated = (
+        f"{t['paired_difference']:+.4f} per customer, 95% CI "
+        f"[{t['paired_ci_low']:+.4f}, {t['paired_ci_high']:+.4f}] — covers zero."
+    )
+    assert stated in results_md
+    assert "not established" in results_md.lower()
+
+
+def test_the_policy_was_evaluated_out_of_sample():
+    """The in-sample version reported 7-12x the honest advantage. If this ever
+    reverts to fitting and ranking the same rows, the number stops meaning
+    anything."""
+    t = _load(REVENUE)["targeting"]
+    assert t["n_train"] > 0 and t["n_evaluated_out_of_sample"] > 0
+    assert t["n_train"] + t["n_evaluated_out_of_sample"] == _load(REVENUE)["n_customers"]

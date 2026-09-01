@@ -1,0 +1,57 @@
+{
+  "dataset": "hillstrom (MineThatData 2008), womens-email vs no-email",
+  "outcome": "spend \u2014 real dollars, two weeks post-treatment",
+  "n_customers": 42693,
+  "n_emailed": 21387,
+  "n_holdout": 21306,
+  "purchaser_rate": 0.00728,
+  "max_single_spend": 499.0,
+  "effect": {
+    "rule": "Incremental revenue is claimable if its bootstrap interval excludes zero. Spend is heavy-tailed (0.9% of customers purchase; max $499), so a wide interval is expected and one covering zero is reported as covering zero.",
+    "incremental_per_1000": 424.41,
+    "ci_low_per_1000": 159.4,
+    "ci_high_per_1000": 677.99,
+    "excludes_zero": true
+  },
+  "targeting": {
+    "rule": "Targeting is claimable only if the targeted policy's estimated value exceeds matched-volume random targeting AND IPS, SNIPS and DR agree on the sign of that difference. Disagreement in sign is published as UNDETERMINED.",
+    "target_fraction": 0.3,
+    "n_train": 21346,
+    "n_evaluated_out_of_sample": 21347,
+    "n_targeted": 6404,
+    "by_estimator": {
+      "ips": {
+        "targeted": 0.892728,
+        "random_matched": 0.840571,
+        "ci_low": 0.646704,
+        "ci_high": 1.166423,
+        "n_unsupported": 0,
+        "difference": 0.052157
+      },
+      "snips": {
+        "targeted": 0.880228,
+        "random_matched": 0.838405,
+        "ci_low": 0.636246,
+        "ci_high": 1.151373,
+        "n_unsupported": 0,
+        "difference": 0.041823
+      },
+      "dr": {
+        "targeted": 0.940775,
+        "random_matched": 0.852398,
+        "ci_low": 0.693044,
+        "ci_high": 1.227361,
+        "n_unsupported": 0,
+        "difference": 0.088377
+      }
+    },
+    "paired_difference": 0.052157,
+    "paired_ci_low": -0.176797,
+    "paired_ci_high": 0.286386,
+    "paired_interval_excludes_zero": false,
+    "registered_rule_was_weaker_than_the_question": "The rule asks only for sign agreement across three estimators computed from the same rows, which they will usually give whether or not the difference is real. The paired interval on the difference is the statistic that decides it, and it is reported here rather than substituted for the registered rule.",
+    "estimators_agree_on_sign": true,
+    "beats_random": true,
+    "verdict": "NOT ESTABLISHED: the three estimators agree on the sign, which is all the registered rule asked for, but the paired interval on the difference covers zero \u2014 the targeting advantage is not distinguishable from noise at this sample size."
+  }
+}
