@@ -29,3 +29,7 @@ dashboard/dist/
 
 # subagent-driven-development scratch (ledger, briefs, review packages)
 .superpowers/
+
+# stray screenshots dropped in the repo root
+/Screenshot*.png
+*.png.download
