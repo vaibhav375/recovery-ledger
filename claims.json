@@ -81,6 +81,15 @@
     "note": "Not established. Three estimators agree on the sign - all the registered rule asked for - but the paired interval on the difference covers zero. The rule was weaker than the question and is left as registered, with the interval reported beside it."
   },
   {
+    "id": "tier1c.targeting-on-real-data",
+    "statement": "Targeting beats contacting the same number of people at random, on real randomised data rather than in simulation.",
+    "artifact": "experiments/tier1_targeting/results_targeting.json",
+    "verdict_path": "holds",
+    "status": "HELD",
+    "observed": true,
+    "note": "Held on Criteo under a rule deliberately stricter than Tier 1b's: the paired interval must exclude zero, not merely have three estimators agree on a sign. 8.94 SEs from zero."
+  },
+  {
     "id": "lambda.dominance",
     "statement": "lambda_churn = 4.0 strictly dominates 2.0.",
     "artifact": "experiments/churn_lambda/results_lambda_sweep.json",

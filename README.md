@@ -73,7 +73,7 @@ evidence the problem is real; it is not something to claim credit for.
 
 | | Claim | Status |
 |---|---|---|
-| **N1** | **Incremental-first accounting.** Recovery vendors overwhelmingly report *gross* recovered revenue. This reports incremental ₹ against a randomised no-contact holdout, with confidence intervals. The holdout here recovers 15.47% unaided — that is the number gross reporting quietly takes credit for. | ✅ Built, measured |
+| **N1** | **Incremental-first accounting**, and the targeting claim tested off the simulator. Recovery vendors report *gross*; this reports incremental ₹ against a randomised no-contact holdout. | ✅ Built, measured. And **B1's central claim — targeting beats contacting the same number at random — now holds on real randomised data**: Criteo, 698,980 rows, policy chosen out of sample, paired difference +0.00652/user (95% CI [+0.00507, +0.00793], 8.94 SEs from zero), a ~16% lift over random. |
 | **N2** | **Negative-uplift targeting ("do-not-disturbs").** Customers whose payment probability *falls* when contacted. Nobody in dunning models the downside of contact. | ✅ Built. A learned churn model gives the policy a signal independent of `τ̂_pay` (do-not-disturbs opt out **1.29x** (95% CI 1.09–1.51) more when contacted), cutting the do-not-disturb contact rate **20.1% → 13.6%** against untargeted policies' ~20.2%, at 49% better rupees-per-contact. Full λ_churn curve in [`RESULTS.md`](RESULTS.md); it is a stated trade, not a free win. |
 | **N3** | **A deterministic, machine-checkable India-regulatory compliance kernel** emitting a per-action certificate — TCCCPR/DLT, RBI recovery-agent norms, RBI e-mandate 2026, DPDPA. | ✅ Built: 13 rules, 100% red-team block rate, mutation-tested |
 | **N4** | **Contact as a budget-constrained sequential decision problem**, not one-shot classification. | ⚠️ Partial: greedy EV under an explicit budget, plus a finite-horizon lookahead variant. Not a full constrained-MDP solver, and the spec explicitly permits the simplification — but it is a simplification, and the lookahead currently adds nothing measurable. |
@@ -452,6 +452,8 @@ make verify-ledger     # third-party audit of the trail — re-derives every
 make calibration       # uplift by decile + calibration slope on a randomised holdout
 make fleet-latency     # N6 detection latency by severity, with its false-alarm rate
 make dr-foldsweep      # tests the cross-fitting hypothesis behind DR's low reading
+make tier1-targeting   # does targeting beat random ON REAL RANDOMISED DATA?
+                       # B1's central claim, off the simulator (Criteo)
 make tier1-revenue     # incremental MONEY on a real randomised experiment —
                        # the one rupee-denominated figure not from the simulator
 make calibration       # uplift by decile + calibration slope on a randomised

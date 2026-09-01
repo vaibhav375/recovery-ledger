@@ -193,6 +193,67 @@ population. It grounds the method in real money; it does not transfer the
 domain. Nor does it establish that targeting beats random on money; the
 interval says that question is open at this sample size.
 
+## Tier 1c — targeting beats random, on real randomised data
+
+```
+make tier1-targeting
+```
+
+B1's central argument is that *targeting* recovers more than contacting the
+same number of people at random. Everything supporting that argument has been
+simulator output. Tier 1 proves the estimators; Tier 1b measures a real money
+effect; neither tested the policy claim itself.
+
+Tier 1b tried on Hillstrom and could not settle it — and, more usefully,
+established that it *could not be settled there*: the difference sat 0.44
+standard errors from zero and resolving it needed ~421,000 held-out customers
+against the 32,000 pooling every arm supplies.
+
+Criteo has what Hillstrom lacked. 698,980 rows from real randomised
+incrementality tests, a known propensity of 0.85 by design, and a binary
+outcome whose variance is roughly 700x tighter than spend's.
+
+**The rule, fixed before the run and deliberately stricter than Tier 1b's:**
+
+> Targeting is claimable only if the paired bootstrap interval on (targeted minus matched-volume random) excludes zero AND all three estimators agree on the sign. Sign agreement alone was Tier 1b's rule and proved too weak; the bar is raised here before seeing any result.
+
+Sign agreement alone was Tier 1b's bar and it proved too weak — three
+estimators computed from the same rows will usually agree on a sign whether or
+not the difference is real. The bar was raised *before* seeing any Criteo
+result. Strengthening a rule before a run is legitimate; weakening one after is
+what pre-registration exists to prevent.
+
+τ̂ is fitted on 349,490 rows and the ranking applied to the 349,490
+it never saw, because Tier 1b's first draft fitted and ranked the same rows and
+reported an advantage seven to twelve times the honest one.
+
+| estimator | targeted | random, matched volume | difference |
+|---|---:|---:|---:|
+| ips | 0.04833 | 0.04181 | +0.00652 |
+| snips | 0.04788 | 0.04188 | +0.00600 |
+| dr | 0.04757 | 0.04350 | +0.00406 |
+
+**Paired difference +0.00652 per user, 95% CI
+[+0.00507, +0.00793] — excludes zero, 8.94 standard errors out.**
+
+That is roughly a **16% relative lift** over contacting the same number of people
+at random, measured on real randomised data with the policy chosen out of
+sample. **B1's central claim is no longer simulator-only.**
+
+DR reads lower than IPS here (+0.00406 against +0.00652), which is the same
+direction-preserving, magnitude-shrinking behaviour documented in the DR
+diagnosis above. It does not change the verdict: all three exclude zero on the
+same side.
+
+### What this does not license
+
+The outcome is `visit`, not money, so this produces no rupee figure — it tests
+the policy claim, not an effect size. And Criteo is ad exposure, not Indian
+payment recovery. What it establishes is that ranking by predicted uplift and
+contacting the top k beats contacting k people at random **on real randomised
+data**, which is the part of B1 that previously rested entirely on a simulator
+this project wrote itself.
+
 ## B1 — measured money recovered across a batch
 
 ```

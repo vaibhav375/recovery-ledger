@@ -1,4 +1,4 @@
-.PHONY: tier1-revenue claims verify-ledger setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet fleet-latency negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
+.PHONY: tier1-targeting tier1-revenue claims verify-ledger setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet fleet-latency negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
 
 # `uv pip install` honours an ambient VIRTUAL_ENV over the venv it was just
 # told to create. Anyone who runs `make setup` with another virtualenv active
@@ -42,6 +42,11 @@ tier1-hillstrom:
 # Tier 1b: incremental MONEY on a real randomised experiment. Hillstrom's spend
 # column is real dollars over 64,000 real customers - the one place this repo
 # can measure revenue without its own simulator.
+# Tier 1c: does targeting beat random ON REAL RANDOMISED DATA? Criteo has the
+# sample size Hillstrom lacked - B1's central claim, outside the simulator.
+tier1-targeting:
+	PYTHONPATH=src .venv/bin/python3 experiments/tier1_targeting/run_targeting.py
+
 tier1-revenue:
 	PYTHONPATH=src .venv/bin/python3 experiments/tier1_revenue/run_revenue.py
 

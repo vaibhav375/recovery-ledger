@@ -192,6 +192,17 @@ REGISTRY: tuple[Claim, ...] = (
              "and is left as registered, with the interval reported beside it.",
     ),
     Claim(
+        id="tier1c.targeting-on-real-data",
+        statement="Targeting beats contacting the same number of people at "
+                  "random, on real randomised data rather than in simulation.",
+        artifact="experiments/tier1_targeting/results_targeting.json",
+        verdict_path="holds",
+        forbidden_when_not_held=("no longer simulator-only",),
+        note="Held on Criteo under a rule deliberately stricter than Tier 1b's: "
+             "the paired interval must exclude zero, not merely have three "
+             "estimators agree on a sign. 8.94 SEs from zero.",
+    ),
+    Claim(
         id="lambda.dominance",
         statement="lambda_churn = 4.0 strictly dominates 2.0.",
         artifact="experiments/churn_lambda/results_lambda_sweep.json",

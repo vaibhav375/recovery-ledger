@@ -1305,3 +1305,39 @@ def test_the_targeting_question_is_reported_as_unanswerable_here(results_md):
     )
     assert f"{pw['standard_errors_from_zero']} standard errors from zero" in results_md
     assert f"{pw['held_out_customers_needed']:,} customers" in results_md
+
+
+# ── Tier 1c: B1's thesis, off the simulator ──────────────────────────────
+
+TARGETING = ROOT / "experiments" / "tier1_targeting" / "results_targeting.json"
+
+
+def test_criteo_targeting_result_matches_the_artifact(results_md):
+    d = _load(TARGETING)
+    stated = (
+        f"**Paired difference {d['paired_difference']:+.5f} per user, 95% CI\n"
+        f"[{d['paired_ci_low']:+.5f}, {d['paired_ci_high']:+.5f}] — excludes zero, "
+        f"{d['standard_errors_from_zero']} standard errors out.**"
+    )
+    assert stated in results_md, f"RESULTS.md does not state {stated!r}"
+
+
+def test_criteo_targeting_rows_match_the_artifact(results_md):
+    for est, v in _load(TARGETING)["by_estimator"].items():
+        row = (f"| {est} | {v['targeted']:.5f} | {v['random_matched']:.5f} "
+               f"| {v['difference']:+.5f} |")
+        assert row in results_md, f"stale estimator row: {row!r}"
+
+
+def test_the_targeting_claim_holds_under_the_stricter_rule():
+    """If this ever flips, RESULTS.md must stop saying B1 is off the simulator."""
+    d = _load(TARGETING)
+    assert d["paired_interval_excludes_zero"] is True
+    assert d["estimators_agree_on_sign"] is True
+    assert d["holds"] is True
+
+
+def test_the_criteo_policy_was_chosen_out_of_sample():
+    d = _load(TARGETING)
+    assert d["n_train"] > 0 and d["n_evaluated_out_of_sample"] > 0
+    assert d["n_train"] + d["n_evaluated_out_of_sample"] == d["n_rows"]

@@ -1,0 +1,37 @@
+{
+  "dataset": "criteo uplift (real randomised incrementality tests)",
+  "outcome": "visit",
+  "note": "binary outcome, not money \u2014 this tests the POLICY claim, not an effect size",
+  "n_rows": 698980,
+  "n_train": 349490,
+  "n_evaluated_out_of_sample": 349490,
+  "propensity": 0.85,
+  "rule": "Targeting is claimable only if the paired bootstrap interval on (targeted minus matched-volume random) excludes zero AND all three estimators agree on the sign. Sign agreement alone was Tier 1b's rule and proved too weak; the bar is raised here before seeing any result.",
+  "target_fraction": 0.3,
+  "n_targeted": 104847,
+  "by_estimator": {
+    "ips": {
+      "targeted": 0.048328,
+      "random_matched": 0.0418063,
+      "difference": 0.0065217
+    },
+    "snips": {
+      "targeted": 0.0478789,
+      "random_matched": 0.0418769,
+      "difference": 0.006002
+    },
+    "dr": {
+      "targeted": 0.0475657,
+      "random_matched": 0.0435018,
+      "difference": 0.0040639
+    }
+  },
+  "paired_difference": 0.0065217,
+  "paired_ci_low": 0.0050669,
+  "paired_ci_high": 0.0079257,
+  "paired_interval_excludes_zero": true,
+  "standard_errors_from_zero": 8.94,
+  "estimators_agree_on_sign": true,
+  "holds": true,
+  "verdict": "CLAIMABLE: targeting beats matched-volume random targeting on real randomised data. The paired interval excludes zero and all three estimators agree on the sign. B1's central claim is no longer simulator-only."
+}

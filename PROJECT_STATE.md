@@ -64,6 +64,7 @@ All from committed artifacts, all reproducible from the listed target.
 | Uplift by decile — monotonicity | Spearman 0.879, 0.903, 0.952 — **fails** the pre-registered 0.9, near-monotone 3/3 | `make calibration` |
 | Uplift calibration slope | **0.758** (predictions ~a third too spread) | `make calibration` |
 | **Tier 1b — real money** | **$424 per 1,000 customers** (95% CI $159–$678) on Hillstrom's randomised `spend` — the only money figure not from the simulator | `make tier1-revenue` |
+| **Tier 1c — targeting, real data** | **+0.00652/user** (95% CI +0.00507–+0.00793), 8.94 SEs from zero, ~16% lift over random — B1's claim off the simulator | `make tier1-targeting` |
 | Tier 1b — pooled, any email | **$597 per 1,000** (95% CI $378–$822) over 64,000 customers | `make tier1-revenue` |
 | Tier 1b — targeting on real money | **not establishable here**: 0.441 SEs from zero, needs ~420,871 held-out customers against 32,000 available | `make tier1-revenue` |
 | Tier 1 — Criteo | direct ATE +0.00938, IPS +0.00938, SNIPS +0.00938, DR +0.00671 | `make tier1-criteo` |
@@ -76,11 +77,11 @@ All from committed artifacts, all reproducible from the listed target.
 | Stopping rules | **11 defined, 8 fired** in the headline batch | `make eval` |
 | Compliance kernel | **13 rules**, all with provenance citations | `make redteam` |
 | Ledger | 34,304 entries, chain valid | `make eval` |
-| Claims registry | **5 held · 4 refuted · 1 unresolved**, generated from artifacts | `make claims` | `make claims` | `make claims` |
+| Claims registry | **6 held · 4 refuted · 1 unresolved**, generated from artifacts | `make claims` | `make claims` | `make claims` | `make claims` |
 | Independent audit | **0 violations** over 5,712 certificates / 467 executed contacts, no agent involved | `make verify-ledger` |
 | N6 detection latency | **50 attempts** median at a 78% collapse, monotone in severity, 0 false alarms in 30 controls | `make fleet-latency` |
 | Regret — what the silences cost | 554 declined cases: cost ₹134,347, saved ₹93,679, **net ₹-40,669**; pre-registered prediction (170 model errors) HOLDS | `make regret` |
-| Tests | **515 passing** across 45 files | `make test` |
+| Tests | **520 passing** across 45 files | `make test` |
 
 ---
 
@@ -341,11 +342,12 @@ and a frontend build that deleted the page's data with no error anywhere.
 Run in this order. Every one must pass.
 
 ```bash
-make test          # 515 tests
+make test          # 520 tests
 make eval          # B1 headline
 make baselines     # 8-policy comparison
 make sensitivity   # 75/75 both criteria across 3 draws
 make tier1-revenue # real-money effect on a randomised experiment
+make tier1-targeting # B1's targeting claim on real randomised data
 make calibration   # uplift by decile: ranking 3/3, near-monotone, slope 0.758
 make fleet-latency  # detection latency + false-alarm rate for N6
 make regret        # what the silences cost, beside what contacting recovered

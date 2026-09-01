@@ -63,6 +63,7 @@ SEED_REGISTRY: dict[str, tuple[str, str]] = {
                   "quotable beside the headline if it is measured on the same "
                   "customers"),
     "tier1_criteo/run_validation.py": ("none", "real RCT data (Criteo, Hillstrom)"),
+    "tier1_targeting/run_targeting.py": ("none", "real RCT data (Criteo) — the policy claim off the simulator"),
     "tier1_revenue/run_revenue.py": ("none", "real RCT data (Hillstrom spend) — the one money figure in this repo not drawn from the simulator"),
     "tier1_criteo/run_dr_diagnosis.py": ("none", "real RCT data"),
     "listener_eval/run_eval.py": ("none", "a hand-authored gold set"),
