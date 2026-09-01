@@ -1,35 +1,101 @@
 # Recovery Ledger
 
-**Status: Tier 1 validation passed. B1 headline: ₹272,281 incremental recovery
-per 1,000 cases (95% CI ₹103,930–₹433,387).** The decisive test: against a
-control contacting a comparable number of cases *at random*, the agent
-recovers **2.34x more incremental revenue with non-overlapping confidence
-intervals** — so the targeting model, not merely contact volume, is doing the
-work. Against blind mass-contact it is **statistically indistinguishable on
-total recovery** (overlapping CIs — and the sign of the difference flips
-with the sample, so "beats" would be an overclaim) while using **80% fewer
-contacts** at 5.0x better cost per incremental rupee and reaching 1.9x fewer
-do-not-disturbs.
+**An agent that decides whether to contact a customer at all — and proves it was
+allowed to.**
 
-These figures are the *deployed* policy — the lookahead EV policy with the
-churn term, which is what `make eval` runs and what the dashboard and live
-console show. An earlier version of this paragraph quoted the no-churn
-variant, which scores 2.85x against random on 48% fewer contacts. That
-variant is not what ships, and mixing the two is how a README ends up
-describing a system nobody can run. The contact efficiency
-is the robust claim; a higher headline total is not. Policy dominance under stated
-assumptions, in simulation — not a real-world claim. **Four revisions to
-these numbers** (three from real bugs, one from a methodology fix) are
-documented in
-[`experiments/tier2_simulation/REPORT.md`](experiments/tier2_simulation/REPORT.md)
-rather than quietly replaced.
+Autonomous revenue recovery for Indian payments: failed payments, abandoned
+checkouts, failed subscription mandates, overdue B2B receivables. It decides
+*whether, when, how and in what language* to intervene, reports **incremental**
+rupees against a randomised no-contact holdout, and gates every outbound action
+through a deterministic compliance kernel that emits a signed certificate.
 
-An autonomous revenue-recovery agent for Indian payments. It decides *whether, when,
-how, and in what language* to intervene on at-risk revenue — failed payments,
-abandoned checkouts, failed subscription mandates, overdue B2B receivables — and
-reports **incremental** rupees recovered against a randomised no-contact holdout,
-with every outbound action gated by a deterministic, machine-checkable compliance
-kernel that emits a signed certificate per action.
+**[Live dashboard →](https://vaibhav375.github.io/recovery-ledger/)** · every
+figure on it is rendered from committed artifacts, not typed in.
+
+---
+
+## Three things that make this different from a dunning bot
+
+**1. It reports what it *added*, not what it collected.** Recovery vendors report
+gross recovered revenue. 15.5% of these cases pay with no contact at all —
+that is the number gross reporting quietly takes credit for. The headline here
+is measured against a randomised holdout: **₹272,281 per 1,000 cases
+(95% CI ₹103,930–₹433,387)**.
+
+**2. It models the downside of contacting someone.** Some customers are *less*
+likely to pay after being messaged. Nothing in dunning represents a customer you
+should not contact. This does, and declines to work them.
+
+**3. It cannot overclaim, mechanically.** Every claim is pre-registered with the
+rule that would decide it, and a test fails if a document asserts one the
+evidence refuted. The registry currently reads **6 held · 4 refuted · 2 unresolved** —
+and a further test fails if everything ever comes back held, because that would
+be evidence of selection rather than rigour.
+
+---
+
+## The strongest evidence, in order
+
+Most of this project's numbers come from a simulator it wrote itself, which is
+the obvious objection. So validation runs in three tiers, and the first two are
+not simulated at all.
+
+| tier | what it establishes | data |
+|---|---|---|
+| **1a** | The causal estimators recover known effects | Criteo + Hillstrom, real RCTs |
+| **1b** | **Contact produces incremental money** — $597 per 1,000 customers, 95% CI [$378, $822] | Hillstrom `spend`, 64,000 real customers |
+| **1c** | **Targeting beats random** — +0.00652/user, 8.94 SEs from zero, policy chosen out of sample | Criteo, 698,980 rows |
+| **2** | Policy comparison, contact budgets, compliance | this simulator |
+
+Tier 1c matters most: **B1's central claim — that targeting beats contacting the
+same number of people at random — is not a simulator result.** Tier 1b's figures
+are in dollars because Hillstrom is a US dataset; converting them would mean
+inventing an exchange rate for someone else's experiment.
+
+---
+
+## Try it in five minutes
+
+```bash
+make setup            # venv + dependencies
+make demo             # 20 cases through the agent loop, no external services
+make eval             # the B1 headline, reproduced end to end
+make live             # the dashboard PLUS a console that drives the real agent
+```
+
+`make live` is the one to run if you only run one: start the agent and watch it
+write its own audit trail, engage the kill switch mid-run, fire the red-team
+suite at the compliance kernel one attack at a time, re-run a case with one fact
+of the world changed, or tamper with a ledger entry and watch verification catch
+it.
+
+Two commands worth knowing about:
+
+```bash
+make claims           # every pre-registered claim, its rule, and its verdict
+make verify-ledger    # audit the trail with no agent in the room
+```
+
+---
+
+## The numbers, and where they came from
+
+| | |
+|---|---:|
+| Incremental recovery (B1) | **₹272,281** / 1,000 cases |
+| vs random targeting at matched volume | **2.34x more incremental revenue**, non-overlapping CIs |
+| vs blind mass-contact | **80% fewer** contacts, 5.0x better cost per incremental rupee |
+| What the agent's silences cost | ₹134,347 cost · ₹93,679 saved · **net ₹-40,669** |
+| Refusals of customers who would have paid | **170** |
+| Compliance rules, each cited to source | 13 |
+| Red-team block rate | **100%**, 0 violations |
+| Tests | **530** |
+
+That net figure is negative on purpose: the agent's refusals cost more than they
+saved on that batch, and it is published as it came out. No recovery product
+reports its own false negatives.
+
+---
 
 | Document | What's in it |
 |---|---|
