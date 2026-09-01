@@ -127,6 +127,11 @@ under a randomisation the experimenter controlled.
 modelled — the arm-mean contrast a randomised experiment licenses directly, with
 no policy and no uplift model in the path.
 
+Pooling all three arms — the effect of *any* email rather than the womens
+campaign — gives **$597 per 1,000 over 64,000 customers, 95% CI
+[$378, $822]**. More data, a tighter interval, and a different
+estimand; both are reported rather than whichever is larger.
+
 That is the one number in this repository that is both denominated in money and
 grounded outside its own simulator.
 
@@ -153,7 +158,17 @@ difference itself:
 **+0.0522 per customer, 95% CI [-0.1768, +0.2864] — covers zero.**
 
 So the targeting advantage is **not established** on real money at this sample
-size. The rule is left as it was registered and this is reported beside it,
+size.
+
+**And it is not establishable here.** "The interval covers zero" and "this
+dataset cannot answer the question" are different statements, and only the
+second tells you whether to go looking for more data. The difference sits
+**0.441 standard errors from zero**; resolving it needs roughly
+**20x the held-out sample — about 420,871 customers** against the
+32,000 that pooling every arm can supply. Pooling narrows the interval by
+1.22x where 4.4x is needed. The targeting claim is not merely unproven on
+Hillstrom; at this effect size it is unprovable on 64,000 people, and no amount
+of re-running changes that. The rule is left as it was registered and this is reported beside it,
 because moving a pre-registered bar after seeing the result is the thing
 pre-registration exists to prevent.
 

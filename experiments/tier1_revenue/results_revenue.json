@@ -13,6 +13,22 @@
     "ci_high_per_1000": 677.99,
     "excludes_zero": true
   },
+  "effect_pooled_all_arms": {
+    "n_customers": 64000,
+    "incremental_per_1000": 596.8,
+    "ci_low_per_1000": 378.17,
+    "ci_high_per_1000": 821.7,
+    "excludes_zero": true,
+    "note": "effect of ANY email \u2014 a mixture of two campaigns, so a different estimand from the womens-only figure above"
+  },
+  "targeting_power": {
+    "standard_errors_from_zero": 0.441,
+    "sample_multiple_needed": 19.7,
+    "held_out_customers_needed": 420871,
+    "max_available_pooled_holdout": 32000,
+    "pooling_would_resolve_it": false,
+    "conclusion": "Not a question this dataset can answer. The difference sits 0.44 standard errors from zero and resolving it needs roughly 20x the sample \u2014 about 420,871 held-out customers against the 32,000 pooling can supply. The targeting claim is not merely unproven here; it is unprovable on 64,000 customers at this effect size."
+  },
   "targeting": {
     "rule": "Targeting is claimable only if the targeted policy's estimated value exceeds matched-volume random targeting AND IPS, SNIPS and DR agree on the sign of that difference. Disagreement in sign is published as UNDETERMINED.",
     "target_fraction": 0.3,

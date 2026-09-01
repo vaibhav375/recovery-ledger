@@ -87,6 +87,20 @@ TARGETING_RULE = (
 )
 
 
+def load_spend_pooled():
+    """All three arms: any email vs no email. 64,000 customers instead of
+    42,693, at the cost of estimating the effect of a MIXTURE of two campaigns
+    rather than one. Both are legitimate estimands and both are reported."""
+    bunch = fetch_hillstrom(target_col="spend")
+    df = bunch.data.copy()
+    df["y"] = bunch.target
+    df["t"] = (bunch.treatment != "No E-Mail").astype(int)
+    df = pd.get_dummies(df, columns=["history_segment", "zip_code", "channel"], drop_first=True)
+    cols = [c for c in df.columns if c not in ("y", "t")]
+    return (df[cols].to_numpy(dtype=float), df["t"].to_numpy(dtype=int),
+            df["y"].to_numpy(dtype=float))
+
+
 def load_spend():
     """Two-arm subset of the Hillstrom RCT, with real dollars as the outcome.
 
@@ -137,6 +151,15 @@ def main() -> None:
     print(f"\nIncremental revenue per 1,000 customers: "
           f"${point*1000:,.0f}  95% CI [${lo*1000:,.0f}, ${hi*1000:,.0f}]  "
           f"-> {'CLAIMABLE' if effect_holds else 'interval covers zero'}")
+
+    # The same effect on all three arms — more customers, a tighter interval,
+    # and a different estimand (the effect of *any* email rather than the
+    # womens campaign). Reported beside the arm-specific figure, not instead
+    # of it.
+    Xp, Tp, Yp = load_spend_pooled()
+    p_point, p_lo, p_hi = bootstrap_diff(Yp[Tp == 1], Yp[Tp == 0], n_boot=args.n_boot, seed=SEED)
+    print(f"Pooled across both email arms ({len(Yp):,} customers): "
+          f"${p_point*1000:,.0f}/1,000  95% CI [${p_lo*1000:,.0f}, ${p_hi*1000:,.0f}]")
 
     # ── 2. the policy claim, on real money ──────────────────────────────
     #
@@ -230,6 +253,23 @@ def main() -> None:
     )
     print(f"\n{targeting_verdict}")
 
+    # How much data would it take to settle the targeting question? Asked
+    # because "the interval covers zero" and "this dataset cannot answer it"
+    # are different statements, and only the second tells you whether to go
+    # looking for more data.
+    half = (d_hi - d_lo) / 2
+    se = half / 1.96
+    needed_factor = (1.96 * se / abs(d_point)) ** 2 if d_point else float("inf")
+    n_needed = int(len(Ye) * needed_factor)
+    pooled_max_holdout = len(Yp) // 2
+    pooled_half = half / np.sqrt(pooled_max_holdout / len(Ye))
+    print(f"\n  power: the difference is {abs(d_point)/se:.2f} SEs from zero; "
+          f"resolving it needs ~{needed_factor:.0f}x the held-out sample "
+          f"(~{n_needed:,} customers).")
+    print(f"  pooling every arm gives at most {pooled_max_holdout:,} held out — "
+          f"projected half-width {pooled_half:.4f} against an effect of "
+          f"{abs(d_point):.4f}. Still covers zero.")
+
     out = {
         "dataset": "hillstrom (MineThatData 2008), womens-email vs no-email",
         "outcome": "spend — real dollars, two weeks post-treatment",
@@ -244,6 +284,30 @@ def main() -> None:
             "ci_low_per_1000": round(lo * 1000, 2),
             "ci_high_per_1000": round(hi * 1000, 2),
             "excludes_zero": bool(effect_holds),
+        },
+        "effect_pooled_all_arms": {
+            "n_customers": int(len(Yp)),
+            "incremental_per_1000": round(p_point * 1000, 2),
+            "ci_low_per_1000": round(p_lo * 1000, 2),
+            "ci_high_per_1000": round(p_hi * 1000, 2),
+            "excludes_zero": bool(p_lo > 0),
+            "note": "effect of ANY email — a mixture of two campaigns, so a "
+                    "different estimand from the womens-only figure above",
+        },
+        "targeting_power": {
+            "standard_errors_from_zero": round(float(abs(d_point) / se), 3),
+            "sample_multiple_needed": round(float(needed_factor), 1),
+            "held_out_customers_needed": n_needed,
+            "max_available_pooled_holdout": pooled_max_holdout,
+            "pooling_would_resolve_it": bool(pooled_half < abs(d_point)),
+            "conclusion": (
+                "Not a question this dataset can answer. The difference sits "
+                f"{abs(d_point)/se:.2f} standard errors from zero and resolving it "
+                f"needs roughly {needed_factor:.0f}x the sample — about {n_needed:,} "
+                "held-out customers against the 32,000 pooling can supply. "
+                "The targeting claim is not merely unproven here; it is "
+                "unprovable on 64,000 customers at this effect size."
+            ),
         },
         "targeting": {
             "rule": TARGETING_RULE,

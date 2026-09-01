@@ -64,7 +64,8 @@ All from committed artifacts, all reproducible from the listed target.
 | Uplift by decile — monotonicity | Spearman 0.879, 0.903, 0.952 — **fails** the pre-registered 0.9, near-monotone 3/3 | `make calibration` |
 | Uplift calibration slope | **0.758** (predictions ~a third too spread) | `make calibration` |
 | **Tier 1b — real money** | **$424 per 1,000 customers** (95% CI $159–$678) on Hillstrom's randomised `spend` — the only money figure not from the simulator | `make tier1-revenue` |
-| Tier 1b — targeting on real money | **not established**: estimators agree on sign, paired interval covers zero | `make tier1-revenue` |
+| Tier 1b — pooled, any email | **$597 per 1,000** (95% CI $378–$822) over 64,000 customers | `make tier1-revenue` |
+| Tier 1b — targeting on real money | **not establishable here**: 0.441 SEs from zero, needs ~420,871 held-out customers against 32,000 available | `make tier1-revenue` |
 | Tier 1 — Criteo | direct ATE +0.00938, IPS +0.00938, SNIPS +0.00938, DR +0.00671 | `make tier1-criteo` |
 | Tier 1 — Hillstrom | direct +0.04511, IPS +0.04511, DR +0.04622 | `make tier1-hillstrom` |
 | Sensitivity C1 (EV beats random) | **75/75** settings across 3 draws | `make sensitivity` |
@@ -79,7 +80,7 @@ All from committed artifacts, all reproducible from the listed target.
 | Independent audit | **0 violations** over 5,712 certificates / 467 executed contacts, no agent involved | `make verify-ledger` |
 | N6 detection latency | **50 attempts** median at a 78% collapse, monotone in severity, 0 false alarms in 30 controls | `make fleet-latency` |
 | Regret — what the silences cost | 554 declined cases: cost ₹134,347, saved ₹93,679, **net ₹-40,669**; pre-registered prediction (170 model errors) HOLDS | `make regret` |
-| Tests | **513 passing** across 45 files | `make test` |
+| Tests | **515 passing** across 45 files | `make test` |
 
 ---
 
@@ -340,7 +341,7 @@ and a frontend build that deleted the page's data with no error anywhere.
 Run in this order. Every one must pass.
 
 ```bash
-make test          # 513 tests
+make test          # 515 tests
 make eval          # B1 headline
 make baselines     # 8-policy comparison
 make sensitivity   # 75/75 both criteria across 3 draws

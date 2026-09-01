@@ -1283,3 +1283,25 @@ def test_the_policy_was_evaluated_out_of_sample():
     t = _load(REVENUE)["targeting"]
     assert t["n_train"] > 0 and t["n_evaluated_out_of_sample"] > 0
     assert t["n_train"] + t["n_evaluated_out_of_sample"] == _load(REVENUE)["n_customers"]
+
+
+def test_pooled_real_money_effect_matches_the_artifact(results_md):
+    p = _load(REVENUE)["effect_pooled_all_arms"]
+    stated = (
+        f"${p['incremental_per_1000']:,.0f} per 1,000 over {p['n_customers']:,} customers, 95% CI\n"
+        f"[${p['ci_low_per_1000']:,.0f}, ${p['ci_high_per_1000']:,.0f}]"
+    )
+    assert stated in results_md
+    assert p["excludes_zero"] is True
+
+
+def test_the_targeting_question_is_reported_as_unanswerable_here(results_md):
+    """Stronger than 'the interval covers zero': the document must say the
+    dataset cannot settle it, and carry the sample size that could. If pooling
+    ever WOULD resolve it, this fails and the claim should be re-run."""
+    pw = _load(REVENUE)["targeting_power"]
+    assert pw["pooling_would_resolve_it"] is False, (
+        "pooling now resolves the targeting question — re-run and upgrade the claim"
+    )
+    assert f"{pw['standard_errors_from_zero']} standard errors from zero" in results_md
+    assert f"{pw['held_out_customers_needed']:,} customers" in results_md
