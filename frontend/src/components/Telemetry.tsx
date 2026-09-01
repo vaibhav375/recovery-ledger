@@ -1,33 +1,39 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-/** A readout pinned to the viewport, never in the content.
+/** A readout pinned to the viewport, and the way to jump between sections.
  *
  * The reference this borrows from keeps its instrument at the edge of the
  * frame — a loading counter on a hairline, a depth marker in the corner — so
- * the page always tells you where you are without a heading ever having to.
- * This page had no such signal: nine long sections and nothing but the scroll
- * bar to say how far through the argument you were.
+ * the page always says where you are without a heading having to.
  *
- * It reports position, not decoration: which section you are in, and how far
- * down. `mix-blend-mode: difference` keeps it legible over both the dark
- * ground and the lit WebGL field without a plate.
+ * The page is now past twenty-six viewports, and reading it end to end is a
+ * long scroll. Rather than bolt a navigation menu onto a design that has no
+ * chrome, the progress rule that already spans this bar is divided into one
+ * segment per section: it still reads as a progress line, and each segment is
+ * a button to its section. The index and the position indicator are the same
+ * object, which is why it does not look like navigation was added.
+ *
+ * Labels are the section marks themselves, so the bar and the page agree on
+ * what each part is called.
  */
 
 const SECTIONS: [string, string][] = [
-  [".rl-opening", "the subtraction"],
+  [".rl-opening", "the holdout"],
   [".rl-subtraction", "the subtraction"],
-  [".rl-frontier", "baselines"],
+  [".rl-frontier", "the lever"],
+  [".rl-grounding", "what is not simulated"],
   [".rl-silence", "the work you cannot see"],
   [".rl-cal", "calibration"],
-  [".rl-kernel", "the compliance kernel"],
-  [".rl-audit", "auditing ourselves"],
-  [".rl-livesection", "the live console"],
-  [".rl-explorer", "the register"],
+  [".rl-kernel", "the constraint"],
+  [".rl-audit", "the audit"],
+  [".rl-livesection", "the instrument"],
+  [".rl-explorer", "the evidence"],
 ];
 
 export default function Telemetry() {
   const [pct, setPct] = useState(0);
-  const [here, setHere] = useState(SECTIONS[0][1]);
+  const [active, setActive] = useState(0);
+  const [hover, setHover] = useState<number | null>(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -35,12 +41,12 @@ export default function Telemetry() {
       setPct(max > 0 ? Math.min(100, Math.max(0, (window.scrollY / max) * 100)) : 0);
 
       const mid = window.innerHeight * 0.45;
-      let current = SECTIONS[0][1];
-      for (const [sel, name] of SECTIONS) {
+      let current = 0;
+      SECTIONS.forEach(([sel], i) => {
         const el = document.querySelector(sel);
-        if (el && el.getBoundingClientRect().top <= mid) current = name;
-      }
-      setHere(current);
+        if (el && el.getBoundingClientRect().top <= mid) current = i;
+      });
+      setActive(current);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -51,11 +57,45 @@ export default function Telemetry() {
     };
   }, []);
 
+  const jump = useCallback((sel: string) => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    // Honour the reduced-motion preference: smooth-scrolling twenty viewports
+    // is a lot of motion to inflict on someone who asked for less.
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  }, []);
+
+  const shown = hover ?? active;
+
   return (
-    <div className="rl-telemetry" aria-hidden="true">
-      <span className="rl-telemetry-here">{here}</span>
-      <span className="rl-telemetry-rule" style={{ transform: `scaleX(${pct / 100})` }} />
-      <span>{String(Math.round(pct)).padStart(3, "0")}</span>
-    </div>
+    <nav className="rl-telemetry" aria-label="Sections">
+      <span className="rl-telemetry-here">{SECTIONS[shown][1]}</span>
+
+      <span className="rl-telemetry-index">
+        {SECTIONS.map(([sel, name], i) => (
+          <button
+            key={sel}
+            type="button"
+            className={
+              "rl-telemetry-seg" +
+              (i === active ? " is-active" : "") +
+              (i < active ? " is-passed" : "")
+            }
+            aria-label={`Jump to ${name}`}
+            aria-current={i === active ? "true" : undefined}
+            onMouseEnter={() => setHover(i)}
+            onMouseLeave={() => setHover(null)}
+            onFocus={() => setHover(i)}
+            onBlur={() => setHover(null)}
+            onClick={() => jump(sel)}
+          />
+        ))}
+      </span>
+
+      <span className="rl-telemetry-pct">
+        {String(Math.round(pct)).padStart(3, "0")}
+      </span>
+    </nav>
   );
 }

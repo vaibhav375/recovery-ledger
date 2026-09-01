@@ -1605,38 +1605,70 @@ main, .rl-footer { position: relative; z-index: 1; }
   font-variant-numeric: tabular-nums;
 }
 
-/* ── telemetry, pinned to the viewport rather than the flow ─────────── */
+/* ── telemetry, and the section index it doubles as ────────────────── */
+/* The progress rule already spanned this bar. Dividing it into one segment
+   per section makes it the index too, so the page gains navigation without
+   gaining chrome — the thing that tells you where you are is the thing you
+   click to go elsewhere. */
 .rl-telemetry {
   position: fixed;
-  z-index: 3;
-  bottom: 22px;
+  z-index: 4;
+  bottom: 20px;
   left: var(--gut);
   right: var(--gut);
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 20px;
-  pointer-events: none;
+  align-items: center;
+  gap: 18px;
   font-family: var(--mono);
   font-size: 10.5px;
   letter-spacing: 0.06em;
   color: var(--fg-faint);
-  opacity: 0.62;
   mix-blend-mode: difference;
 }
-.rl-telemetry-rule {
+.rl-telemetry-here {
+  flex: 0 0 auto;
+  min-width: 15ch;
+  opacity: 0.75;
+  transition: opacity 160ms var(--ease);
+  white-space: nowrap;
+}
+.rl-telemetry:hover .rl-telemetry-here { opacity: 1; }
+
+.rl-telemetry-index { flex: 1; display: flex; gap: 4px; align-items: center; }
+.rl-telemetry-seg {
+  all: unset;
   flex: 1;
+  height: 14px;              /* a comfortable target; the mark inside is 1px */
+  cursor: pointer;
+  position: relative;
+}
+.rl-telemetry-seg::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 50%;
   height: 1px;
   background: currentColor;
-  opacity: 0.3;
-  transform-origin: left;
+  opacity: 0.22;
+  transition: opacity 160ms var(--ease), height 160ms var(--ease);
 }
-.rl-telemetry span { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rl-telemetry-seg.is-passed::after { opacity: 0.45; }
+.rl-telemetry-seg.is-active::after { opacity: 1; height: 2px; }
+.rl-telemetry-seg:hover::after { opacity: 0.85; height: 2px; }
+.rl-telemetry-seg:focus-visible {
+  outline: 1px solid var(--ring);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+.rl-telemetry-pct { flex: 0 0 auto; font-variant-numeric: tabular-nums; opacity: 0.7; }
+
 @media (max-width: 720px) {
+  /* The label costs more width than it earns at this size; the index does not. */
   .rl-telemetry-here { display: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .rl-telemetry-rule { transition: none; }
+  .rl-telemetry { gap: 12px; bottom: 14px; }
+  /* A 14px tap target is a miss waiting to happen. The hit area grows to a
+     thumb's worth; the mark inside stays a hairline, so the bar looks
+     identical and only becomes easier to hit. */
+  .rl-telemetry-seg { height: 34px; }
 }
 
 /* ── what is not simulated ─────────────────────────────────────────── */
