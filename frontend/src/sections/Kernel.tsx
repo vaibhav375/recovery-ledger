@@ -1,5 +1,11 @@
-import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { useRef, useState } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "motion/react";
 import InView from "../motion/InView";
 import { CitationCard } from "../live/Range";
 import type { Dashboard } from "../types";
@@ -25,17 +31,48 @@ export default function Kernel({ data }: { data: Dashboard }) {
   const [open, setOpen] = useState<string | null>(null);
   const provenance = data.rule_provenance ?? {};
 
+  // The claim, stated alone before any of its evidence arrives. Every figure
+  // is derived from rule_stats rather than written, so the sentence cannot
+  // drift from the table underneath it.
+  const checks = data.rule_stats.reduce((n, r) => n + r.evaluated, 0);
+  const refusing = data.rule_stats.filter((r) => r.failed > 0).length;
+
+  const stageRef = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: stageRef,
+    offset: ["start start", "end start"],
+  });
+  // The claim holds the screen, then releases it to the evidence.
+  const claimOpacity = useTransform(scrollYProgress, [0, 0.55, 0.85], [1, 1, 0]);
+  const claimY = useTransform(scrollYProgress, [0, 0.85], [0, -40]);
+
   return (
     <section className="rl-kernel">
-      <div className="rl-kernel-inner">
-        <p className="rl-sectionmark">The constraint</p>
-        <InView>
-          <h2 className="rl-h2">
-            The compliance kernel is deliberately not an LLM.
-            <span className="rl-dim"> 99% compliant is 100% undeployable.</span>
+      {/* Stage one: the claim, alone, holding the screen. The evidence is
+          directly below and arrives when the reader has had the point. */}
+      <div className="rl-kernel-stage" ref={stageRef}>
+        <motion.div
+          className="rl-kernel-claim"
+          style={reduce ? undefined : { opacity: claimOpacity, y: claimY }}
+        >
+          <p className="rl-sectionmark">the constraint</p>
+          <h2 className="rl-kernel-headline">
+            {data.rule_stats.length} rules.{" "}
+            {checks.toLocaleString("en-IN")} checks.
+            <span className="rl-dim">
+              {" "}
+              {refusing === 1 ? "One rule ever says no." : `${refusing} rules ever say no.`}
+            </span>
           </h2>
-        </InView>
+          <p className="rl-kernel-claimsub">
+            The compliance kernel is deliberately not an LLM. 99% compliant is
+            100% undeployable.
+          </p>
+        </motion.div>
+      </div>
 
+      <div className="rl-kernel-inner">
         <InView index={1}>
           <div className="rl-kernel-grid">
             <div>

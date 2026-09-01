@@ -364,7 +364,48 @@ main, .rl-footer { position: relative; z-index: 1; }
 }
 
 /* ── kernel ────────────────────────────────────────────────────────── */
-.rl-kernel { padding: clamp(120px, 20vh, 240px) var(--gut); border-top: 1px solid var(--line-soft); }
+.rl-kernel { border-top: 1px solid var(--line-soft); }
+
+/* ── one claim, one viewport ───────────────────────────────────────── */
+/* The section states its point alone and holds the screen for it, then
+   releases to the evidence below. The travel is what makes it a beat rather
+   than a heading: a claim you scroll past is a heading, a claim that owns the
+   frame while you scroll is an argument. */
+.rl-kernel-stage { height: 190svh; position: relative; }
+.rl-kernel-claim {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 var(--gut);
+  max-width: 1160px;
+  margin: 0 auto;
+}
+.rl-kernel-headline {
+  margin: 0;
+  font-size: clamp(34px, 6.4vw, 96px);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  max-width: 16ch;
+  font-variant-numeric: tabular-nums;
+}
+.rl-kernel-claimsub {
+  margin: clamp(24px, 3vw, 40px) 0 0;
+  max-width: 46ch;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--fg-faint);
+}
+.rl-kernel-inner { padding: clamp(40px, 8vh, 90px) var(--gut) clamp(120px, 20vh, 240px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .rl-kernel-stage { height: auto; }
+  .rl-kernel-claim { position: static; height: auto; padding: clamp(90px, 14vh, 160px) var(--gut); }
+}
 .rl-kernel-inner { max-width: 1160px; margin: 0 auto; }
 .rl-kernel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: clamp(20px, 3vw, 44px); margin-bottom: clamp(28px, 4vw, 46px); }
 .rl-kernel-num {
