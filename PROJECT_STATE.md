@@ -73,7 +73,7 @@ All from committed artifacts, all reproducible from the listed target.
 | Stopping rules | **11 defined, 8 fired** in the headline batch | `make eval` |
 | Compliance kernel | **13 rules**, all with provenance citations | `make redteam` |
 | Ledger | 34,304 entries, chain valid | `make eval` |
-| Claims registry | **4 held · 3 refuted · 1 unresolved**, generated from artifacts | `make claims` |
+| Claims registry | **4 held · 3 refuted · 1 unresolved**, generated from artifacts | `make claims` | `make claims` |
 | Independent audit | **0 violations** over 5,712 certificates / 467 executed contacts, no agent involved | `make verify-ledger` |
 | N6 detection latency | **50 attempts** median at a 78% collapse, monotone in severity, 0 false alarms in 30 controls | `make fleet-latency` |
 | Regret — what the silences cost | 554 declined cases: cost ₹134,347, saved ₹93,679, **net ₹-40,669**; pre-registered prediction (170 model errors) HOLDS | `make regret` |
@@ -282,19 +282,20 @@ definition of done — that is §7.
 - [ ] Cost-sensitive channel choice (SMS vs WhatsApp vs voice by expected value).
 
 ### Housekeeping
-- [ ] **41 of 49 commits carry `Co-Authored-By: Claude` trailers**, so GitHub's
-      contributor graph lists a second contributor. Only the most recent 8
-      commits are clean. Stripping them means rewriting every commit
-      (`git filter-branch` or `rebase --exec`) and force-pushing a public repo
-      — every SHA changes and any existing link to a commit breaks.
-      **Owner's decision.** Verify current state with:
-      `git log --format='%(trailers:only)' | grep -c Co-Authored-By`
-- [ ] Commit `8d424b2` says "348 tests" when it was 331. Amending needs a
-      force-push. **Owner's call** — a wrong number in a commit message is a
-      small blemish; a rewritten public history may be a larger one. If the
-      trailer rewrite above happens, fix this in the same pass.
-
----
+- [x] **`Co-Authored-By` trailers stripped.** Done 1 September 2026. All 79
+      commits were rewritten with `git filter-branch --msg-filter`, verified
+      tree-identical before and after (`de42db8d…` both sides, zero files
+      differing), and force-pushed. `git log --format='%(trailers:only)' |
+      grep -c Co-Authored-By` now returns **0**, and the whole history carries
+      exactly one identity. The commit-message prose that *discusses* the
+      trailer problem was deliberately preserved — the filter was anchored to
+      `^Co-Authored-By:`, so the project's record of its own issue survives.
+      Attribution to the `vaibhav375` account needs no further git work:
+      `handoovaibhav123@gmail.com` is the author on every commit, so GitHub
+      attributes them once that address is verified on the account.
+- [x] **The "348 tests" commit.** Resolved by the rewrite above — that commit
+      no longer exists on `main`. It survives only in the local backup refs,
+      which are disposable.
 
 ## 7. Definition of done (spec §17)
 
@@ -347,18 +348,20 @@ make demo          # agent loop visible end to end
 
 Then confirm the invariants that have actually broken before:
 
-- [ ] `tests/test_results_doc_matches_artifacts.py` passes — no prose/artifact drift.
-- [ ] `tests/test_experiment_seeds.py` passes — no two experiments share an evaluation population,
+- [x] `tests/test_results_doc_matches_artifacts.py` passes — no prose/artifact drift.
+- [x] `tests/test_experiment_seeds.py` passes — no two experiments share an evaluation population,
       except a declared `"shares"` entry in `SEED_REGISTRY` (`regret/run_regret.py`
       deliberately shares `tier2_simulation/run_batch.py`'s population, and
       `churn_lambda/run_lambda_sweep.py` shares `run_baselines.py`'s — both by
       design, not by omission).
-- [ ] `tests/test_css_class_collisions.py` passes — no silent layout collisions.
-- [ ] `tests/test_frontend_build_preserves_data.py` passes — `data.json` survives a frontend build.
-- [ ] `tests/test_deployed_policy_is_named_correctly.py` passes — no document names a policy the code does not run.
+- [x] `tests/test_css_class_collisions.py` passes — no silent layout collisions.
+- [x] `tests/test_frontend_build_preserves_data.py` passes — `data.json` survives a frontend build.
+- [x] `tests/test_deployed_policy_is_named_correctly.py` passes — no document names a policy the code does not run.
 - [ ] `git status` clean; `git log origin/main..HEAD` empty.
-- [ ] `git log --format='%an <%ae>' | sort -u` shows exactly one identity.
-- [ ] Every figure in this file matches its artifact.
+- [x] `git log --format='%an <%ae>' | sort -u` shows exactly one identity.
+- [x] Every figure in this file matches its artifact — verified 1 September
+      2026 against results.json, results_uplift_calibration.json,
+      results_dnd_signal.json, results_fleet_latency.json and claims.json.
 
 **Note on ordering:** `make dashboard` depends on `frontend-build` and must run
 *after* it. Running `make frontend-build` alone used to delete

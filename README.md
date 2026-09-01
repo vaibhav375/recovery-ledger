@@ -78,10 +78,12 @@ evidence the problem is real; it is not something to claim credit for.
 | **N3** | **A deterministic, machine-checkable India-regulatory compliance kernel** emitting a per-action certificate — TCCCPR/DLT, RBI recovery-agent norms, RBI e-mandate 2026, DPDPA. | ✅ Built: 13 rules, 100% red-team block rate, mutation-tested |
 | **N4** | **Contact as a budget-constrained sequential decision problem**, not one-shot classification. | ⚠️ Partial: greedy EV under an explicit budget, plus a finite-horizon lookahead variant. Not a full constrained-MDP solver, and the spec explicitly permits the simplification — but it is a simplification, and the lookahead currently adds nothing measurable. |
 | **Bonus** | **Bounded-authority negotiation with the Section 43B(h) tax clock** (spec 9.4). Invokes the counterparty's *own* tax incentive rather than only chasing. | ✅ Built. NPV solver, kernel-enforced concession envelope, and a measured decision to keep an LLM *out* of the drafting. |
+| **N7** | **A regret ledger — the agent's own false negatives, priced.** Every case it declined to contact, split into refusals a rule forced, refusals the model chose, and cases that simply ran out of attempts. No recovery product publishes what its silences cost. | ✅ Built. On the same cases as the headline: cost **₹134,347**, saved **₹93,679**, **net ₹-40,669** — the silences cost more than they saved, published as such. **170 model errors**: refusals of customers who would have paid. |
+| **N8** | **A claims registry that makes overclaiming a build failure.** Every pre-registered claim, its rule, and its verdict — generated from the artifacts, never written by hand. A claim the evidence refuted cannot be asserted in the documents. | ✅ Built. **4 held · 3 refuted · 1 unresolved.** Appending this project's own retracted "strictly dominates" sentence to RESULTS.md fails the suite. It also fails if every claim ever comes back held, because that would be evidence of selection rather than rigour. |
 | **N5** | **Two-tier validation** — causal machinery proven on real randomised public data *before* transfer to the simulator. Directly defeats "your synthetic number is circular". | ✅ Built (Criteo + Hillstrom) |
-| **N6** | **Contact-free recovery** — detecting issuer degradation and suppressing retries into a dead issuer. Inverts the assumption that recovery means outreach. | ✅ Built. Change-point detection per issuer/method/region with root-cause attribution; **precision 1.00 / recall 1.00** against ground truth at realistic observation volume. Cuts futile retries into a dead rail **351 → 0** and recovers **+₹41,264**, all on outage-hit cases. |
+| **N6** | **Contact-free recovery** — detecting issuer degradation and suppressing retries into a dead issuer. Inverts the assumption that recovery means outreach. | ✅ Built. Change-point detection per issuer/method/region with root-cause attribution; **precision 1.00 / recall 1.00** against ground truth at realistic observation volume. Cuts futile retries into a dead rail **351 → 0** and recovers **+₹41,264**, all on outage-hit cases. Detection is now *measured*, not demonstrated: fires in **8/8 draws at every severity**, median latency 125 attempts for a 20% drop down to 50 for a 78% collapse, with **0 false alarms in 30 control draws**. |
 
-Four of six are built and measured; N4 remains a stated simplification the
+Six of eight are built and measured; N4 remains a stated simplification the
 spec explicitly permits. That status is kept current here rather than left
 for a reader to discover — N2 and N6 both read ⚠️/❌ until the work landed.
 
@@ -441,6 +443,15 @@ make baselines         # runs all 5 spec-required baselines + a matched-volume
                        # random-targeting control + both EV variants against the
                        # same eval batch — verified working, deterministic
 make sensitivity       # 5-parameter ranking-stability sweep — verified working
+make regret            # what refusing cost, and what it saved, on the headline's
+                       # own cases — cost / saved / net, split by why it refused
+make claims            # the pre-registration registry: every claim, its rule and
+                       # its verdict, generated from the artifacts
+make verify-ledger     # third-party audit of the trail — re-derives every
+                       # certificate from its own rule outcomes, no agent involved
+make calibration       # uplift by decile + calibration slope on a randomised holdout
+make fleet-latency     # N6 detection latency by severity, with its false-alarm rate
+make dr-foldsweep      # tests the cross-fitting hypothesis behind DR's low reading
 make calibration       # uplift by decile + calibration slope on a randomised
                        # holdout — the spec's required evaluation artifact
 make negotiate         # Section 43B(h) negotiation showpiece
