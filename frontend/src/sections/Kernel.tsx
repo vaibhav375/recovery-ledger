@@ -84,13 +84,28 @@ export default function Kernel({ data }: { data: Dashboard }) {
                     onClick={() => setOpen(isOpen ? null : r.rule)}
                   >
                     <code>{r.rule}</code>
-                    <span className="rl-rulerow-bar">
+                    {/* The bar reports the WORK, not just the refusals. Twelve
+                        of these thirteen rules refuse nothing, and drawing only
+                        refusals rendered them as an empty track and an em-dash
+                        — a rule that evaluated 5,712 times and refused none is
+                        the kernel working, and the page was showing it as the
+                        kernel absent. The track is the evaluations, the filled
+                        segment the refusals. */}
+                    <span className="rl-rulerow-bar" aria-hidden="true">
                       <span
-                        style={{ width: `${(r.failed / Math.max(r.evaluated, 1)) * 100}%` }}
+                        className="rl-rulerow-refused"
+                        style={{
+                          width: r.failed
+                            ? `${Math.max(2, (r.failed / Math.max(r.evaluated, 1)) * 100)}%`
+                            : "0%",
+                        }}
                       />
                     </span>
                     <span className="rl-rulerow-n">
-                      {r.failed ? `${r.failed.toLocaleString("en-IN")} refused` : "—"}
+                      <b>{r.evaluated.toLocaleString("en-IN")}</b> checked
+                      {r.failed > 0 && (
+                        <em>{r.failed.toLocaleString("en-IN")} refused</em>
+                      )}
                     </span>
                   </button>
                   <AnimatePresence initial={false}>
