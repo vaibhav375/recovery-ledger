@@ -81,7 +81,7 @@ evidence the problem is real; it is not something to claim credit for.
 | **N7** | **A regret ledger — the agent's own false negatives, priced.** Every case it declined to contact, split into refusals a rule forced, refusals the model chose, and cases that simply ran out of attempts. No recovery product publishes what its silences cost. | ✅ Built. On the same cases as the headline: cost **₹134,347**, saved **₹93,679**, **net ₹-40,669** — the silences cost more than they saved, published as such. **170 model errors**: refusals of customers who would have paid. |
 | **N8** | **A claims registry that makes overclaiming a build failure.** Every pre-registered claim, its rule, and its verdict — generated from the artifacts, never written by hand. A claim the evidence refuted cannot be asserted in the documents. | ✅ Built. **4 held · 3 refuted · 1 unresolved.** Appending this project's own retracted "strictly dominates" sentence to RESULTS.md fails the suite. It also fails if every claim ever comes back held, because that would be evidence of selection rather than rigour. |
 | **N5** | **Two-tier validation** — causal machinery proven on real randomised public data *before* transfer to the simulator. Directly defeats "your synthetic number is circular". | ✅ Built (Criteo + Hillstrom) |
-| **N6** | **Contact-free recovery** — detecting issuer degradation and suppressing retries into a dead issuer. Inverts the assumption that recovery means outreach. | ✅ Built. Change-point detection per issuer/method/region with root-cause attribution; **precision 1.00 / recall 1.00** against ground truth at realistic observation volume. Cuts futile retries into a dead rail **351 → 0** and recovers **+₹41,264**, all on outage-hit cases. Detection is now *measured*, not demonstrated: fires in **8/8 draws at every severity**, median latency 125 attempts for a 20% drop down to 50 for a 78% collapse, with **0 false alarms in 30 control draws**. |
+| **N6** | **Contact-free recovery** — detecting issuer degradation and suppressing retries into a dead issuer. Inverts the assumption that recovery means outreach. | ✅ Built. Change-point detection per issuer/method/region with root-cause attribution; **precision 1.00 / recall 1.00** against ground truth at realistic observation volume. Cuts futile retries into a dead rail **340 → 0** and recovers **+₹50,600**, all on outage-hit cases. Detection is now *measured*, not demonstrated: fires in **8/8 draws at every severity**, median latency 125 attempts for a 20% drop down to 50 for a 78% collapse, with **0 false alarms in 30 control draws**. |
 
 Six of eight are built and measured; N4 remains a stated simplification the
 spec explicitly permits. That status is kept current here rather than left
@@ -232,7 +232,7 @@ running.
 - [x] **N6 — contact-free recovery.** `make fleet`: issuer/method/region
       change-point detection with root-cause attribution, precision 1.00 /
       recall 1.00 against ground truth. Futile retries into a degraded issuer
-      **351 → 0**, **+₹41,264** recovered without messaging anyone extra to
+      **340 → 0**, **+₹50,600** recovered without messaging anyone extra to
       find it. Also caught and fixed a real defect in my own detector — the
       minimum-observations floor was set too low, producing false positives
       that a volume sweep showed were pure small-sample noise.

@@ -544,13 +544,13 @@ observed attempt stream.
 
 | | blind | fleet-aware |
 |---|---:|---:|
-| Retries into the degraded issuer | 351 | **0** |
-| Gross ₹ recovered | 1,348,020 | 1,389,285 |
-| ₹ recovered on outage-hit cases | 20,349 | **61,613** |
-| Contacts | 852 | 933 |
+| Retries into the degraded issuer | 340 | **0** |
+| Gross ₹ recovered | 1,341,339 | 1,391,939 |
+| ₹ recovered on outage-hit cases | 18,640 | **69,239** |
+| Contacts | 925 | 1038 |
 
-**+₹41,264 recovered, all of it on the outage-hit cases**, by stopping 351
-futile retries. The cost is 81 extra contacts — the agent switches strategy
+**+₹50,600 recovered, all of it on the outage-hit cases**, by stopping 340
+futile retries. The cost is 113 extra contacts — the agent switches strategy
 on cases where retrying became worthless, which is the honest caveat: the
 *detection* is contact-free, and it reallocates effort rather than
 eliminating it.

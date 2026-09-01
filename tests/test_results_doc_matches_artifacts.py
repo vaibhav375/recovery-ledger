@@ -1207,3 +1207,30 @@ def test_fleet_latency_is_monotone_in_severity():
     assert medians == sorted(medians, reverse=True), (
         f"latency is not monotone in severity: {medians}"
     )
+
+
+# ── N6: the figures that drifted ─────────────────────────────────────────
+#
+# `futile_retries_avoided` was quoted as 351 in README and RESULTS while the
+# artifact reproduced 340 — the experiment is deterministic, but the committed
+# artifact had gone stale against a behavioural change and nothing was pinning
+# it. Every other headline figure had a test; this one did not, which is
+# exactly why it was the one that drifted.
+
+def test_fleet_futile_retries_match_the_artifact(results_md, readme):
+    f = _load(FLEET)
+    n = f["futile_retries_avoided"]
+    assert f"| Retries into the degraded issuer | {n} | **0** |" in results_md
+    assert f"stopping {n}" in results_md
+    assert f"**{n} → 0**" in readme
+
+
+def test_fleet_recovery_change_matches_the_artifact(results_md, readme):
+    f = _load(FLEET)
+    money = f"₹{round(f['gross_recovery_change']):,}"
+    assert money in results_md, f"RESULTS.md does not state {money}"
+    assert money in readme, f"README.md does not state {money}"
+
+
+def test_the_fleet_detection_claim_still_holds():
+    assert _load(FLEET)["detection_correct"] is True

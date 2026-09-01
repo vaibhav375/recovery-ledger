@@ -77,7 +77,7 @@ All from committed artifacts, all reproducible from the listed target.
 | Independent audit | **0 violations** over 5,712 certificates / 467 executed contacts, no agent involved | `make verify-ledger` |
 | N6 detection latency | **50 attempts** median at a 78% collapse, monotone in severity, 0 false alarms in 30 controls | `make fleet-latency` |
 | Regret — what the silences cost | 554 declined cases: cost ₹134,347, saved ₹93,679, **net ₹-40,669**; pre-registered prediction (170 model errors) HOLDS | `make regret` |
-| Tests | **505 passing** across 45 files | `make test` |
+| Tests | **508 passing** across 45 files | `make test` |
 
 ---
 
@@ -153,6 +153,14 @@ five separate times:
 
 The generalisable finding: **a single-draw conclusion is a claim about that
 draw.** Every headline figure in §2 has survived this rule.
+
+A third, found in the final pre-submission sweep: **an artifact that nobody
+re-runs goes stale silently.** `results_fleet.json` was committed reporting 351
+futile retries avoided; the experiment is deterministic and reproduces 340. The
+code had changed behaviour and the artifact was never regenerated, so README
+and RESULTS.md both quoted a figure that no longer existed. It was the one
+headline number with no doc test pinning it — every other figure had one, and
+this was the one that drifted. Now pinned.
 
 A second lesson, newer: **a test that cannot fail is worse than no test.** The
 λ_churn dominance check was first written against confidence-interval overlap,
@@ -330,7 +338,7 @@ and a frontend build that deleted the page's data with no error anywhere.
 Run in this order. Every one must pass.
 
 ```bash
-make test          # 505 tests
+make test          # 508 tests
 make eval          # B1 headline
 make baselines     # 8-policy comparison
 make sensitivity   # 75/75 both criteria across 3 draws
