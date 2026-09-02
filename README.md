@@ -427,70 +427,129 @@ Every case travels the same loop, and **every step writes to the ledger** —
 the audit trail is not a report generated afterwards, it is the record the
 system makes as it runs.
 
+### The loop, end to end
+
 ```mermaid
 flowchart TD
-    E["events/<br/>4 loss types"] --> D["detector/<br/>still at risk?"]
-    D -->|resolved| STOP1(["stop: resolved"])
-    D --> DX["diagnoser/<br/>taxonomy + root cause"]
-    DX --> P
-
-    subgraph P["policy/ — what to do"]
-        direction TB
-        U["uplift/<br/>S · T · X-learner, causal forest<br/>tau_hat, and how much to trust it"]
-        C["churn.py<br/>incremental opt-out risk"]
-        DEC["decision.py<br/>EV = tau x amount - cost<br/>- lambda_churn x P(churn) x LTV"]
-        U --> DEC
-        C --> DEC
-    end
-
-    FLEET["detector/fleet.py<br/>issuer degradation<br/>(contact-free recovery)"] -.->|"retry into a dead rail<br/>is worth zero"| DEC
-
-    DEC -->|"proposes an action"| K
-
-    subgraph K["kernel/ — may we?"]
-        direction TB
-        R["rules/ — 13 rules<br/>TCCCPR · RBI · DPDP · e-mandate · policy"]
-        ENG["engine.py<br/>DENY unless every rule passes"]
-        R --> ENG
-        PROV["provenance.py<br/>says who, and where we could not pin a clause"]
-        PROV -.-> R
-    end
-
-    K -->|"DENY"| RETRY["fall back to WAIT<br/>never silently drop the case"]
-    K -->|"ALLOW + certificate"| X["executor/<br/>channel adapters"]
-    X --> L["listener/<br/>reply -> intent<br/>(opt-out is deterministic, not the LLM)"]
-    L --> NEG["negotiation/<br/>43B(h) clock · NPV solver<br/>· kernel-enforced envelope"]
-    NEG --> SR{"11 stopping rules"}
-    L --> SR
-    RETRY --> SR
-    SR -->|"terminate or pause"| STOP2(["outcome + reason"])
-    SR -->|"keep working"| D
-
-    ENG -.->|"certificate per attempted action"| LED
-    DEC -.-> LED
-    L -.-> LED
-    STOP2 -.-> LED
-    LED[("ledger/<br/>append-only, hash-chained<br/>every entry commits to the one before")]
-
-    LED --> DASH["dashboard/ + frontend/<br/>browsable trail"]
-    LED --> LIVE["live/<br/>run it, attack it, break it"]
-
-    classDef kernel fill:#2f27ce22,stroke:#433bff,stroke-width:2px
-    classDef ledger fill:#433bff14,stroke:#433bff,stroke-width:2px
-    class K,R,ENG,PROV kernel
-    class LED ledger
+    E["events/"] --> D["detector/"]
+    D -->|"already paid"| OUT(["stop: resolved"])
+    D --> DX["diagnoser/"]
+    DX --> P["policy/"]
+    FLEET["detector/fleet.py"] -.->|"dead rail = zero"| P
+    P -->|"proposes an action"| K{"kernel/"}
+    K -->|"DENY"| W["fall back to WAIT"]
+    K -->|"ALLOW + certificate"| X["executor/"]
+    X --> L["listener/"]
+    L --> N["negotiation/"]
+    L --> S{"11 stopping rules"}
+    N --> S
+    W --> S
+    S -->|"terminate or pause"| DONE(["outcome + reason"])
+    S -->|"keep working"| D
 ```
 
-**The two arrows that carry the argument.** The kernel sits *between* the
-policy and the executor — nothing reaches a customer without an `ALLOW`
-certificate, and a `DENY` falls back to `WAIT` rather than dropping the case.
-And everything is dashed into the ledger, because a decision that was not
-recorded did not happen.
+### What each stage decides
 
-**Where the measurement lives.** `sim/` is the recovery gym the policy is
-evaluated in; `policy/ope/` estimates what a policy *would* have earned from
-logs of a different one. Neither is in the loop above — they are how the loop
-is judged, not part of it.
+| # | Stage | Module | The question it answers |
+|---|-------|--------|-------------------------|
+| 1 | Detect | `detector/` | Is this case still at risk, or already resolved? |
+| 2 | Diagnose | `diagnoser/` | Why did it fail — taxonomy and root cause? |
+| 3 | Decide | `policy/` | Is contact worth it at all? |
+| 4 | Gate | `kernel/` | Are we *allowed* to do this? |
+| 5 | Execute | `executor/` | Send it, through the channel adapter. |
+| 6 | Listen | `listener/` | What did the customer say back? |
+| 7 | Negotiate | `negotiation/` | What settlement is both legal and worth taking? |
+| 8 | Stop | 11 stopping rules | Terminate, pause, or go round again? |
+
+Stage 3 is the only place money is weighed, and stage 4 is the only place
+permission is decided. Keeping them separate is the point: the policy may
+want to contact someone the kernel will not let it reach.
+
+### Stage 3 — how the policy decides
+
+```
+EV = tau_hat x amount - cost - lambda_churn x P(churn) x LTV
+```
+
+| Module | Contributes |
+|--------|-------------|
+| `policy/uplift/learners.py` | `tau_hat` — S-, T-, X-learner and causal forest |
+| `policy/uplift/calibration.py` | How much to trust `tau_hat`, by decile |
+| `policy/churn.py` | `P(churn)` — the incremental opt-out risk of contact |
+| `policy/decision.py` | Combines them into the expected value above |
+| `detector/fleet.py` | Suppresses retries into a degraded issuer rail |
+| `policy/regret.py` | Attributes, afterwards, what each stop actually cost |
+
+### Stage 4 — the gate
+
+```mermaid
+flowchart LR
+    A["proposed action"] --> R["13 rules"]
+    R --> ENG{"engine.py"}
+    ENG -->|"any rule fails"| DENY["DENY"]
+    ENG -->|"all 13 pass"| ALLOW["ALLOW + certificate"]
+    DENY --> W["WAIT, case stays open"]
+    ALLOW --> EX["executor/ may contact"]
+```
+
+The kernel is deterministic and contains no LLM — a test fails the build if
+`import anthropic` ever appears under `kernel/`. It denies by default: an
+action is permitted only when every rule returns a pass.
+
+The 13 live in nine files under `kernel/rules/`, grouped by the authority
+they come from:
+
+| Source | Rules |
+|--------|-------|
+| TCCCPR — sender identity | `CONSENT.VALIDITY` · `DLT.REGISTERED` · `HEADER.CLASS_MATCH` · `NUMBER_SERIES` |
+| TCCCPR — opt-out | `OPT_OUT.OPTION_PRESENT` · `OPT_OUT.COOLING` |
+| RBI recovery conduct | `RECOVERY.HOURS` · `RECOVERY.TONE_CEILING` |
+| DPDP | `DPDPA.CONSENT_RECORD` |
+| e-mandate 2026 | `EMANDATE2026.PRE_DEBIT_NOTICE` |
+| Internal policy | `CONTACT_BUDGET` · `NEGOTIATION_ENVELOPE` · `PROMISE_TO_PAY_WINDOW` |
+
+`kernel/provenance.py` records the authority behind each rule — including
+the cases where no clause could be pinned down precisely.
+
+### The ledger
+
+```mermaid
+flowchart LR
+    DEC["policy decision"] --> LED[("ledger/")]
+    CERT["kernel certificate"] --> LED
+    REP["customer reply"] --> LED
+    RES["case outcome"] --> LED
+    LED --> DASH["dashboard/ + frontend/"]
+    LED --> VER["kernel/verifier.py"]
+    LED --> LIVE["live/"]
+```
+
+Append-only and hash-chained: every entry commits to the one before it, so
+editing any past decision invalidates every entry after it. One certificate
+is written per attempted action, whether it was allowed or denied.
+
+### What sits outside the loop
+
+These are how the loop is judged, not part of it.
+
+| Module | Role |
+|--------|------|
+| `sim/` | The recovery gym the policy is evaluated in |
+| `policy/ope/` | What a policy *would* have earned, from another policy's logs |
+| `kernel/verifier.py` | Third-party audit of a finished ledger, with no agent present |
+| `live/` | Run it, attack it, break the chain — in the browser |
+| `dashboard/` + `frontend/` | The browsable trail |
+
+### The two claims the diagrams are making
+
+**The kernel sits between the policy and the executor.** Nothing reaches a
+customer without an `ALLOW` certificate, and a `DENY` falls back to `WAIT`
+rather than dropping the case — the agent is never silently stopped by a
+rule it could not satisfy.
+
+**Everything flows into the ledger.** A decision that was not recorded did
+not happen, which is why the write is part of each stage rather than a
+reporting step bolted on at the end.
 
 ## Running this repo
 

@@ -28,7 +28,7 @@
         ╔══════════════════════════════▼═══════════════════╗
         ║  4. COMPLIANCE KERNEL     kernel/                ║
         ║     DETERMINISTIC · NO LLM · DENY BY DEFAULT     ║
-        ║     12 rules → signed Certificate                ║
+        ║     13 rules → signed Certificate                ║
         ║     no certificate ⇒ no action, structurally     ║
         ╚══════════════════════════════┬═══════════════════╝
                                        │  Certificate (ALLOW)
