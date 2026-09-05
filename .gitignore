@@ -33,3 +33,10 @@ dashboard/dist/
 # stray screenshots dropped in the repo root
 /Screenshot*.png
 *.png.download
+
+# pitch prep — personal working material, not part of the project
+/Screen Recording*.mov
+narration/
+tools/narrate.py
+VIDEO_SCRIPT.md
+UNDERSTANDING.md
