@@ -40,3 +40,11 @@ narration/
 tools/narrate.py
 VIDEO_SCRIPT.md
 UNDERSTANDING.md
+
+# The Space payload is assembled by tools/build_hf_space.py and pushed to the
+# Space's own git remote. Only the authored files here are tracked; the copied
+# package, attack suite and built front end are not, so the repo does not carry
+# a second copy of itself.
+deploy/hf-space/src/
+deploy/hf-space/dashboard/
+deploy/hf-space/redteam/

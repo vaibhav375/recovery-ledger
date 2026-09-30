@@ -1,0 +1,14 @@
+# The live console's dependencies, not the whole project's.
+#
+# The research pipeline needs pyarrow, matplotlib, scikit-uplift, click and
+# rich. The live path does not touch any of them, which was verified by
+# blocking each import and running a session. Leaving them out takes roughly
+# 180 MB off the image.
+#
+# econml is not optional: the uplift model the agent scores cases with is an
+# econml T-learner, and dropping it would change what the console demonstrates.
+numpy>=1.26
+pandas>=2.2
+scikit-learn>=1.4
+econml>=0.15
+pydantic>=2.6

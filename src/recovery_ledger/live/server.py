@@ -23,6 +23,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import sys
 import threading
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -235,8 +237,12 @@ class Handler(BaseHTTPRequestHandler):
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--port", type=int, default=5175)
-    ap.add_argument("--no-open", action="store_true")
+    # A hosted container is told which port to listen on, and there is no
+    # browser on it to open. Both are environment, not flags, so the same
+    # entrypoint works on a laptop and on a server.
+    ap.add_argument("--port", type=int, default=int(os.environ.get("PORT", 5175)))
+    ap.add_argument("--no-open", action="store_true",
+                    default=not sys.stdout.isatty() or bool(os.environ.get("PORT")))
     ap.add_argument(
         "--warm", action="store_true",
         help="fit the uplift and churn models at startup instead of on the first run",

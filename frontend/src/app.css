@@ -1754,3 +1754,24 @@ main, .rl-footer { position: relative; z-index: 1; }
    it is a container rather than a control — an outline on it would read as a
    focused widget that does nothing. Its children show their own focus. */
 .rl-drawer-panel:focus { outline: none; }
+
+/* the way out of a page that cannot run the thing it describes */
+.rl-livelink {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 11px 20px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.rl-livelink:hover,
+.rl-livelink:focus-visible {
+  background: currentColor;
+}
+.rl-livelink:hover span,
+.rl-livelink:focus-visible {
+  color: var(--rl-bg, #000);
+}

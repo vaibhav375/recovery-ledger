@@ -1,4 +1,4 @@
-.PHONY: recalibration tier1-targeting tier1-revenue claims verify-ledger setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet fleet-latency negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
+.PHONY: hf-space recalibration tier1-targeting tier1-revenue claims verify-ledger setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet fleet-latency negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
 
 # `uv pip install` honours an ambient VIRTUAL_ENV over the venv it was just
 # told to create. Anyone who runs `make setup` with another virtualenv active
@@ -237,3 +237,10 @@ verify-ledger:
 
 redteam:
 	PYTHONPATH=src:redteam .venv/bin/python3 redteam/run_redteam.py --fuzz-samples 5000
+
+# Assembles deploy/hf-space/ for Hugging Face Spaces: the package, the attack
+# suite and the built front end, with nothing the live path does not touch.
+# The console needs a process with shared memory and a long-lived connection,
+# which is why it is a container rather than a function.
+hf-space: dashboard
+	python3 tools/build_hf_space.py

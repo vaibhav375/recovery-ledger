@@ -10,6 +10,12 @@ import type { Dashboard } from "../types";
 
 type Tab = "console" | "range" | "counterfactual" | "chain";
 
+/* Where the live console is hosted, for the copies of this page that cannot
+   run a backend — GitHub Pages, or a file opened from disk. Set at build time
+   so the static report can point at the running system instead of telling a
+   stranger to run a command they will not run. */
+const LIVE_URL: string = import.meta.env.VITE_LIVE_URL ?? "";
+
 const TABS: { id: Tab; label: string; blurb: string }[] = [
   { id: "console", label: "Run it", blurb: "Start the agent and watch the loop write its own audit trail." },
   { id: "range", label: "Attack it", blurb: "Fire the red-team suite at the compliance kernel, one attack at a time." },
@@ -52,18 +58,32 @@ export default function Live({ data }: { data: Dashboard }) {
 
         {health === null && (
           <div className="rl-offline">
-            <h3>The live backend is not running.</h3>
+            <h3>The controls are not on this copy of the page.</h3>
             <p>
               Everything above this line came from runs that already happened
               and needs no server. This section drives the agent in real time,
-              which does. Start it with:
+              which does — a process that holds a run in memory and streams
+              events while the loop executes. A static host cannot run one.
             </p>
-            <pre className="rl-pre">make live</pre>
-            <p className="rl-dim">
-              Standard library only — nothing to install beyond what{" "}
-              <code>make setup</code> already put in the virtualenv. It serves
-              this page too, so the same URL gains the controls.
-            </p>
+            {LIVE_URL ? (
+              <>
+                <p>
+                  <a className="rl-livelink" href={LIVE_URL} target="_blank" rel="noreferrer">
+                    Open the live console
+                  </a>
+                </p>
+                <p className="rl-dim">
+                  It serves this same page with the controls attached. The
+                  models are fitted when the container starts, so a cold visit
+                  waits a few seconds before the first run.
+                </p>
+              </>
+            ) : (
+              <p className="rl-dim">
+                Running it yourself needs nothing beyond the virtualenv, and it
+                serves this page too, so the same URL gains the controls.
+              </p>
+            )}
           </div>
         )}
 
