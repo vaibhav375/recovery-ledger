@@ -73,9 +73,10 @@ export default function Live({ data }: { data: Dashboard }) {
                   </a>
                 </p>
                 <p className="rl-dim">
-                  It serves this same page with the controls attached. The
-                  models are fitted when the container starts, so a cold visit
-                  waits a few seconds before the first run.
+                  It serves this same page with the controls attached. The host
+                  sleeps when nobody is using it, so a first visit can take
+                  about a minute to wake; everything after that is the agent's
+                  own speed.
                 </p>
               </>
             ) : (
