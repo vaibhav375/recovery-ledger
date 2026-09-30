@@ -132,15 +132,19 @@ listener-eval:
 	PYTHONPATH=src .venv/bin/python3 experiments/listener_eval/run_eval.py --set gold
 
 # Browsable audit trail (bar requirement B4). Self-contained HTML — no npm, no
-# build step, no network. Uses the rich batch ledger when `make eval` has been
-# run, otherwise falls back to the demo ledger.
+# build step, no network.
+#
+# Always the committed gzipped batch ledger, never whatever happens to be on
+# this machine. The uncompressed copy is a local artifact of `make eval` and is
+# not in git, so building from it meant the published dashboard depended on who
+# built it: the copy on Pages reported 2000 cases and 320 refusals while the
+# container, which only had the demo ledger, reported 20 cases and none. Same
+# bytes everywhere, or the two copies disagree.
 dashboard: frontend-build
-	@if [ -f experiments/tier2_simulation/batch_ledger.json ]; then \
-		PYTHONPATH=src .venv/bin/python3 dashboard/build_dashboard.py \
-			--ledger experiments/tier2_simulation/batch_ledger.json --max-cases 80; \
-	else \
-		$(MAKE) demo >/dev/null && PYTHONPATH=src .venv/bin/python3 dashboard/build_dashboard.py; \
-	fi
+	@DIR=$$(mktemp -d); LEDGER=$$DIR/batch_ledger.json; \
+	python3 -c "import gzip,shutil,sys; shutil.copyfileobj(gzip.open('experiments/tier2_simulation/batch_ledger.json.gz','rb'), open(sys.argv[1],'wb'))" $$LEDGER; \
+	PYTHONPATH=src .venv/bin/python3 dashboard/build_dashboard.py --ledger $$LEDGER --max-cases 80; \
+	rm -rf $$DIR
 	@echo ""
 	@echo "React app : dashboard/dist/index.html   (make dashboard-serve)"
 	@echo "Fallback  : dashboard/index.html        (single file, opens directly)"

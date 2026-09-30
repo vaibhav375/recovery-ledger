@@ -52,14 +52,16 @@ RUN test -s experiments/tier2_simulation/results.json \
     && test -s experiments/uplift_calibration/results_uplift_calibration.json \
     && test -s claims.json
 
-# The ledger is a generated artifact, not a committed one — running the demo
-# produces it in a few seconds, and generating it here means the image cannot
-# ship a dashboard that disagrees with the code that made it. data.json, which
-# is the entire content of the page, is then built from that ledger.
-RUN PYTHONPATH=/app/src python -m recovery_ledger.cli --out /tmp/demo_ledger.json \
+# The same ledger the Pages copy is built from, committed gzipped because it is
+# 28 MB raw and 2.5 MB here. Generating a fresh demo ledger instead was the
+# obvious shortcut and it was wrong: a demo run is 20 cases and never trips the
+# pre-debit-notice rule, so the hosted dashboard reported zero refusals where
+# the real evaluation reports 320. data.json, which is the entire content of
+# the page, is built from it here.
+RUN python -c "import gzip,shutil; shutil.copyfileobj(gzip.open('experiments/tier2_simulation/batch_ledger.json.gz','rb'), open('/tmp/batch_ledger.json','wb'))" \
     && PYTHONPATH=/app/src python dashboard/build_dashboard.py \
-         --ledger /tmp/demo_ledger.json --out /tmp/fallback.html \
-    && rm -f /tmp/fallback.html /tmp/demo_ledger.json \
+         --ledger /tmp/batch_ledger.json --max-cases 80 --out /tmp/fallback.html \
+    && rm -f /tmp/fallback.html /tmp/batch_ledger.json \
     && chown -R app:app /app/dashboard
 
 USER app

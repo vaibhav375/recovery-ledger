@@ -16,6 +16,10 @@ data/*.parquet
 
 demo_ledger.json
 experiments/tier2_simulation/batch_ledger.json
+# ...but the gzipped copy IS committed. The dashboard's ledger figures come
+# from it, and both the Pages build and the container build read the same
+# bytes, so the two published copies cannot disagree. 28 MB raw, 2.5 MB here.
+!experiments/tier2_simulation/batch_ledger.json.gz
 
 # local secrets
 .env
