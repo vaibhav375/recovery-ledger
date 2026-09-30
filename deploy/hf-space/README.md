@@ -3,8 +3,8 @@ title: Recovery Ledger — live console
 emoji: 📒
 colorFrom: gray
 colorTo: green
-sdk: docker
-app_port: 7860
+sdk: gradio
+app_file: app.py
 pinned: false
 license: mit
 ---
@@ -28,5 +28,10 @@ This is the part that is not a report. It drives the running system:
 
 Source: [github.com/vaibhav375/recovery-ledger](https://github.com/vaibhav375/recovery-ledger)
 
-The models are fitted when the container starts, so the first request after a
-cold start waits a few seconds. Everything after it is the agent's own speed.
+The models are fitted when the Space starts, so the first request after a cold
+start waits a few seconds. Everything after it is the agent's own speed.
+
+Running under the Gradio SDK rather than Docker, which Hugging Face charges
+for. `app.py` starts the same console server that runs locally and the Space
+serves whatever is listening on 7860; no Gradio app is involved. The Dockerfile
+beside it is still current, for hosts that build images for free.

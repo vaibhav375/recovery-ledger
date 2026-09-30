@@ -10,6 +10,8 @@ ships as a container rather than a function.
 
 This copies in only what that container needs:
 
+  app.py                 the Space entry point (Gradio SDK, which is free;
+                         the Docker SDK is not)
   src/recovery_ledger/   the package
   redteam/attacks.py     the attack suite, which live/range.py loads by adding
                          redteam/ to sys.path so the interactive range and the

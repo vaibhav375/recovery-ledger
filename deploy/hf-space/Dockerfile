@@ -7,6 +7,10 @@
 # switch mid-run. That needs one process with shared memory and a long-lived
 # connection, which is why it is a container and not a function.
 
+# Hugging Face charges for the Docker SDK, so the Space runs app.py under the
+# free Gradio SDK instead. This Dockerfile is unchanged and still correct for
+# anywhere that builds images for free: Render, Koyeb, Cloud Run, a plain VM.
+
 FROM python:3.12-slim
 
 # A non-root user, because the container has no business running as root and
