@@ -9,8 +9,15 @@ checkouts, failed subscription mandates, overdue B2B receivables. It decides
 rupees against a randomised no-contact holdout, and gates every outbound action
 through a deterministic compliance kernel that emits a signed certificate.
 
-**[Live dashboard →](https://vaibhav375.github.io/recovery-ledger/)** · every
-figure on it is rendered from committed artifacts, not typed in.
+**[Read the dashboard →](https://vaibhav375.github.io/recovery-ledger/)** ·
+every figure on it is rendered from committed artifacts, not typed in.
+
+**[Drive the agent →](https://recovery-ledger-w2lk.onrender.com/)** · the same
+page with the console attached: start a run and watch the loop write its own
+audit trail, fire the red-team suite at the compliance kernel with rules of
+your choosing switched off, re-run a case with one fact of the world changed,
+or tamper with a ledger entry and watch verification catch it. Free hosting, so
+it sleeps when idle — a cold visit takes about a minute to wake.
 
 ---
 
@@ -67,7 +74,9 @@ make live             # the dashboard PLUS a console that drives the real agent
 write its own audit trail, engage the kill switch mid-run, fire the red-team
 suite at the compliance kernel one attack at a time, re-run a case with one fact
 of the world changed, or tamper with a ledger entry and watch verification catch
-it.
+it. All of that is also
+[running here](https://recovery-ledger-w2lk.onrender.com/) if you would rather
+not clone anything.
 
 Two commands worth knowing about:
 
@@ -384,7 +393,9 @@ running.
       more than the quartiles the model reads best. That is epistemic
       inequality rather than disparate treatment.
 
-- [x] **The live console.** `make live` adds a backend — **standard library
+- [x] **The live console.** Hosted at
+      [recovery-ledger-w2lk.onrender.com](https://recovery-ledger-w2lk.onrender.com/),
+      or `make live` adds a backend locally — **standard library
       only**, nothing to install — that drives the real agent from the browser
       on four surfaces:
 
