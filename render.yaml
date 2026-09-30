@@ -1,0 +1,11 @@
+# Render reads this on first deploy, so the service arrives configured rather
+# than assembled by hand in a form.
+services:
+  - type: web
+    name: recovery-ledger-live
+    runtime: docker
+    plan: free
+    region: singapore          # closest to the people this is for
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
