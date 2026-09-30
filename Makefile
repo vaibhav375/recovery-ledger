@@ -1,4 +1,4 @@
-.PHONY: hf-space recalibration tier1-targeting tier1-revenue claims verify-ledger setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet fleet-latency negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
+.PHONY: publish-pages hf-space recalibration tier1-targeting tier1-revenue claims verify-ledger setup test tier1-hillstrom tier1-criteo demo eval baselines sensitivity redteam dashboard listener-eval fleet fleet-latency negotiate frontend-build dashboard-serve frontend-dev live ope fairness pessimism dnd-signal verify-page horizon dr-diagnosis dr-foldsweep uplift-ab lambda-sweep regret
 
 # `uv pip install` honours an ambient VIRTUAL_ENV over the venv it was just
 # told to create. Anyone who runs `make setup` with another virtualenv active
@@ -244,3 +244,9 @@ redteam:
 # which is why it is a container rather than a function.
 hf-space: dashboard
 	python3 tools/build_hf_space.py
+
+# Builds clean and publishes dashboard/dist to gh-pages. Clean because the app
+# code-splits: chunks fetched by dynamic import() appear in no href, so
+# publishing a pruned dist renders a blank page with no error.
+publish-pages:
+	sh tools/publish_pages.sh
