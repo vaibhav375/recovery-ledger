@@ -1,0 +1,28 @@
+# The build context is uploaded before anything runs, so anything large and
+# irrelevant here is time paid on every deploy. .venv alone is 743 MB.
+.venv/
+**/node_modules/
+**/__pycache__/
+*.pyc
+
+.git/
+.github/
+
+# Generated locally; the image builds its own.
+dashboard/dist/
+dashboard/index.html
+demo_ledger.json
+experiments/tier2_simulation/batch_ledger.json
+deploy/
+
+# Raw data and figures the live path never reads.
+data/
+**/*.parquet
+**/*.csv
+**/*.csv.gz
+**/*.png
+**/*.pdf
+
+# Documentation.
+*.md
+!README.md

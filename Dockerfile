@@ -40,6 +40,18 @@ COPY --chown=app:app redteam/attacks.py ./redteam/
 COPY --chown=app:app dashboard/build_dashboard.py ./dashboard/
 COPY --chown=app:app --from=ui /build/dashboard/dist ./dashboard/dist
 
+# Every headline number on the dashboard comes from these: the holdout, the
+# baselines, the calibration checks, the fairness and fleet runs. The ledger
+# below supplies only the case-by-case explorer. Without them the page renders
+# with the structure intact and every value null, which reads as a broken build
+# rather than a missing input — so they are copied explicitly, by name, and a
+# missing one fails the build instead of the page.
+COPY --chown=app:app claims.json ./
+COPY --chown=app:app experiments/ ./experiments/
+RUN test -s experiments/tier2_simulation/results.json \
+    && test -s experiments/uplift_calibration/results_uplift_calibration.json \
+    && test -s claims.json
+
 # The ledger is a generated artifact, not a committed one — running the demo
 # produces it in a few seconds, and generating it here means the image cannot
 # ship a dashboard that disagrees with the code that made it. data.json, which
