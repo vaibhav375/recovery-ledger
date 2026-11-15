@@ -50,7 +50,7 @@ not simulated at all.
 | tier | what it establishes | data |
 |---|---|---|
 | **1a** | The causal estimators recover known effects | Criteo + Hillstrom, real RCTs |
-| **1b** | **Contact produces incremental money** — $597 per 1,000 customers, 95% CI [$378, $822] | Hillstrom `spend`, 64,000 real customers |
+| **1b** | **Contact produces incremental money** — $597 per 1,000 customers, 95% CI [$378, $822], for any email vs none (all three arms pooled); $424, CI [$159, $678], for the women's campaign alone | Hillstrom `spend`, 64,000 real customers (42,693 in the two-arm contrast) |
 | **1c** | **Targeting beats random** — +0.00652/user, 8.94 SEs from zero, policy chosen out of sample | Criteo, 698,980 rows |
 | **2** | Policy comparison, contact budgets, compliance | this simulator |
 
@@ -110,7 +110,7 @@ reports its own false negatives.
 |---|---|
 | [`RESULTS.md`](RESULTS.md) | **Every measured number, with the command that reproduces it** |
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Component contracts, data flow, and the reasoning behind each design decision |
-| [`COMPLIANCE.md`](COMPLIANCE.md) | All 12 kernel rules, each cited to source, plus two ambiguities flagged rather than silently resolved |
+| [`COMPLIANCE.md`](COMPLIANCE.md) | All 13 kernel rules, each cited to source, plus two ambiguities flagged rather than silently resolved |
 | [`ENGINEERING_LOG.md`](ENGINEERING_LOG.md) | Dated build history — including the wrong turns, withdrawn numbers, and bugs found in my own work |
 | [`RAZORPAY_BUILDATHON_TRACK3_SPEC.md`](RAZORPAY_BUILDATHON_TRACK3_SPEC.md) | The original spec this was built against |
 
@@ -154,7 +154,7 @@ evidence the problem is real; it is not something to claim credit for.
 | **N4** | **Contact as a budget-constrained sequential decision problem**, not one-shot classification. | ⚠️ Partial: greedy EV under an explicit budget, plus a finite-horizon lookahead variant. Not a full constrained-MDP solver, and the spec explicitly permits the simplification — but it is a simplification, and the lookahead currently adds nothing measurable. |
 | **Bonus** | **Bounded-authority negotiation with the Section 43B(h) tax clock** (spec 9.4). Invokes the counterparty's *own* tax incentive rather than only chasing. | ✅ Built. NPV solver, kernel-enforced concession envelope, and a measured decision to keep an LLM *out* of the drafting. |
 | **N7** | **A regret ledger — the agent's own false negatives, priced.** Every case it declined to contact, split into refusals a rule forced, refusals the model chose, and cases that simply ran out of attempts. No recovery product publishes what its silences cost. | ✅ Built. On the same cases as the headline: cost **₹134,347**, saved **₹93,679**, **net ₹-40,669** — the silences cost more than they saved, published as such. **170 model errors**: refusals of customers who would have paid. |
-| **N8** | **A claims registry that makes overclaiming a build failure.** Every pre-registered claim, its rule, and its verdict — generated from the artifacts, never written by hand. A claim the evidence refuted cannot be asserted in the documents. | ✅ Built. **4 held · 3 refuted · 1 unresolved.** Appending this project's own retracted "strictly dominates" sentence to RESULTS.md fails the suite. It also fails if every claim ever comes back held, because that would be evidence of selection rather than rigour. |
+| **N8** | **A claims registry that makes overclaiming a build failure.** Every pre-registered claim, its rule, and its verdict — generated from the artifacts, never written by hand. A claim the evidence refuted cannot be asserted in the documents. | ✅ Built. **6 held · 4 refuted · 2 unresolved.** Appending this project's own retracted "strictly dominates" sentence to RESULTS.md fails the suite. It also fails if every claim ever comes back held, because that would be evidence of selection rather than rigour. |
 | **N5** | **Three-tier validation** — causal machinery proven on real randomised public data, then **incremental money measured on a real randomised experiment**, then transfer to the simulator. | ✅ Built. Criteo + Hillstrom for the estimator; Hillstrom `spend` for the money: **$424 incremental revenue per 1,000 customers, 95% CI [$159, $678]**, interval excluding zero, over 42,693 real customers. The targeting claim tested the same way is **not established** — the paired interval covers zero, and that is published too. |
 | **N6** | **Contact-free recovery** — detecting issuer degradation and suppressing retries into a dead issuer. Inverts the assumption that recovery means outreach. | ✅ Built. Change-point detection per issuer/method/region with root-cause attribution; **precision 1.00 / recall 1.00** against ground truth at realistic observation volume. Cuts futile retries into a dead rail **340 → 0** and recovers **+₹50,600**, all on outage-hit cases. Detection is now *measured*, not demonstrated: fires in **8/8 draws at every severity**, median latency 125 attempts for a 20% drop down to 50 for a 78% collapse, with **0 false alarms in 30 control draws**. |
 
@@ -620,11 +620,12 @@ successfully.
 ## What is NOT claimed
 
 - No real-world causal effect size **in rupees**. The ₹272,281-per-1,000-cases
-  figure above is a simulation result. The one money figure grounded outside the
-  simulator is Tier 1b's **$424 per 1,000 customers** on Hillstrom's real
-  randomised spend data — and that is e-commerce email, not Indian payment
-  recovery, so it grounds the method rather than transferring the domain — policy dominance under stated assumptions, in
-  simulation. Everything in `experiments/tier2_simulation/` runs against a
+  figure above is a simulation result: what it supports is a comparison between
+  policies under stated assumptions, in simulation. The one money figure
+  grounded outside the simulator is Tier 1b's **$424 per 1,000 customers**
+  (women's-email arm; $597 pooling all arms) on Hillstrom's real randomised
+  spend data — and that is e-commerce email, not Indian payment recovery, so it
+  grounds the method rather than transferring the domain. Everything in `experiments/tier2_simulation/` runs against a
   simulator calibrated to published marginal benchmarks — that calibrates
   outcome rates, not causal response to intervention. See §7 of the spec, and
   the claim-scope section at the top of `experiments/tier2_simulation/REPORT.md`,
