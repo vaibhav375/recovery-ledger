@@ -1476,3 +1476,22 @@ threshold, so it needs its own replicated A/B rather than a patch and a
 re-quoted headline. Logged in PROJECT_STATE §6 Tier B as the best-supported
 follow-up in the file, because for once the fix is aimed at a measured quantity
 instead of a suspected one.
+
+## 2026-11-12 — Four tests failed on a fresh clone, and the README disagreed with itself
+
+A clean `git clone` and `make test` gave 4 failures that my working copy hid.
+Two verifier tests read `experiments/tier2_simulation/batch_ledger.json`, which
+588b1ba replaced with a gzipped copy and gitignored; they passed locally only
+because the old uncompressed file was still on disk. They now read the `.gz`.
+The other two were doc drift the suite exists to catch: RESULTS.md's decile 9
+said 4.8% where the calibration artifact rounds to 4.7%, and PROJECT_STATE.md
+named the gitignored `dashboard/dist` output as a repo path.
+
+The README had three stale figures. The N8 row still said 4 held / 3 refuted /
+1 unresolved while its own intro and `claims.json` said 6 / 4 / 2. The docs
+table said 12 kernel rules; the code has 13 rule IDs. And Tier 1b quoted $597
+while "What is NOT claimed" quoted $424 without saying these are different
+estimands (all arms pooled vs the women's campaign). Each now names which is
+which. `make claims` regenerated with no diff, so the registry itself was right.
+
+Result: 529 passed, 1 skipped from a fresh clone on Python 3.11.

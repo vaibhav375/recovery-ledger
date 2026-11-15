@@ -2,7 +2,7 @@
 
 **Track 03 (AI Revenue Recovery), Razorpay AI Buildathon.**
 Repo: https://github.com/vaibhav375/recovery-ledger (public)
-Deadline: **5 September 2026**. Last updated: **31 August 2026** (5 days out).
+Deadline: **5 September 2026**. Last updated: **12 November 2026**.
 
 > ## How to use this file
 >
@@ -77,12 +77,12 @@ All from committed artifacts, all reproducible from the listed target.
 | Stopping rules | **11 defined, 8 fired** in the headline batch | `make eval` |
 | Compliance kernel | **13 rules**, all with provenance citations | `make redteam` |
 | Ledger | 34,304 entries, chain valid | `make eval` |
-| Claims registry | **6 held · 4 refuted · 2 unresolved**, generated from artifacts | `make claims` | `make claims` | `make claims` | `make claims` | `make claims` | `make claims` |
+| Claims registry | **6 held · 4 refuted · 2 unresolved**, generated from artifacts | `make claims` |
 | Currency | ₹ is the simulator; $ is Hillstrom. Deliberately unreconciled — converting would mean inventing a rate for another team's data | — |
 | Independent audit | **0 violations** over 5,712 certificates / 467 executed contacts, no agent involved | `make verify-ledger` |
 | N6 detection latency | **50 attempts** median at a 78% collapse, monotone in severity, 0 false alarms in 30 controls | `make fleet-latency` |
 | Regret — what the silences cost | 554 declined cases: cost ₹134,347, saved ₹93,679, **net ₹-40,669**; pre-registered prediction (170 model errors) HOLDS | `make regret` |
-| Tests | **530 passing** across 45 files | `make test` |
+| Tests | **530** across 45 files (529 pass, 1 skipped), green from a fresh clone | `make test` |
 
 ---
 
@@ -305,6 +305,12 @@ definition of done — that is §7.
 - [x] **The "348 tests" commit.** Resolved by the rewrite above — that commit
       no longer exists on `main`. It survives only in the local backup refs,
       which are disposable.
+- [x] **Green from a fresh clone.** 12 November 2026. A clean `git clone` had
+      4 failing tests: two verifier tests still opened the plain
+      `batch_ledger.json` after it was committed gzipped, RESULTS.md's decile 9
+      read 4.8% against an artifact that rounds to 4.7%, and this file named a
+      gitignored build output as a repo path. All fixed; README's claims count,
+      kernel rule count and Hillstrom figures now match the artifacts.
 
 ## 7. Definition of done (spec §17)
 
