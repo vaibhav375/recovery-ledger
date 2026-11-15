@@ -115,11 +115,12 @@ def test_non_contact_actions_do_not_require_an_allowing_certificate():
 
 def test_the_real_committed_ledger_verifies():
     """The artifact the project actually ships."""
+    import gzip
     import json
     from pathlib import Path
 
-    raw = json.loads((Path(__file__).resolve().parents[1]
-                      / "experiments" / "tier2_simulation" / "batch_ledger.json").read_text())
+    raw = json.loads(gzip.decompress((Path(__file__).resolve().parents[1]
+                      / "experiments" / "tier2_simulation" / "batch_ledger.json.gz").read_bytes()))
     entries = raw["entries"] if isinstance(raw, dict) else raw
     report = verify_ledger(entries)
     assert report.ok, f"the shipped ledger does not verify: {report.violations[:3]}"
@@ -130,14 +131,15 @@ def test_a_tampered_ledger_is_caught_by_the_chain():
     """The other half of the guarantee: internal consistency means nothing if
     the file can be edited after the fact. Flip one recorded decision and the
     hash chain must refuse it."""
+    import gzip
     import json
     from pathlib import Path
 
     from recovery_ledger.kernel.verifier import verify_ledger
     from recovery_ledger.ledger.ledger import Ledger
 
-    raw = json.loads((Path(__file__).resolve().parents[1]
-                      / "experiments" / "tier2_simulation" / "batch_ledger.json").read_text())
+    raw = json.loads(gzip.decompress((Path(__file__).resolve().parents[1]
+                      / "experiments" / "tier2_simulation" / "batch_ledger.json.gz").read_bytes()))
     entries = raw["entries"] if isinstance(raw, dict) else raw
 
     tampered = [dict(e) for e in entries]
