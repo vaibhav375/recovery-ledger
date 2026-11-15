@@ -377,5 +377,5 @@ Then confirm the invariants that have actually broken before:
 
 **Note on ordering:** `make dashboard` depends on `frontend-build` and must run
 *after* it. Running `make frontend-build` alone used to delete
-`dashboard/dist/data.json`; that is fixed (`emptyOutDir: false`) and tested, but
+the generated data.json in the dashboard build folder; that is fixed (`emptyOutDir: false`) and tested, but
 the dependency direction is still worth knowing.
